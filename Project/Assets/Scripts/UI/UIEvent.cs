@@ -5,7 +5,7 @@ namespace OnLooker
 {
     namespace UI
     {
-        //public delegate void UIEvent(UIToggle aSender, UIEventArgs aArgs);
+        public delegate void UIEvent(UIToggle aSender, UIEventArgs aArgs);
 
         public enum UIEventType
         {
