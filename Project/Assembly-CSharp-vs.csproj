@@ -50,9 +50,13 @@
      <Compile Include="Assets\Scripts\UI\UIEvent.cs" />
      <Compile Include="Assets\Scripts\UI\UIEventHandler.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
+     <Compile Include="Assets\Scripts\UI\UIText.cs" />
+     <Compile Include="Assets\Scripts\UI\UITexture.cs" />
      <Compile Include="Assets\Scripts\UI\UIToggle.cs" />
      <Compile Include="Assets\Scripts\UI\UIUtilities.cs" />
      <Compile Include="Assets\Scripts\Utilities\OnLookerUtils.cs" />
+     <Compile Include="Assets\Scripts\Utilities\TempBounds.cs" />
+     <None Include="Assets\Shaders\3DTextShader.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

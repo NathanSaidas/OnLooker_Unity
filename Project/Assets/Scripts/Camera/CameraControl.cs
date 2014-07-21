@@ -39,9 +39,5 @@ public class CameraControl : MonoBehaviour
                 transform.position = Vector3.Lerp(transform.position, transform.position + Vector3.forward * m_CameraSpeed, 5.0f * Time.deltaTime);
             }
         }
-        
-
-        
-
 	}
 }

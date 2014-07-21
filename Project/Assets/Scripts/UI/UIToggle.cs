@@ -11,7 +11,7 @@ namespace OnLooker
         public class UIToggle : MonoBehaviour
         {
             //Whether or not to show debug information
-            [SerializeField()]//[HideInInspector()]
+            [SerializeField()][HideInInspector()]
             private bool m_Debug = false;
 
 
