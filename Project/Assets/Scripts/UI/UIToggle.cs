@@ -11,82 +11,156 @@ namespace OnLooker
         public class UIToggle : MonoBehaviour
         {
             //Whether or not to show debug information
-            [SerializeField()]
-            //[HideInInspector()]
+            [SerializeField()]//[HideInInspector()]
             private bool m_Debug = false;
 
 
             //A reference to the UI Manager
-            [SerializeField()]
-            //[HideInInspector()]
+            [SerializeField()]//[HideInInspector()]
             protected UIManager m_Manager = null;
 
 
             //The name of the toggle - For UIManager
-            [SerializeField()]
-            //[HideInInspector()]
+            [SerializeField()]//[HideInInspector()]
             protected string m_ToggleName = string.Empty;
-            protected bool m_MouseInBounds = false;
-            protected bool m_IsFocused = false;
 
-            [SerializeField()]
-            //[HideInInspector()]
+            
+            //Whether or not the toggle is interactive
+            [SerializeField()]//[HideInInspector()]
             private bool m_Interactive = false;
 
-            [SerializeField()]
-            //[HideInInspector()]
+            //Input Control
+            [SerializeField()]//[HideInInspector()]
             protected bool m_TrapDoubleClick = false;
             protected float m_LastClick = 0.0f;
 
             //private UIHandler m_Handler = null;
             private event UIEvent m_UIEvent;
 
-            
+
+            [SerializeField()]
+            protected Vector3 m_OffsetPosition = Vector3.zero;
+            [SerializeField()]
+            protected Vector3 m_OffsetRotation = Vector3.zero;
+
+            [SerializeField()]
+            protected Transform m_AnchorTarget = null;
+            [SerializeField()]
+            protected UIAnchor m_AnchorMode = UIAnchor.CAMERA;
+            [SerializeField()]
+            protected bool m_FaceCamera = true;
+            [SerializeField()]
+            protected bool m_SmoothTransform = true;
+
+
             
 
-            public bool debug
+
+            //User accessible flags
+            protected bool m_MouseInBounds = false;
+            protected bool m_IsFocused = false;
+
+
+            private void Update()
             {
-                get { return m_Debug; }
-                set { m_Debug = value; }
-            }
-            public UIManager manager
-            {
-                get { return m_Manager; }
-            }
-            public string toggleName
-            {
-                get { return m_ToggleName; }
-                set { m_ToggleName = value; }
-            }
-            public bool mouseInBounds
-            {
-                get { return m_MouseInBounds; }
-            }
-            public bool isFocused
-            {
-                get { return m_IsFocused; }
-            }
-            public bool isInteractive
-            {
-                get { return m_Interactive; }
-                set
+                if (Application.isPlaying == true)
                 {
-                    m_Interactive = value;
-                    if (m_Interactive == true)
-                    {
-                        gameObject.layer = UIManager.uiLayer;
-                    }
+                    updateTransform();
+                    gameUpdate();
                 }
             }
-            public bool trapDoubleClick
+            private void FixedUpdate()
             {
-                get { return m_TrapDoubleClick; }
-                set { m_TrapDoubleClick = value; }
+                if (Application.isPlaying == true)
+                {
+                    gameFixedUpdate();
+                }
             }
-            public float lastClick
+
+            protected virtual void gameUpdate()
             {
-                get { return m_LastClick; }
+
             }
+            protected virtual void gameFixedUpdate()
+            {
+
+            }
+
+
+            public void updateTransform()
+            {
+                
+                //The manager is required for the camera
+                //If there is no manager or camera this function returns and does nothing
+                if(m_Manager == null)
+                {
+                    Debug.Log("UIToggle: No Manager");
+                    return;
+                }
+                Camera currentCamera = m_Manager.currentCamera;
+                if(currentCamera == null)
+                {
+                    Debug.Log("UIToggle: No Camera");
+                    return;
+                }
+                
+
+                switch (m_AnchorMode)
+                {
+                    case UIAnchor.NONE:
+                        {
+                            //Position is whereever the user sets the transform
+                            if (m_FaceCamera == true)
+                            {
+                                transform.LookAt(transform.position + currentCamera.transform.rotation * Vector3.forward, currentCamera.transform.rotation * Vector3.up);
+                                transform.Rotate(m_OffsetRotation);
+                            }
+                        }
+                        break;
+                    case UIAnchor.CAMERA:
+                        {
+                            //Position is offset from the camera local position / rotation
+                            //The camera does not lerp
+                            Vector3 position = currentCamera.transform.position + currentCamera.transform.rotation * m_OffsetPosition; ;
+                            transform.position = position;
+                            //Override m_FaceCamera to be true by default when attached to the camera
+                            transform.LookAt(transform.position + currentCamera.transform.rotation * Vector3.forward, currentCamera.transform.rotation * Vector3.up);
+                            transform.Rotate(m_OffsetRotation);
+                        }
+                        break;
+                    case UIAnchor.OBJECT:
+                        {
+                            if (m_AnchorTarget == null)
+                            {
+                                return;
+                            }
+                            //Set position based on offset
+                            Vector3 position = m_AnchorTarget.position + m_AnchorTarget.rotation * m_OffsetPosition;
+                            if (m_SmoothTransform == true)
+                            {
+                                transform.position = Vector3.Lerp(transform.position, position, 5.0f * Time.deltaTime);
+                            }
+                            else
+                            {
+                                transform.position = position;
+                            }
+                            //Set rotation based on offset
+                            if (m_FaceCamera == true)
+                            {
+                                transform.LookAt(transform.position + currentCamera.transform.rotation * Vector3.forward, currentCamera.transform.rotation * Vector3.up);
+                                transform.Rotate(m_OffsetRotation);
+                            }
+                            else
+                            {
+                                transform.rotation = m_AnchorTarget.rotation;
+                                transform.Rotate(m_OffsetRotation);
+                            }
+                        }
+                        break;
+                }
+            }
+
+            
 
             public void registerEvent(UIEvent aCallback)
             {
@@ -102,7 +176,6 @@ namespace OnLooker
                     m_UIEvent -= aCallback;
                 }
             }
-
             public void processEvents()
             {
                 bool action = false;
@@ -236,6 +309,7 @@ namespace OnLooker
                 }
             }
 
+            //For UIManager
             public void setFocus(bool aFocus)
             {
                 if (m_IsFocused == aFocus)
@@ -327,6 +401,78 @@ namespace OnLooker
                 }
             }
             #endregion
+            #region Properties
+            public bool debug
+            {
+                get { return m_Debug; }
+                set { m_Debug = value; }
+            }
+            public UIManager manager
+            {
+                get { return m_Manager; }
+            }
+            public string toggleName
+            {
+                get { return m_ToggleName; }
+                set { m_ToggleName = value; }
+            }
+            public bool mouseInBounds
+            {
+                get { return m_MouseInBounds; }
+            }
+            public bool isFocused
+            {
+                get { return m_IsFocused; }
+            }
+            public bool isInteractive
+            {
+                get { return m_Interactive; }
+                set
+                {
+                    m_Interactive = value;
+                    if (m_Interactive == true)
+                    {
+                        gameObject.layer = UIManager.uiLayer;
+                    }
+                }
+            }
+            public bool trapDoubleClick
+            {
+                get { return m_TrapDoubleClick; }
+                set { m_TrapDoubleClick = value; }
+            }
+            public float lastClick
+            {
+                get { return m_LastClick; }
+            }
+
+            public Vector3 offsetPosition
+            {
+                get { return m_OffsetPosition; }
+                set { m_OffsetPosition = value; }
+            }
+            public Vector3 offsetRotation
+            {
+                get { return m_OffsetRotation; }
+                set { m_OffsetRotation = value; }
+            }
+            public Transform anchorTarget
+            {
+                get { return m_AnchorTarget; }
+                set { m_AnchorTarget = value; }
+            }
+            public UIAnchor anchorMode
+            {
+                get { return m_AnchorMode; }
+                set { m_AnchorMode = value; }
+            }
+            public bool smoothTransform
+            {
+                get { return m_SmoothTransform; }
+                set { m_SmoothTransform = value; }
+            }
+
+#endregion
         }
     }
 }

@@ -18,8 +18,10 @@ namespace OnLooker
                 get { return m_UILayer; }
                 set { m_UILayer = value; }
             }
-
-            public Camera m_Camera;
+            [SerializeField()]
+            private Camera m_MainCamera;
+            [SerializeField()]
+            private Camera m_UserCamera;
             public UIToggle[] m_Toggles;
 
             [SerializeField]
@@ -60,7 +62,7 @@ namespace OnLooker
             {
                 int layer = 1 << m_UILayer;
                 RaycastHit hit;
-                Ray ray = m_Camera.ScreenPointToRay(Input.mousePosition);
+                Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition);
 
                 //Do a raycast to hit a toggle
                 if (Physics.Raycast(ray, out hit, m_GUIDistance, layer))
@@ -160,6 +162,29 @@ namespace OnLooker
                     
                 }
                 return uiToggle;
+            }
+
+            public Camera mainCamera
+            {
+                get{return m_MainCamera;}
+                set{m_MainCamera = value;}
+            }
+            public Camera userCamera
+            {
+                get{return m_UserCamera;}
+                set{m_UserCamera = value;}
+            }
+            public Camera currentCamera
+            {
+                get
+                {
+                    if (m_UserCamera != null)
+                    {
+                        return m_UserCamera;
+                    }
+                return m_MainCamera;
+                }
+                
             }
         }
     }
