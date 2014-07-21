@@ -41,6 +41,9 @@ namespace OnLooker
             //private UIHandler m_Handler = null;
             private event UIEvent m_UIEvent;
 
+            
+            
+
             public bool debug
             {
                 get { return m_Debug; }
@@ -66,7 +69,14 @@ namespace OnLooker
             public bool isInteractive
             {
                 get { return m_Interactive; }
-                set { m_Interactive = value; }
+                set
+                {
+                    m_Interactive = value;
+                    if (m_Interactive == true)
+                    {
+                        gameObject.layer = UIManager.uiLayer;
+                    }
+                }
             }
             public bool trapDoubleClick
             {
@@ -248,6 +258,7 @@ namespace OnLooker
             {
                 if (m_UIEvent != null && m_Interactive == true)
                 {
+                    m_MouseInBounds = true;
                     m_UIEvent.Invoke(this, new UIEventArgs(UIEventType.ENTER));
                 }
             }
@@ -255,6 +266,7 @@ namespace OnLooker
             {
                 if (m_UIEvent != null && m_Interactive == true)
                 {
+                    m_MouseInBounds = false;
                     m_UIEvent.Invoke(this, new UIEventArgs(UIEventType.EXIT));
                 }
             }

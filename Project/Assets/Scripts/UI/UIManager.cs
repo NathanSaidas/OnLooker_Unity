@@ -11,9 +11,9 @@ namespace OnLooker
 
             public const float DOUBLE_CLICK_TIME = 0.5f;
 
-            private int m_UILayer = 9;
+            private static int m_UILayer = 9;
 
-            public int uiLayer
+            public static int uiLayer
             {
                 get { return m_UILayer; }
                 set { m_UILayer = value; }

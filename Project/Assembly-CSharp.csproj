@@ -50,6 +50,7 @@
      <Compile Include="Assets\Scripts\UI\UIEventHandler.cs" />
      <Compile Include="Assets\Scripts\UI\UIManager.cs" />
      <Compile Include="Assets\Scripts\UI\UIToggle.cs" />
+     <Compile Include="Assets\Scripts\UI\UIUtilities.cs" />
      <Compile Include="Assets\Scripts\Utilities\OnLookerUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
