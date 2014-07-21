@@ -492,6 +492,11 @@ namespace OnLooker
                 get { return m_AnchorMode; }
                 set { m_AnchorMode = value; }
             }
+            public bool faceCamera
+            {
+                get { return m_FaceCamera; }
+                set { m_FaceCamera = value; }
+            }
             public bool smoothTransform
             {
                 get { return m_SmoothTransform; }

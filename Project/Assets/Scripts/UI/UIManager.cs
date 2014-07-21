@@ -350,6 +350,38 @@ namespace OnLooker
 
                 return uiTexture;
             }
+
+            public UILabel createUILabel(UIArguments aArgs, out UIText aText, out UILabel aLabel)
+            {
+                aText = null;
+                aLabel = null;
+                if (aArgs == null)
+                {
+                    return null;
+                }
+                if (aArgs.toggleName == string.Empty)
+                {
+                    Debug.Log("This toggle has no name");
+                    return null;
+                }
+                if (getToggle(aArgs.toggleName) != null)
+                {
+                    Debug.Log("Toggle with that name already exists");
+                    return null;
+                }
+
+                //Create GameObject
+                GameObject go = new GameObject("UI Label (" + aArgs.toggleName + ")");
+                go.layer = UI_LAYER;
+
+                //Save the toggleName for later
+                string toggleName = aArgs.toggleName;
+                aArgs.toggleName = aArgs.toggleName + "_Text";
+                UIText uiText = createUIText(aArgs);
+
+
+                return null;
+            }
         }
     }
 }

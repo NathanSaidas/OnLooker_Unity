@@ -6,6 +6,8 @@ namespace OnLooker
 {
     namespace UI
     {
+
+        public delegate void TextChanged(UIText aSender, string aText);
         [Serializable]
         public class UIText : UIToggle
         {
@@ -29,6 +31,8 @@ namespace OnLooker
             private Material m_TextMaterial = null;
 
             private bool m_UpdateText = false;
+            private TextChanged m_TextChanged;
+            private TextChanged m_TextChangedImmediate;
             
 
             // Use this for initialization
@@ -38,6 +42,16 @@ namespace OnLooker
                 init();
                 m_UpdateText = true;
             }
+
+            public void setTextChanged(TextChanged aCallback)
+            {
+                m_TextChanged = aCallback;
+            }
+            public void setTextChangedImmediate(TextChanged aCallback)
+            {
+                m_TextChangedImmediate = aCallback;
+            }
+            
 
             public void init()
             {
@@ -73,12 +87,7 @@ namespace OnLooker
 
                 if (isInteractive == true && m_UpdateText == true)
                 {
-                    if (m_UpdateText == true)
-                    {
-                        Debug.Log("Updating Text");
-                        m_UpdateText = false;
-                    }
-
+                    m_UpdateText = false;
                     BoxCollider boxCollider = GetComponent<BoxCollider>();
                     if (boxCollider != null)
                     {
@@ -93,6 +102,11 @@ namespace OnLooker
                     }
                     boxCollider = gameObject.AddComponent<BoxCollider>();
                     boxCollider.isTrigger = true;
+
+                    if (m_TextChanged != null && Application.isPlaying == true)
+                    {
+                        m_TextChanged.Invoke(this, text);
+                    }
                 }
             }
             public void clear()
@@ -108,6 +122,10 @@ namespace OnLooker
                 {
                     if (value != m_TextMesh.text)
                     {
+                        if (m_TextChangedImmediate != null && Application.isPlaying == true)
+                        {
+                            m_TextChangedImmediate.Invoke(this, value);
+                        }
                         m_UpdateText = true;
                     }
                     m_TextMesh.text = value;
