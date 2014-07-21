@@ -26,6 +26,10 @@ namespace OnLooker
                 inspected.updateTransform();
                 inspected.smoothTransform = smoothTransform;
 
+                if (inspected.isInteractive == true)
+                {
+                    inspected.gameObject.layer = UIManager.UI_LAYER;
+                }
             }
         }
     }

@@ -432,7 +432,7 @@ namespace OnLooker
                     m_Interactive = value;
                     if (m_Interactive == true)
                     {
-                        gameObject.layer = UIManager.uiLayer;
+                        gameObject.layer = UIManager.UI_LAYER;
                     }
                 }
             }

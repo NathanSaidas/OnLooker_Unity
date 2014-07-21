@@ -29,7 +29,7 @@ namespace OnLooker
             private Material m_TextMaterial = null;
 
             private bool m_UpdateText = true;
-
+            
 
             // Use this for initialization
             void Start()

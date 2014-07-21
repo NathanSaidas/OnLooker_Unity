@@ -8,46 +8,41 @@ namespace OnLooker
     {
         public class UIManager : MonoBehaviour
         {
-
+            //CONSTANTS
             public const float DOUBLE_CLICK_TIME = 0.5f;
+            public const int UI_LAYER = 9;
 
-            private static int m_UILayer = 9;
-
-            public static int uiLayer
-            {
-                get { return m_UILayer; }
-                set { m_UILayer = value; }
-            }
             [SerializeField()]
-            private Camera m_MainCamera;
+            private Font m_DefaultFont = null;
             [SerializeField()]
-            private Camera m_UserCamera;
-            public UIToggle[] m_Toggles;
-
+            private Mesh m_DefaultMesh = null;
+            //The two cameras the UIManager uses
+            [SerializeField()]
+            private Camera m_MainCamera = null;
+            [SerializeField()]
+            private Camera m_UserCamera = null;
+            [SerializeField()]
+            public List<UIToggle> m_Toggles = new List<UIToggle>();
+            //Toggle Currently in focus
             [SerializeField]
             private UIToggle m_FocusedToggle = null;
+
+            //Mouse Controls
             [SerializeField]
             private bool m_AllowClickOff = true;
             [SerializeField]
-            private float m_GUIDistance = Mathf.Infinity;
+            private float m_MouseDistance = Mathf.Infinity;
+
+
+            //Keyboard Controls
             [SerializeField]
             private KeyCode m_NextKey = KeyCode.UpArrow;
             [SerializeField]
             private KeyCode m_PreviousKey = KeyCode.DownArrow;
-
             [SerializeField]
             private KeyCode[] m_ActionKeys;
 
-            public KeyCode[] actionKeys
-            {
-                get { return m_ActionKeys; }
-            }
-
-            public bool allowClickOff
-            {
-                get{return m_AllowClickOff;}
-                set{m_AllowClickOff = value;}
-            }
+            
 
             public void Update()
             {
@@ -60,12 +55,12 @@ namespace OnLooker
 
             public void FixedUpdate()
             {
-                int layer = 1 << m_UILayer;
+                int layer = 1 << UI_LAYER;
                 RaycastHit hit;
                 Ray ray = m_MainCamera.ScreenPointToRay(Input.mousePosition);
 
                 //Do a raycast to hit a toggle
-                if (Physics.Raycast(ray, out hit, m_GUIDistance, layer))
+                if (Physics.Raycast(ray, out hit, m_MouseDistance, layer))
                 {
                     //Does this collider have a toggle?
                     UIToggle toggle = hit.collider.GetComponent<UIToggle>();
@@ -109,10 +104,6 @@ namespace OnLooker
                         unfocusToggle();
                     }
                 }
-
-                
-
-                
             }
 
             public void focusToggle(UIToggle aToggle)
@@ -153,7 +144,7 @@ namespace OnLooker
 
                 if (aInteractive)
                 {
-                    go.layer = uiLayer;
+                    go.layer = UI_LAYER;
                     go.AddComponent<BoxCollider>();
                     //uiToggle.interactive = true;
                 }
@@ -163,6 +154,9 @@ namespace OnLooker
                 }
                 return uiToggle;
             }
+
+
+            #region Properties
 
             public Camera mainCamera
             {
@@ -185,6 +179,66 @@ namespace OnLooker
                 return m_MainCamera;
                 }
                 
+            }
+            public KeyCode nextKey
+            {
+                get { return m_NextKey; }
+                set { m_NextKey = value; }
+            }
+            public KeyCode previousKey
+            {
+                get { return m_PreviousKey; }
+                set { m_PreviousKey = value; }
+            }
+            public KeyCode[] actionKeys
+            {
+                get { return m_ActionKeys; }
+            }
+
+            public bool allowClickOff
+            {
+                get { return m_AllowClickOff; }
+                set { m_AllowClickOff = value; }
+            }
+            public float mouseDistance
+            {
+                get { return m_MouseDistance; }
+                set { m_MouseDistance = value; }
+            }
+
+            #endregion
+
+
+
+            //CREATION METHODS
+
+            public void createUIText(UIArguments aArgs)
+            {
+                if (aArgs == null)
+                {
+                    return;
+                }
+                //Create GameObject
+                GameObject go = new GameObject("UI Text");
+                go.layer = UI_LAYER;
+                //Set Transform
+                Transform uiTransform = go.transform;
+                uiTransform.parent = transform;
+                //Create Required Components
+                MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+                TextMesh textMesh = go.AddComponent<TextMesh>();
+
+                textMesh.font = m_DefaultFont;
+                //Create UIText
+                UIText uiText = go.AddComponent<UIText>();
+
+            }
+            public void createUITexture(UIArguments aArgs)
+            {
+                if (aArgs == null)
+                {
+                    return;
+                }
             }
         }
     }
