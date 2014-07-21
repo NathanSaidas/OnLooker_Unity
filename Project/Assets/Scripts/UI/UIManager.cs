@@ -57,7 +57,7 @@ namespace OnLooker
             }
             
 
-            public void FixedUpdate()
+            public void LateUpdate()
             {
                 int layer = 1 << UI_LAYER;
                 RaycastHit hit;
@@ -255,7 +255,7 @@ namespace OnLooker
                     return null;
                 }
                 //Create GameObject
-                GameObject go = new GameObject("UI Text");
+                GameObject go = new GameObject("UI Text(" + aArgs.toggleName +  ")");
                 go.layer = UI_LAYER;
                 //Set Transform
                 Transform uiTransform = go.transform;
@@ -305,8 +305,18 @@ namespace OnLooker
                 {
                     return null;
                 }
+                if (aArgs.toggleName == string.Empty)
+                {
+                    Debug.Log("This toggle has no name");
+                    return null;
+                }
+                if (getToggle(aArgs.toggleName) != null)
+                {
+                    Debug.Log("Toggle with that name already exists");
+                    return null;
+                }
                 //Create GameObject
-                GameObject go = new GameObject("UI Text");
+                GameObject go = new GameObject("UI Texture (" + aArgs.toggleName +  ")");
                 go.layer = UI_LAYER;
                 //Set Transform
                 Transform uiTransform = go.transform;
@@ -320,6 +330,7 @@ namespace OnLooker
                 //Create UIText
                 UITexture uiTexture = go.AddComponent<UITexture>();
                 uiTexture.setManager(this);
+                uiTexture.toggleName = aArgs.toggleName;
                 uiTexture.isInteractive = aArgs.interactive;
                 uiTexture.trapDoubleClick = aArgs.trapDoubleClick;
                 uiTexture.offsetPosition = aArgs.position;
@@ -334,6 +345,8 @@ namespace OnLooker
                     BoxCollider col = go.AddComponent<BoxCollider>();
                     col.isTrigger = true;
                 }
+
+                reigsterToggle(uiTexture);
 
                 return uiTexture;
             }

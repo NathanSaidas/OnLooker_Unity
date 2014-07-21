@@ -139,7 +139,7 @@ namespace OnLooker
                         {
                             //Position is offset from the camera local position / rotation
                             //The camera does not lerp
-                            Vector3 position = currentCamera.transform.position + currentCamera.transform.rotation * m_OffsetPosition; ;
+                            Vector3 position = currentCamera.transform.position + currentCamera.transform.rotation * m_OffsetPosition; 
                             transform.position = position;
                             //Override m_FaceCamera to be true by default when attached to the camera
                             transform.LookAt(transform.position + currentCamera.transform.rotation * Vector3.forward, currentCamera.transform.rotation * Vector3.up);

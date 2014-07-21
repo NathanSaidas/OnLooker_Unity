@@ -128,7 +128,7 @@ namespace OnLooker
 
                 if (GUILayout.Button("Create"))
                 {
-                    m_Manager.createUIText(m_Args);
+                    m_Manager.createUITexture(m_Args);
                 }
             }
         }

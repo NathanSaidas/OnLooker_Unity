@@ -36,7 +36,7 @@ namespace OnLooker
             {
 
                 init();
-                
+                m_UpdateText = true;
             }
 
             public void init()
