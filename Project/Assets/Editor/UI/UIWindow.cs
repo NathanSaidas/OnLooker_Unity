@@ -99,6 +99,7 @@ namespace OnLooker
 
             void drawUIText()
             {
+                m_Args.toggleName = EditorGUILayout.TextField("Toggle Name", m_Args.toggleName);
                 m_Args.position = EditorGUILayout.Vector3Field("Position", m_Args.position);
                 m_Args.rotation = EditorGUILayout.Vector3Field("Rotation", m_Args.rotation);
                 m_Args.anchorMode = (UIAnchor)EditorGUILayout.EnumPopup("Anchor Mode", m_Args.anchorMode);
@@ -106,7 +107,7 @@ namespace OnLooker
                 m_Args.interactive = EditorGUILayout.Toggle("Interactive", m_Args.interactive);
                 m_Args.trapDoubleClick = EditorGUILayout.Toggle("Trap Double Click", m_Args.trapDoubleClick);
                 m_Args.text = EditorGUILayout.TextField("Text", m_Args.text);
-
+                m_Args.fontSize = EditorGUILayout.IntField("Font Size", m_Args.fontSize);
                 if (GUILayout.Button("Create"))
                 {
                     m_Manager.createUIText(m_Args);
@@ -116,6 +117,7 @@ namespace OnLooker
             }
             void drawUITexture()
             {
+                m_Args.toggleName = EditorGUILayout.TextField("Toggle Name", m_Args.toggleName);
                 m_Args.position = EditorGUILayout.Vector3Field("Position", m_Args.position);
                 m_Args.rotation = EditorGUILayout.Vector3Field("Rotation", m_Args.rotation);
                 m_Args.anchorMode = (UIAnchor)EditorGUILayout.EnumPopup("Anchor Mode", m_Args.anchorMode);

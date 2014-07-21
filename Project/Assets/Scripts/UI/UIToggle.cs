@@ -60,13 +60,27 @@ namespace OnLooker
             protected bool m_MouseInBounds = false;
             protected bool m_IsFocused = false;
 
+            private void OnDestroy()
+            {
+                if (m_Manager != null)
+                {
+                    m_Manager.unregisterToggle(this);
+                }
+            }
 
             private void Update()
             {
                 if (Application.isPlaying == true)
                 {
-                    updateTransform();
                     gameUpdate();
+                }
+            }
+            private void LateUpdate()
+            {
+                if (Application.isPlaying == true)
+                {
+                    updateTransform();
+                    gameLateUpdate();
                 }
             }
             private void FixedUpdate()
@@ -78,6 +92,10 @@ namespace OnLooker
             }
 
             protected virtual void gameUpdate()
+            {
+
+            }
+            protected virtual void gameLateUpdate()
             {
 
             }
@@ -325,6 +343,14 @@ namespace OnLooker
                 {
                     onUnfocus();
                 }
+            }
+            public void setManager(UIManager aManager)
+            {
+                if (m_Manager != null)
+                {
+                    Debug.LogWarning("More than one UI Manager in the scene possibly?");
+                }
+                m_Manager = aManager;
             }
 
             #region EventHelperFuncs

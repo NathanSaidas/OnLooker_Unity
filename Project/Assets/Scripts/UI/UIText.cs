@@ -24,20 +24,16 @@ namespace OnLooker
             //smoothTransform
 
             [SerializeField]
-            private TextMesh m_TextMesh;
+            private TextMesh m_TextMesh = null;
             [SerializeField]
             private Material m_TextMaterial = null;
 
-            private bool m_UpdateText = true;
+            private bool m_UpdateText = false;
             
 
             // Use this for initialization
             void Start()
             {
-                if (m_TextMesh == null)
-                {
-                    m_TextMesh = GetComponent<TextMesh>();
-                }
 
                 init();
                 
@@ -45,13 +41,17 @@ namespace OnLooker
 
             public void init()
             {
+                if (m_TextMesh == null)
+                {
+                    m_TextMesh = GetComponent<TextMesh>();
+                }
                 if (m_TextMesh != null && m_TextMaterial == null)
                 {
                     MeshRenderer meshRenderer = m_TextMesh.GetComponent<MeshRenderer>();
                     if (meshRenderer != null)
                     {
-                        meshRenderer.material = new Material(meshRenderer.sharedMaterial);
-                        m_TextMaterial = meshRenderer.material;
+                        m_TextMaterial = new Material(meshRenderer.sharedMaterial);
+                        meshRenderer.material = m_TextMaterial;
                     }
                 }
             }
@@ -64,22 +64,40 @@ namespace OnLooker
             {
                 
             }
-
+            public bool shouldUpdateText
+            {
+                get { return m_UpdateText; }
+            }
             public void updateText()
             {
+
                 if (isInteractive == true && m_UpdateText == true)
                 {
+                    if (m_UpdateText == true)
+                    {
+                        Debug.Log("Updating Text");
+                        m_UpdateText = false;
+                    }
+
                     BoxCollider boxCollider = GetComponent<BoxCollider>();
-                    if (Application.isPlaying == true)
+                    if (boxCollider != null)
                     {
-                        DestroyImmediate(boxCollider);
+                        if (Application.isPlaying == true)
+                        {
+                            Destroy(boxCollider);
+                        }
+                        else
+                        {
+                            DestroyImmediate(boxCollider);
+                        }
                     }
-                    else
-                    {
-                        Destroy(boxCollider);
-                    }
-                    gameObject.AddComponent<BoxCollider>();
+                    boxCollider = gameObject.AddComponent<BoxCollider>();
+                    boxCollider.isTrigger = true;
                 }
+            }
+            public void clear()
+            {
+                m_UpdateText = false;
             }
 
 

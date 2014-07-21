@@ -15,7 +15,11 @@ namespace OnLooker
             [SerializeField()]
             private Font m_DefaultFont = null;
             [SerializeField()]
+            private Material m_DefaultFontMaterial = null;
+            [SerializeField()]
             private Mesh m_DefaultMesh = null;
+            [SerializeField()]
+            private Material m_DefaultMaterial = null;
             //The two cameras the UIManager uses
             [SerializeField()]
             private Camera m_MainCamera = null;
@@ -208,15 +212,47 @@ namespace OnLooker
 
             #endregion
 
+            public UIToggle getToggle(string aName)
+            {
+                for (int i = 0; i < m_Toggles.Count; i++)
+                {
+                    if (m_Toggles[i].toggleName == aName)
+                    {
+                        return m_Toggles[i];
+                    }
+                }
+                return null;
+            }
+            private void reigsterToggle(UIToggle aToggle)
+            {
+                if (aToggle != null)
+                {
+                    m_Toggles.Add(aToggle);
+                }
+            }
+            public void unregisterToggle(UIToggle aToggle)
+            {
+                m_Toggles.Remove(aToggle);
+            }
 
 
             //CREATION METHODS
 
-            public void createUIText(UIArguments aArgs)
+            public UIText createUIText(UIArguments aArgs)
             {
                 if (aArgs == null)
                 {
-                    return;
+                    return null;
+                }
+                if (aArgs.toggleName == string.Empty)
+                {
+                    Debug.Log("This toggle has no name");
+                    return null;
+                }
+                if (getToggle(aArgs.toggleName) != null)
+                {
+                    Debug.Log("Toggle with that name already exists");
+                    return null;
                 }
                 //Create GameObject
                 GameObject go = new GameObject("UI Text");
@@ -229,16 +265,77 @@ namespace OnLooker
                 TextMesh textMesh = go.AddComponent<TextMesh>();
 
                 textMesh.font = m_DefaultFont;
+                textMesh.characterSize = 0.1f;
+                textMesh.anchor = TextAnchor.MiddleCenter;
+                textMesh.alignment = TextAlignment.Center;
+
+                meshRenderer.material = m_DefaultFontMaterial;
                 //Create UIText
                 UIText uiText = go.AddComponent<UIText>();
+                uiText.setManager(this);
+                uiText.toggleName = aArgs.toggleName;
+                uiText.isInteractive = aArgs.interactive;
+                uiText.trapDoubleClick = aArgs.trapDoubleClick;
+                uiText.offsetPosition = aArgs.position;
+                uiText.offsetRotation = aArgs.rotation;
+                uiText.anchorMode = aArgs.anchorMode;
+                uiText.smoothTransform = aArgs.smoothTransform;
+                uiText.init();
+                uiText.text = aArgs.text;
+                uiText.fontSize = aArgs.fontSize;
+                uiText.clear();
 
+                if (uiText.isInteractive == true)
+                {
+                    BoxCollider col = go.AddComponent<BoxCollider>();
+                    col.isTrigger = true;
+                }
+                bool smoothTransform = uiText.smoothTransform;
+                uiText.smoothTransform = false;
+                uiText.updateTransform();
+                uiText.smoothTransform = smoothTransform;
+
+                reigsterToggle(uiText);
+
+                return uiText;
             }
-            public void createUITexture(UIArguments aArgs)
+            public UITexture createUITexture(UIArguments aArgs)
             {
                 if (aArgs == null)
                 {
-                    return;
+                    return null;
                 }
+                //Create GameObject
+                GameObject go = new GameObject("UI Text");
+                go.layer = UI_LAYER;
+                //Set Transform
+                Transform uiTransform = go.transform;
+                uiTransform.parent = transform;
+                //Create Required Components
+                MeshRenderer meshRenderer = go.AddComponent<MeshRenderer>();
+                MeshFilter meshFilter = go.AddComponent<MeshFilter>();
+
+                meshFilter.mesh = m_DefaultMesh;
+                meshRenderer.material = m_DefaultMaterial;
+                //Create UIText
+                UITexture uiTexture = go.AddComponent<UITexture>();
+                uiTexture.setManager(this);
+                uiTexture.isInteractive = aArgs.interactive;
+                uiTexture.trapDoubleClick = aArgs.trapDoubleClick;
+                uiTexture.offsetPosition = aArgs.position;
+                uiTexture.offsetRotation = aArgs.rotation;
+                uiTexture.anchorMode = aArgs.anchorMode;
+                uiTexture.smoothTransform = aArgs.smoothTransform;
+                uiTexture.init();
+                uiTexture.texture = aArgs.texture;
+
+                if (uiTexture.isInteractive == true)
+                {
+                    BoxCollider col = go.AddComponent<BoxCollider>();
+                    col.isTrigger = true;
+                }
+
+                return uiTexture;
             }
         }
     }

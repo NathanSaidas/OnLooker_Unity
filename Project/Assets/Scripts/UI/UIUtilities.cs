@@ -15,6 +15,7 @@ namespace OnLooker
         [Serializable()]
         public class UIArguments
         {
+            private string m_ToggleName = string.Empty;
             private Vector3 m_Position = Vector3.zero;
             private Vector3 m_Rotation = Vector3.zero;
             private UIAnchor m_AnchorMode = UIAnchor.CAMERA;
@@ -23,10 +24,16 @@ namespace OnLooker
             private bool m_TrapDoubleClick = false;
 
 
-            private string m_Text;
+            private string m_Text = string.Empty;
+            private int m_FontSize = 20;
 
-            private Texture m_Texture;
+            private Texture m_Texture = null;
 
+            public string toggleName
+            {
+                get { return m_ToggleName; }
+                set { m_ToggleName = value; }
+            }
             public Vector3 position
             {
                 get { return m_Position; }
@@ -62,6 +69,11 @@ namespace OnLooker
             {
                 get { return m_Text; }
                 set { m_Text = value; }
+            }
+            public int fontSize
+            {
+                get { return m_FontSize; }
+                set { m_FontSize = value; }
             }
             public Texture texture
             {
