@@ -18,18 +18,42 @@ namespace OnLooker
 
         public static bool anyMouseButtonDown()
         {
-            if (Input.GetMouseButtonDown((int)MouseButton.LEFT))
+
+            return anyMouseButtonDown(false);
+        }
+        public static bool anyMouseButtonDown(bool aContinous)
+        {
+            if (aContinous == true)
             {
-                return true;
+                if (Input.GetMouseButton((int)MouseButton.LEFT))
+                {
+                    return true;
+                }
+                if (Input.GetMouseButton((int)MouseButton.MIDDLE))
+                {
+                    return true;
+                }
+                if (Input.GetMouseButton((int)MouseButton.RIGHT))
+                {
+                    return true;
+                }
             }
-            if (Input.GetMouseButtonDown((int)MouseButton.MIDDLE))
+            else
             {
-                return true;
+                if (Input.GetMouseButtonDown((int)MouseButton.LEFT))
+                {
+                    return true;
+                }
+                if (Input.GetMouseButtonDown((int)MouseButton.MIDDLE))
+                {
+                    return true;
+                }
+                if (Input.GetMouseButtonDown((int)MouseButton.RIGHT))
+                {
+                    return true;
+                }
             }
-            if (Input.GetMouseButtonDown((int)MouseButton.RIGHT))
-            {
-                return true;
-            }
+
             return false;
         }
 

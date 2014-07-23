@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 
@@ -8,7 +9,7 @@ namespace OnLooker
     {
         //UIImage does not make use of UIText
 
-        
+        [Serializable]
         public class UIImage : UIControl
         {
             public void fun()

@@ -62,6 +62,8 @@ namespace OnLooker
             [SerializeField]
             protected bool m_IsFocused = false;
 
+
+
             private void OnDestroy()
             {
                 if (m_Manager != null)

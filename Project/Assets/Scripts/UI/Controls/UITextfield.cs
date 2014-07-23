@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace OnLooker
 {
     namespace UI
     {
         [Serializable]
-        public class UILabel : UIControl
+        public class UITextfield : UIControl
         {
-            //public const int NO_LIMIT = -1;
-
             [SerializeField]
             private bool m_FixedBackground = false;
             [SerializeField]
@@ -18,12 +16,11 @@ namespace OnLooker
             [SerializeField]
             private Vector2 m_BoarderSize = Vector2.zero;
 
-
             private event TextChanged m_TextChanged;
 
-            //The purpose of this function is to initialize this class
-            //Get references to the required components
-            //And set the default state of them
+            private float m_BackspaceKeyTime = 0.0f;
+            private float m_SpacebarKeyTime = 0.0f;
+
             public override void init()
             {
                 base.init();
@@ -32,7 +29,6 @@ namespace OnLooker
                     m_TextComponent.registerEvent(onUIEvent);
                     m_TextComponent.setTextChanged(onTextChanged);
                     m_TextComponent.setTextChangedImmediate(onTextChangedImmediate);
-                    //After that we can safely check for max characters
                     if (m_MaxCharacter != UIUtilities.NO_LIMIT)
                     {
                         if (m_TextComponent.text.Length > m_MaxCharacter)
@@ -54,20 +50,75 @@ namespace OnLooker
             {
                 if (Application.isPlaying == true)
                 {
+                    //Input
+                    if (m_TextComponent.isFocused == true)
+                    {
+                        string inputString = Input.inputString;
+                        string currentText = text;
+                        string verifiedString = string.Empty;
+
+                        if (inputString.Length > 0)
+                        {
+                            if (inputString[0] > 32 && inputString[0] < 127)
+                            {
+                                verifiedString += inputString[0];
+                            }
+                        }
+                        //Backspace
+                        if (Input.GetKeyDown(KeyCode.Backspace) && currentText.Length > 0)
+                        {
+                            currentText = currentText.Substring(0, currentText.Length - 1);
+                        }
+                        if (Input.GetKey(KeyCode.Backspace) && currentText.Length > 0)
+                        {
+                            m_BackspaceKeyTime += Time.deltaTime;
+                            if (m_BackspaceKeyTime > 0.5f)
+                            {
+                                currentText = currentText.Substring(0, currentText.Length - 1);
+                            }
+                        }
+                        else if (Input.GetKey(KeyCode.Backspace) == false)
+                        {
+                            m_BackspaceKeyTime = 0.0f;
+                        }
+
+                        //Space
+                        if (Input.GetKeyDown(KeyCode.Space))
+                        {
+                            currentText += " ";
+                        }
+                        if (Input.GetKey(KeyCode.Space))
+                        {
+                            m_SpacebarKeyTime += Time.deltaTime;
+                            if (m_BackspaceKeyTime > 0.5f)
+                            {
+                                currentText += " ";
+                            }
+                        }
+                        else
+                        {
+                            m_SpacebarKeyTime = 0.0f;
+                        }
+
+                        currentText += verifiedString;
+                        text = currentText;
+
+
+                    }
+
+                    //End Input
                     updateBackground();
                 }
             }
 
             public void updateBackground()
             {
-                //If this UILabel has a fixed background that means its size is related to the size of the bounds for the collider
-                //which encapsulates the text
+
                 if (m_FixedBackground == true)
                 {
-                    //Get the scale and collider
                     Vector3 scale = m_TextureComponent.transform.localScale;
                     BoxCollider col = m_TextComponent.GetComponent<BoxCollider>();
-                    //Set the scale accordingly
+                    
                     if (col != null)
                     {
                         scale.x = col.size.x * m_TextComponent.transform.localScale.x + m_BoarderSize.x;
@@ -75,9 +126,8 @@ namespace OnLooker
                         m_TextureComponent.transform.localScale = scale;
                     }
                 }
-
-                //Otherwise if there is no fixed background the user is free to set the background to whatever size they want
             }
+
             public void registerUIEvent(UIEvent aCallback)
             {
                 if (m_TextComponent != null)
@@ -110,9 +160,8 @@ namespace OnLooker
 
             protected override void onUIEvent(UIToggle aSender, UIEventArgs aArgs)
             {
-
+                
             }
-
             protected virtual string onTextChanged(UIText aSender, string aText)
             {
                 return aText;
@@ -144,10 +193,6 @@ namespace OnLooker
                 return returnText;
             }
 
-
-
-
-            //This property represents the string of text from the text component
             public string text
             {
                 get
@@ -166,6 +211,7 @@ namespace OnLooker
                     }
                 }
             }
+
             //These properties refer to the texture component
             public Texture backgroundTexture
             {
@@ -198,13 +244,13 @@ namespace OnLooker
                 }
                 set
                 {
-                    if (m_TextureComponent != null )
+                    if (m_TextureComponent != null)
                     {
                         m_TextureComponent.color = value;
                     }
                 }
             }
-            //End Properties
+            
         }
     }
 }

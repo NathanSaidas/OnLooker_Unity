@@ -114,8 +114,6 @@ namespace OnLooker
                             }
                             m_LastHitToggle = toggle;
                             m_LastHitToggle.onMouseEnter();
-                            Debug.Log(m_LastHitToggle.toggleName);
-                            Debug.Log(m_LastHitToggle.mouseInBounds);
                         }
                     }
                 }
@@ -124,8 +122,6 @@ namespace OnLooker
                     if (m_LastHitToggle != null)
                     {
                         m_LastHitToggle.onMouseExit();
-                        Debug.Log(m_LastHitToggle.toggleName);
-                        Debug.Log(m_LastHitToggle.mouseInBounds);
                         m_LastHitToggle = null;
                     }
                     if (m_AllowClickOff == true && OnLookerUtils.anyMouseButtonDown() == true)
@@ -445,7 +441,10 @@ namespace OnLooker
                 aArgs.toggleName = toggleName;
                 aArgs.interactive = interactive;
 
+                bool smoothTransform = uiLabel.smoothTransform;
+                uiLabel.smoothTransform = false;
                 uiLabel.updateTransform();
+                uiLabel.smoothTransform = smoothTransform;
 
                 return uiLabel;
             }
@@ -491,7 +490,10 @@ namespace OnLooker
                 aArgs.toggleName = toggleName;
                 aArgs.interactive = interactive;
 
+                bool smoothTransform = uiImage.smoothTransform;
+                uiImage.smoothTransform = false;
                 uiImage.updateTransform();
+                uiImage.smoothTransform = smoothTransform;
                 return uiImage;
             }
             public UIButton createUIButton(UIArguments aArgs, out UIText aText, out UITexture aTexture)
@@ -549,11 +551,71 @@ namespace OnLooker
                 aArgs.interactive = interactive;
                 aArgs.toggleName = toggleName;
                 //Update the UIButton once
+                bool smoothTransform = uiButton.smoothTransform;
+                uiButton.smoothTransform = false;
                 uiButton.updateTransform();
+                uiButton.smoothTransform = smoothTransform;
 
                 return uiButton;
             }
-            
+            public UITextfield createUITextfield(UIArguments aArgs, out UIText aText, out UITexture aTexture)
+            {
+                aText = null;
+                aTexture = null;
+                if (aArgs == null)
+                {
+                    return null;
+                }
+                if (aArgs.toggleName == string.Empty)
+                {
+                    Debug.Log("This control has no name");
+                    return null;
+                }
+                if (getControl(aArgs.toggleName) != null)
+                {
+                    Debug.Log("A Control with that name already exists");
+                    return null;
+                }
+
+                //Create GameObject
+                GameObject go = new GameObject("UI Textfield (" + aArgs.toggleName + ")");
+                go.layer = UI_LAYER;
+                go.transform.parent = transform;
+
+                //Save the toggleName for later
+                string toggleName = aArgs.toggleName;
+                bool interactive = aArgs.interactive;
+
+                aArgs.interactive = true;
+                aArgs.toggleName = toggleName + "_Text";
+                aText = createUIText(aArgs);
+
+                aArgs.interactive = false;
+                aArgs.toggleName = toggleName + "_Texture";
+                aTexture = createUITexture(aArgs);
+
+                aText.transform.parent = go.transform;
+                aTexture.transform.parent = go.transform;
+
+                UITextfield uiTextfield = go.AddComponent<UITextfield>();
+                uiTextfield.init();
+                uiTextfield.controlName = toggleName;
+                registerControl(uiTextfield);
+                aText.parentControl = uiTextfield;
+                aTexture.parentControl = uiTextfield;
+
+                aArgs.interactive = interactive;
+                aArgs.toggleName = toggleName;
+
+
+                bool smoothTransform = uiTextfield.smoothTransform;
+                uiTextfield.smoothTransform = false;
+                uiTextfield.updateTransform();
+                uiTextfield.smoothTransform = smoothTransform;
+
+
+                return uiTextfield;
+            }
         }
     }
 }

@@ -51,6 +51,7 @@
      <Compile Include="Assets\Scripts\UI\Controls\UIControl.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UIImage.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UILabel.cs" />
+     <Compile Include="Assets\Scripts\UI\Controls\UITextfield.cs" />
      <Compile Include="Assets\Scripts\UI\UIBounce.cs" />
      <Compile Include="Assets\Scripts\UI\UIEvent.cs" />
      <Compile Include="Assets\Scripts\UI\UIEventHandler.cs" />
