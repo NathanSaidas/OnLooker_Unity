@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Camera\CameraControl.cs" />
+     <Compile Include="Assets\Scripts\UI\UIBounce.cs" />
+     <Compile Include="Assets\Scripts\UI\UIControl.cs" />
      <Compile Include="Assets\Scripts\UI\UIEvent.cs" />
      <Compile Include="Assets\Scripts\UI\UIEventHandler.cs" />
      <Compile Include="Assets\Scripts\UI\UILabel.cs" />

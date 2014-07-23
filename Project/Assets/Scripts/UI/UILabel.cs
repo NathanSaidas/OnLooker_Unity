@@ -1,63 +1,109 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 namespace OnLooker
 {
     namespace UI
     {
-
-        public class UILabel : UIEventHandler
+        [Serializable]
+        public class UILabel : UIControl
         {
-            [SerializeField]
-            private UIText m_Text;
-            [SerializeField]
-            private UITexture m_Texture;
+            public const int NO_LIMIT = -1;
 
             [SerializeField]
-            private Vector2 m_BoarderSize;
+            private bool m_FixedBackground = false;
+            [SerializeField]
+            private int m_MaxCharacter = NO_LIMIT;
+            [SerializeField]
+            private Vector2 m_BoarderSize = Vector2.zero;
 
-            private void Start()
+
+            private event UIEvent m_UIEvent;
+            private event TextChanged m_TextChanged;
+
+            //The purpose of this function is to initialize this class
+            //Get references to the required components
+            //And set the default state of them
+            public override void init()
             {
-                init();
-                m_Text.setTextChanged(onTextChanged);
-                m_Text.setTextChangedImmediate(onTextChangedImmediate);
-            }
-
-            public void init()
-            {
-                m_Text = GetComponentInChildren<UIText>();
-                m_Texture = GetComponentInChildren<UITexture>();
-                TextMesh textmesh = m_Text.GetComponent<TextMesh>();
-                if (textmesh != null)
+                base.init();
+                if (Application.isPlaying)
                 {
-                    textmesh.offsetZ = -0.1f;
+                    m_TextComponent.setTextChanged(onTextChanged);
+                    m_TextComponent.setTextChangedImmediate(onTextChangedImmediate);
+                    //After that we can safely check for max characters
+                    if (m_MaxCharacter != NO_LIMIT)
+                    {
+                        if (m_TextComponent.text.Length > m_MaxCharacter)
+                        {
+                            m_TextComponent.text = m_TextComponent.text.Substring(0, m_MaxCharacter - 1);
+                        }
+                    }
                 }
             }
+            public override void deinit()
+            {
+                m_TextComponent.setTextChanged(null);
+                m_TextComponent.setTextChangedImmediate(null);
+                base.deinit();
+            }
+
             private void LateUpdate()
             {
-                
+                if (Application.isPlaying == true)
+                {
+                    updateBackground();
+                }
             }
+
             public void updateBackground()
             {
-                Vector3 scale = m_Texture.transform.localScale;
-                BoxCollider col = m_Text.GetComponent<BoxCollider>();
-                if (col != null)
+                //If this UILabel has a fixed background that means its size is related to the size of the bounds for the collider
+                //which encapsulates the text
+                if (m_FixedBackground == true)
                 {
-                    scale.x = col.size.x * 1.0f + m_BoarderSize.x;
-                    scale.y = col.size.y * 1.0f + m_BoarderSize.y;
-                    m_Texture.transform.localScale = scale;
+                    //Get the scale and collider
+                    Vector3 scale = m_TextureComponent.transform.localScale;
+                    BoxCollider col = m_TextComponent.GetComponent<BoxCollider>();
+                    //Set the scale accordingly
+                    if (col != null)
+                    {
+                        scale.x = col.size.x * m_TextComponent.transform.localScale.x + m_BoarderSize.x;
+                        scale.y = col.size.y * m_TextComponent.transform.localScale.y + m_BoarderSize.y;
+                        m_TextureComponent.transform.localScale = scale;
+                    }
+                }
+
+                //Otherwise if there is no fixed background the user is free to set the background to whatever size they want
+            }
+            public void registerUIEvent(UIEvent aCallback)
+            {
+                if (aCallback != null)
+                {
+                    m_UIEvent += aCallback;
                 }
             }
-            //For editor use only really.
-            public void updateTransform()
+            public void unregisterUIEvent(UIEvent aCallback)
             {
-                if (m_Text != null)
+                if (m_UIEvent != null && aCallback != null)
                 {
-                    m_Text.updateTransform();
+                    m_UIEvent -= aCallback;
                 }
-                if (m_Texture != null)
+            }
+
+            public void registerTextChangedEvent(TextChanged aCallback)
+            {
+                if (aCallback != null)
                 {
-                    m_Texture.updateTransform();
+                    m_TextChanged += aCallback;
+                }
+            }
+            public void unregisterTextChangedEvent(TextChanged aCallback)
+            {
+                if (m_TextChanged != null && aCallback != null)
+                {
+                    m_TextChanged -= aCallback;
                 }
             }
 
@@ -65,209 +111,89 @@ namespace OnLooker
             {
                 
             }
-            protected virtual void onTextChanged(UIText aSender, string aText)
+
+            protected virtual string onTextChanged(UIText aSender, string aText)
             {
-                if (m_Texture == null)
+                return aText;
+            }
+            //Everytime the text changes check to see if we need to refine it
+            protected virtual string onTextChangedImmediate(UIText aSender, string aText)
+            {
+                if (m_TextComponent == null)
                 {
-                    return;
+                    return aText;
                 }
-                Debug.Log("Text Changed: " + aText);
-                //Update Texture Mesh Vertices
-                //BoxCollider boxCol = aSender.GetComponent<BoxCollider>();
-                //m_Center = boxCol.bounds.center;
-                //m_Extents = boxCol.bounds.extents;
-                //
-                //Vector3 scale = new Vector3(m_Extents.x * 2.5f, m_Extents.y * 2.5f, 1.0f);
-                //m_Texture.transform.localScale = scale;
-
-            }
-            protected virtual void onTextChangedImmediate(UIText aSender, string aText)
-            {
-
-            }
-
-            public UIText textComponent
-            {
-                get { return m_Text; }
-                set { m_Text = value; }
-            }
-            public UITexture textureComponent
-            {
-                get { return m_Texture; }
-                set { m_Texture = value; }
+                //If there is a limit on the characters reduce the characters to a substring of the limit
+                if (m_MaxCharacter != NO_LIMIT)
+                {
+                    if (aText.Length > m_MaxCharacter)
+                    {
+                        return aText.Substring(0, m_MaxCharacter - 1);
+                    }
+                }
+                return aText;
             }
 
-            public Vector3 offsetPosition
-            {
-                get
-                {
-                    if (m_Text != null)
-                    {
-                        return m_Text.offsetPosition;
-                    }
-                    return Vector3.zero;
-                }
-                set
-                {
-                    if (m_Text != null)
-                    {
-                        m_Text.offsetPosition = value;
-                    }
-                    if (m_Texture != null)
-                    {
-                        m_Texture.offsetPosition = value;
-                    }
-                }
-            }
-            public Vector3 offsetRotation
-            {
-                get
-                {
-                    if (m_Text != null)
-                    {
-                        return m_Text.offsetRotation;
-                    }
-                    return Vector3.zero;
-                }
-                set
-                {
-                    if (m_Text != null)
-                    {
-                        m_Text.offsetRotation = value;
-                    }
-                    if (m_Texture != null)
-                    {
-                        m_Texture.offsetRotation = value;
-                    }
-                }
-            }
-            public Transform anchorTarget
-            {
-                get
-                {
-                    if (m_Text != null)
-                    {
-                        return m_Text.anchorTarget;
-                    }
-                    return null;
-                }
-                set
-                {
-                    if (m_Text != null)
-                    {
-                        m_Text.anchorTarget = value;
-                    }
-                    if (m_Texture != null)
-                    {
-                        m_Texture.anchorTarget = value;
-                    }
-                }
-            }
-            public UIAnchor anchorMode
-            {
-                get
-                {
-                    if (m_Text != null)
-                    {
-                        return m_Text.anchorMode;
-                    }
-                    return UIAnchor.NONE;
-                }
-                set
-                {
-                    if (m_Text != null)
-                    {
-                        m_Text.anchorMode = value;
-                    }
-                    if (m_Texture != null)
-                    {
-                        m_Texture.anchorMode = value;
-                    }
-                }
-            }
-            public bool faceCamera
-            {
-                get
-                {
-                    if (m_Text != null)
-                    {
-                        return m_Text.faceCamera;
-                    }
-                    return false;
-                }
-                set
-                {
-                    if (m_Text != null)
-                    {
-                        m_Text.faceCamera = value;
-                    }
-                    if (m_Texture != null)
-                    {
-                        m_Texture.faceCamera = value;
-                    }
-                }
-            }
-            public bool smoothTransform
-            {
-                get
-                {
-                    if (m_Text != null)
-                    {
-                        return m_Text.smoothTransform;
-                    }
-                    return false;
-                }
-                set
-                {
-                    if (m_Text != null)
-                    {
-                        m_Text.smoothTransform = value;
-                    }
-                    if (m_Texture != null)
-                    {
-                        m_Texture.smoothTransform = value;
-                    }
-                }
-            }
 
+
+
+            //This property represents the string of text from the text component
             public string text
             {
                 get
                 {
-                    if (m_Text != null)
+                    if (m_TextComponent != null)
                     {
-                        return m_Text.text;
+                        return m_TextComponent.text;
                     }
                     return string.Empty;
                 }
                 set
                 {
-                    if (m_Text != null)
+                    if (m_TextComponent != null)
                     {
-                        m_Text.text = value;
+                        m_TextComponent.text = value;
                     }
                 }
             }
+            //These properties refer to the texture component
             public Texture backgroundTexture
             {
                 get
                 {
-                    if (m_Texture != null)
+                    if (m_TextureComponent != null)
                     {
-                        return m_Texture.texture;
+                        return m_TextureComponent.texture;
                     }
                     return null;
                 }
 
                 set
                 {
-                    if (m_Texture != null)
+                    if (m_TextureComponent != null)
                     {
-                        m_Texture.texture = value;
+                        m_TextureComponent.texture = value;
                     }
                 }
             }
-
+            public Color backgroundColor
+            {
+                get
+                {
+                    if (m_TextureComponent != null)
+                    {
+                        return m_TextureComponent.color;
+                    }
+                    return Color.white;
+                }
+                set
+                {
+                    if (m_TextureComponent != null )
+                    {
+                        m_TextureComponent.color = value;
+                    }
+                }
+            }
             //End Properties
         }
     }

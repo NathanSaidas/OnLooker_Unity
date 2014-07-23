@@ -7,7 +7,7 @@ namespace OnLooker
     namespace UI
     {
 
-        public delegate void TextChanged(UIText aSender, string aText);
+        public delegate string TextChanged(UIText aSender, string aText);
         [Serializable]
         public class UIText : UIToggle
         {
@@ -31,7 +31,10 @@ namespace OnLooker
             private Material m_TextMaterial = null;
 
             private bool m_UpdateText = false;
+
+            //This callback gets called when the collider resizes. (Post)
             private TextChanged m_TextChanged;
+            //This callback gets called when the text changes
             private TextChanged m_TextChangedImmediate;
             
 
@@ -120,11 +123,15 @@ namespace OnLooker
                 get { return m_TextMesh.text; }
                 set
                 {
+                    //If the two strings are not the same
                     if (value != m_TextMesh.text)
                     {
+                        //
                         if (m_TextChangedImmediate != null && Application.isPlaying == true)
                         {
-                            m_TextChangedImmediate.Invoke(this, value);
+                            //If the callback returns false then dont change the text value
+                            //If there is a maximum number of characters the value will be changed to a substring with a maximum length;
+                            value = m_TextChangedImmediate.Invoke(this, value);
                         }
                         m_UpdateText = true;
                     }

@@ -26,7 +26,9 @@ namespace OnLooker
             [SerializeField()]
             private Camera m_UserCamera = null;
             [SerializeField()]
-            public List<UIToggle> m_Toggles = new List<UIToggle>();
+            private List<UIToggle> m_Toggles = new List<UIToggle>();
+            [SerializeField()]
+            private List<UIControl> m_Controls = new List<UIControl>();
             //Toggle Currently in focus
             [SerializeField]
             private UIToggle m_FocusedToggle = null;
@@ -44,7 +46,7 @@ namespace OnLooker
             [SerializeField]
             private KeyCode m_PreviousKey = KeyCode.DownArrow;
             [SerializeField]
-            private KeyCode[] m_ActionKeys;
+            private KeyCode[] m_ActionKeys = null;
 
             
 
@@ -223,6 +225,17 @@ namespace OnLooker
                 }
                 return null;
             }
+            public UIControl getControl(string aName)
+            {
+                for (int i = 0; i < m_Controls.Count; i++)
+                {
+                    if (m_Controls[i].controlName == aName)
+                    {
+                        return m_Controls[i];
+                    }
+                }
+                return null;
+            }
             private void reigsterToggle(UIToggle aToggle)
             {
                 if (aToggle != null)
@@ -233,6 +246,17 @@ namespace OnLooker
             public void unregisterToggle(UIToggle aToggle)
             {
                 m_Toggles.Remove(aToggle);
+            }
+            private void registerControl(UIControl aControl)
+            {
+                if (aControl != null)
+                {
+                    m_Controls.Add(aControl);
+                }
+            }
+            public void unregisterControl(UIControl aControl)
+            {
+                m_Controls.Remove(aControl);
             }
 
 
@@ -351,36 +375,55 @@ namespace OnLooker
                 return uiTexture;
             }
 
-            public UILabel createUILabel(UIArguments aArgs, out UIText aText, out UILabel aLabel)
+            public UILabel createUILabel(UIArguments aArgs, out UIText aText, out UITexture aTexture)
             {
                 aText = null;
-                aLabel = null;
+                aTexture = null;
                 if (aArgs == null)
                 {
                     return null;
                 }
                 if (aArgs.toggleName == string.Empty)
                 {
-                    Debug.Log("This toggle has no name");
+                    Debug.Log("This control has no name");
                     return null;
                 }
-                if (getToggle(aArgs.toggleName) != null)
+                if (getControl(aArgs.toggleName) != null)
                 {
-                    Debug.Log("Toggle with that name already exists");
+                    Debug.Log("Control with that name already exists");
                     return null;
                 }
 
                 //Create GameObject
                 GameObject go = new GameObject("UI Label (" + aArgs.toggleName + ")");
                 go.layer = UI_LAYER;
+                go.transform.parent = transform;
 
                 //Save the toggleName for later
                 string toggleName = aArgs.toggleName;
-                aArgs.toggleName = aArgs.toggleName + "_Text";
-                UIText uiText = createUIText(aArgs);
+                bool interactive = aArgs.interactive;
+                aArgs.interactive = true;
+                aArgs.toggleName = toggleName + "_Text";
+                aText = createUIText(aArgs);
+                aArgs.interactive = false;
+                aArgs.toggleName = toggleName + "_Texture";
+                aTexture = createUITexture(aArgs);
+
+                aText.transform.parent = go.transform;
+                aTexture.transform.parent = go.transform;
+
+                UILabel uiLabel = go.AddComponent<UILabel>();
+                uiLabel.init();
+                uiLabel.controlName = toggleName;
+                registerControl(uiLabel);
 
 
-                return null;
+                aArgs.toggleName = toggleName;
+                aArgs.interactive = interactive;
+
+                uiLabel.updateTransform();
+
+                return uiLabel;
             }
         }
     }

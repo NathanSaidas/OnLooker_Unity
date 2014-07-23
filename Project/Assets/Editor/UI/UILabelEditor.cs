@@ -29,7 +29,7 @@ namespace OnLooker
 
                 inspected.text = EditorGUILayout.TextField("Text", inspected.text);
                 inspected.backgroundTexture = OLEditorUtilities.textureField("Background Texture", inspected.backgroundTexture);
-
+                inspected.backgroundColor = EditorGUILayout.ColorField("Background Color", inspected.backgroundColor);
                 inspected.textComponent.updateText();
                 inspected.updateBackground();
             }

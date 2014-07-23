@@ -84,6 +84,10 @@ namespace OnLooker
                         case UIToggleType.TEXTURE:
                             drawUITexture();
                             break;
+
+                        case UIToggleType.LABEL:
+                            drawUILabel();
+                            break;
                     }
 
                 }
@@ -129,6 +133,17 @@ namespace OnLooker
                 if (GUILayout.Button("Create"))
                 {
                     m_Manager.createUITexture(m_Args);
+                }
+            }
+
+            void drawUILabel()
+            {
+                m_Args.toggleName = EditorGUILayout.TextField("Control Name", m_Args.toggleName);
+                if (GUILayout.Button("Create"))
+                {
+                    UIText text;
+                    UITexture texture;
+                    m_Manager.createUILabel(m_Args,out text,out texture);
                 }
             }
         }
