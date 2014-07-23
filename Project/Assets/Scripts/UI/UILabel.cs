@@ -30,6 +30,7 @@ namespace OnLooker
                 base.init();
                 if (Application.isPlaying)
                 {
+                    m_TextComponent.registerEvent(onUIEvent);
                     m_TextComponent.setTextChanged(onTextChanged);
                     m_TextComponent.setTextChangedImmediate(onTextChangedImmediate);
                     //After that we can safely check for max characters
@@ -44,6 +45,7 @@ namespace OnLooker
             }
             public override void deinit()
             {
+                m_TextComponent.unregisterEvent(onUIEvent);
                 m_TextComponent.setTextChanged(null);
                 m_TextComponent.setTextChangedImmediate(null);
                 base.deinit();
@@ -109,7 +111,10 @@ namespace OnLooker
 
             protected override void onUIEvent(UIToggle aSender, UIEventArgs aArgs)
             {
-                
+                if (m_UIEvent != null)
+                {
+                    m_UIEvent.Invoke(aSender, aArgs);
+                }
             }
 
             protected virtual string onTextChanged(UIText aSender, string aText)
@@ -119,8 +124,13 @@ namespace OnLooker
             //Everytime the text changes check to see if we need to refine it
             protected virtual string onTextChangedImmediate(UIText aSender, string aText)
             {
+                string returnText = aText;
                 if (m_TextComponent == null)
                 {
+                    if (m_TextChanged != null)
+                    {
+                        m_TextChanged.Invoke(aSender, aText);
+                    }
                     return aText;
                 }
                 //If there is a limit on the characters reduce the characters to a substring of the limit
@@ -128,10 +138,14 @@ namespace OnLooker
                 {
                     if (aText.Length > m_MaxCharacter)
                     {
-                        return aText.Substring(0, m_MaxCharacter - 1);
+                        returnText = aText.Substring(0, m_MaxCharacter);
                     }
                 }
-                return aText;
+                if (m_TextChanged != null)
+                {
+                    m_TextChanged.Invoke(aSender, returnText);
+                }
+                return returnText;
             }
 
 
