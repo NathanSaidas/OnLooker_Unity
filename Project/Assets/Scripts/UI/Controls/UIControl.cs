@@ -5,7 +5,7 @@ namespace OnLooker
     namespace UI
     {
 
-
+        [ExecuteInEditMode()]
         public class UIControl : UIEventHandler
         {
             [SerializeField]
@@ -72,7 +72,7 @@ namespace OnLooker
             }
 
             //Transform properties that are shared between the two Required Components / Game Objects
-            public Vector3 offsetPosition
+            public virtual Vector3 offsetPosition
             {
                 get
                 {
@@ -80,10 +80,19 @@ namespace OnLooker
                     {
                         return m_TextComponent.offsetPosition;
                     }
+                    if (m_TextureComponent != null)
+                    {
+                        return m_TextureComponent.offsetPosition;
+                    }
                     return Vector3.zero;
                 }
                 set
                 {
+                    if (m_TextComponent == null && m_TextureComponent != null)
+                    {
+                        m_TextureComponent.offsetPosition = value;
+                        return;
+                    }
                     if (m_TextComponent != null)
                     {
                         m_TextComponent.offsetPosition = value;
@@ -95,13 +104,17 @@ namespace OnLooker
                     }
                 }
             }
-            public Vector3 offsetRotation
+            public virtual Vector3 offsetRotation
             {
                 get
                 {
                     if (m_TextComponent != null)
                     {
                         return m_TextComponent.offsetRotation;
+                    }
+                    if (m_TextureComponent != null)
+                    {
+                        return m_TextureComponent.offsetRotation;
                     }
                     return Vector3.zero;
                 }
@@ -117,13 +130,17 @@ namespace OnLooker
                     }
                 }
             }
-            public Transform anchorTarget
+            public virtual Transform anchorTarget
             {
                 get
                 {
                     if (m_TextComponent != null)
                     {
                         return m_TextComponent.anchorTarget;
+                    }
+                    if (m_TextureComponent != null)
+                    {
+                        return m_TextureComponent.anchorTarget;
                     }
                     return null;
                 }
@@ -139,13 +156,17 @@ namespace OnLooker
                     }
                 }
             }
-            public UIAnchor anchorMode
+            public virtual UIAnchor anchorMode
             {
                 get
                 {
                     if (m_TextComponent != null)
                     {
                         return m_TextComponent.anchorMode;
+                    }
+                    if (m_TextureComponent != null)
+                    {
+                        return m_TextureComponent.anchorMode;
                     }
                     return UIAnchor.NONE;
                 }
@@ -161,13 +182,17 @@ namespace OnLooker
                     }
                 }
             }
-            public bool faceCamera
+            public virtual bool faceCamera
             {
                 get
                 {
                     if (m_TextComponent != null)
                     {
                         return m_TextComponent.faceCamera;
+                    }
+                    if (m_TextureComponent != null)
+                    {
+                        return m_TextureComponent.faceCamera;
                     }
                     return false;
                 }
@@ -183,7 +208,7 @@ namespace OnLooker
                     }
                 }
             }
-            public bool smoothTransform
+            public virtual bool smoothTransform
             {
                 get
                 {
@@ -191,6 +216,11 @@ namespace OnLooker
                     {
                         return m_TextComponent.smoothTransform;
                     }
+                    if (m_TextureComponent != null)
+                    {
+                        return m_TextureComponent.smoothTransform;
+                    }
+                    
                     return false;
                 }
                 set

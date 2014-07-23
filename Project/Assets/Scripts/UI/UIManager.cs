@@ -416,7 +416,8 @@ namespace OnLooker
                 uiLabel.init();
                 uiLabel.controlName = toggleName;
                 registerControl(uiLabel);
-
+                aText.parentControl = uiLabel;
+                aTexture.parentControl = uiLabel;
 
                 aArgs.toggleName = toggleName;
                 aArgs.interactive = interactive;

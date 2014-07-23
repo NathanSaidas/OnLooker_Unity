@@ -33,8 +33,8 @@ namespace OnLooker
             [SerializeField()]//[HideInInspector()]
             protected bool m_TrapDoubleClick = false;
             protected float m_LastClick = 0.0f;
-
-            //private UIHandler m_Handler = null;
+            [SerializeField()]
+            private UIControl m_ParentControl;
             private event UIEvent m_UIEvent;
 
 
@@ -501,6 +501,11 @@ namespace OnLooker
             {
                 get { return m_SmoothTransform; }
                 set { m_SmoothTransform = value; }
+            }
+            public UIControl parentControl
+            {
+                get { return m_ParentControl; }
+                set { m_ParentControl = value; }
             }
 
 #endregion
