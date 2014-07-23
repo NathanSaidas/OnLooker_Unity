@@ -6,20 +6,18 @@ namespace OnLooker
 {
     namespace UI
     {
-        [CustomEditor(typeof(UILabel))]
-        public class UILabelEditor : Editor
+
+        [CustomEditor(typeof(UIImage))]
+        public class UIImageEditor : Editor
         {
+
             public override void OnInspectorGUI()
             {
                 DrawDefaultInspector();
 
-                UILabel inspected = (UILabel)target;
-
-                inspected.textComponent = (UIText)EditorGUILayout.ObjectField("Text Component", inspected.textComponent, typeof(UIText), true);
+                UIImage inspected = (UIImage)target;
                 inspected.textureComponent = (UITexture)EditorGUILayout.ObjectField("Texture Component", inspected.textureComponent, typeof(UITexture), true);
                 inspected.init();
-
-                
 
                 inspected.offsetPosition = EditorGUILayout.Vector3Field("Position", inspected.offsetPosition);
                 inspected.offsetRotation = EditorGUILayout.Vector3Field("Rotation", inspected.offsetRotation);
@@ -32,14 +30,10 @@ namespace OnLooker
                 inspected.updateTransform();
                 inspected.smoothTransform = smoothTransform;
 
-                inspected.text = EditorGUILayout.TextField("Text", inspected.text);
-                inspected.backgroundTexture = OLEditorUtilities.textureField("Background Texture", inspected.backgroundTexture);
-                inspected.backgroundColor = EditorGUILayout.ColorField("Background Color", inspected.backgroundColor);
-                inspected.textComponent.updateText();
-                inspected.updateBackground();
+                inspected.texture = OLEditorUtilities.textureField("Background Texture", inspected.texture);
+                inspected.color = EditorGUILayout.ColorField("Background Color", inspected.color);
+                
             }
         }
-
-
-    }//End Namespace
-}//End Namespace
+    }
+}

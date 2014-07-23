@@ -8,9 +8,9 @@ namespace OnLooker
         [ExecuteInEditMode()]
         public class UIControl : UIEventHandler
         {
-            [SerializeField]
+            [SerializeField][HideInInspector()]
             protected UIText m_TextComponent;
-            [SerializeField]
+            [SerializeField][HideInInspector()]
             protected UITexture m_TextureComponent;
             [SerializeField]
             protected string m_ControlName = string.Empty;
@@ -44,7 +44,14 @@ namespace OnLooker
             }
             public virtual void deinit()
             {
-                m_TextComponent.manager.unregisterControl(this);
+                if (m_TextComponent != null)
+                {
+                    m_TextComponent.manager.unregisterControl(this);
+                }
+                else if (m_TextureComponent != null)
+                {
+                    m_TextureComponent.manager.unregisterControl(this);
+                }
             }
 
             public void updateTransform()

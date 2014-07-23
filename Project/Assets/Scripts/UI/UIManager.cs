@@ -426,6 +426,51 @@ namespace OnLooker
 
                 return uiLabel;
             }
+
+            public UIImage createUIImage(UIArguments aArgs, out UITexture aTexture)
+            {
+                aTexture = null;
+                if (aArgs == null)
+                {
+                    return null;
+                }
+                if (aArgs.toggleName == string.Empty)
+                {
+                    Debug.Log("This control has no name");
+                    return null;
+                }
+                if (getControl(aArgs.toggleName) != null)
+                {
+                    Debug.Log("Control with that name already exists");
+                    return null;
+                }
+
+                //Create GameObject
+                GameObject go = new GameObject("UI Image (" + aArgs.toggleName + ")");
+                go.layer = UI_LAYER;
+                go.transform.parent = transform;
+
+                //Save the toggleName for later & force the texture go to be interactive
+                string toggleName = aArgs.toggleName;
+                bool interactive = aArgs.interactive;
+                aArgs.interactive = true;
+                aArgs.toggleName = toggleName + "_Texture";
+                aTexture = createUITexture(aArgs);
+
+                aTexture.transform.parent = go.transform;
+
+                UIImage uiImage = go.AddComponent<UIImage>();
+                uiImage.init();
+                uiImage.controlName = toggleName;
+                registerControl(uiImage);
+                aTexture.parentControl = uiImage;
+
+                aArgs.toggleName = toggleName;
+                aArgs.interactive = interactive;
+
+                uiImage.updateTransform();
+                return uiImage;
+            }
         }
     }
 }

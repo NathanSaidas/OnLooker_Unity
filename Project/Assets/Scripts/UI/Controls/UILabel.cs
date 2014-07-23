@@ -19,7 +19,6 @@ namespace OnLooker
             private Vector2 m_BoarderSize = Vector2.zero;
 
 
-            private event UIEvent m_UIEvent;
             private event TextChanged m_TextChanged;
 
             //The purpose of this function is to initialize this class
@@ -81,16 +80,16 @@ namespace OnLooker
             }
             public void registerUIEvent(UIEvent aCallback)
             {
-                if (aCallback != null)
+                if (m_TextComponent != null)
                 {
-                    m_UIEvent += aCallback;
+                    m_TextComponent.registerEvent(aCallback);
                 }
             }
             public void unregisterUIEvent(UIEvent aCallback)
             {
-                if (m_UIEvent != null && aCallback != null)
+                if (m_TextComponent != null)
                 {
-                    m_UIEvent -= aCallback;
+                    m_TextComponent.unregisterEvent(aCallback);
                 }
             }
 
@@ -111,10 +110,7 @@ namespace OnLooker
 
             protected override void onUIEvent(UIToggle aSender, UIEventArgs aArgs)
             {
-                if (m_UIEvent != null)
-                {
-                    m_UIEvent.Invoke(aSender, aArgs);
-                }
+
             }
 
             protected virtual string onTextChanged(UIText aSender, string aText)
