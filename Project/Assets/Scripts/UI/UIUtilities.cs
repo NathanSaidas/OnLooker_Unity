@@ -84,6 +84,7 @@ namespace OnLooker
 
         public class UIUtilities
         {
+            public const int NO_LIMIT = -1;
         }
 
 

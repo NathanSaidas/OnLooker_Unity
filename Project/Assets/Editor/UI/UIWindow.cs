@@ -92,6 +92,9 @@ namespace OnLooker
                         case UIToggleType.IMAGE:
                             drawUIImage();
                             break;
+                        case UIToggleType.BUTTON:
+                            drawUIButton();
+                            break;
                     }
 
                 }
@@ -158,6 +161,16 @@ namespace OnLooker
                 {
                     UITexture texture;
                     m_Manager.createUIImage(m_Args, out texture);
+                }
+            }
+            void drawUIButton()
+            {
+                m_Args.toggleName = EditorGUILayout.TextField("Control Name", m_Args.toggleName);
+                if (GUILayout.Button("Create"))
+                {
+                    UIText text;
+                    UITexture texture;
+                    m_Manager.createUIButton(m_Args,out text, out texture);
                 }
             }
         }

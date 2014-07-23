@@ -57,7 +57,9 @@ namespace OnLooker
 
 
             //User accessible flags
+            [SerializeField]
             protected bool m_MouseInBounds = false;
+            [SerializeField]
             protected bool m_IsFocused = false;
 
             private void OnDestroy()
@@ -354,20 +356,26 @@ namespace OnLooker
             }
 
             #region EventHelperFuncs
-            protected void OnMouseEnter()
+            public void onMouseEnter()
             {
-                if (m_UIEvent != null && m_Interactive == true)
+                if (m_Interactive == true)
                 {
                     m_MouseInBounds = true;
-                    m_UIEvent.Invoke(this, new UIEventArgs(UIEventType.ENTER));
+                    if (m_UIEvent != null)
+                    {
+                        m_UIEvent.Invoke(this, new UIEventArgs(UIEventType.ENTER));
+                    }
                 }
             }
-            protected void OnMouseExit()
+            public void onMouseExit()
             {
-                if (m_UIEvent != null && m_Interactive == true)
+                if (m_Interactive == true)
                 {
                     m_MouseInBounds = false;
-                    m_UIEvent.Invoke(this, new UIEventArgs(UIEventType.EXIT));
+                    if (m_UIEvent != null)
+                    {
+                        m_UIEvent.Invoke(this, new UIEventArgs(UIEventType.EXIT));
+                    }
                 }
             }
             private void onUnfocus()

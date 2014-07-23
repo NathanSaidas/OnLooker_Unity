@@ -39,6 +39,9 @@ namespace OnLooker
             [SerializeField]
             private float m_MouseDistance = Mathf.Infinity;
 
+            [SerializeField]
+            private UIToggle m_LastHitToggle = null;
+
 
             //Keyboard Controls
             [SerializeField]
@@ -97,14 +100,34 @@ namespace OnLooker
                         //If the toggle is interactive process its events
                         if (toggle.isInteractive == true)
                         {
-                            Debug.Log("Toggle Process Events");
+                            Debug.Log("Toggle Process Event");
 
                             toggle.processEvents();
+                        }
+                        
+                        //If they are not the same then send the two events. On Mouse enter / on mouse exit
+                        if (toggle != m_LastHitToggle)
+                        {
+                            if(m_LastHitToggle != null)
+                            {
+                                m_LastHitToggle.onMouseExit();
+                            }
+                            m_LastHitToggle = toggle;
+                            m_LastHitToggle.onMouseEnter();
+                            Debug.Log(m_LastHitToggle.toggleName);
+                            Debug.Log(m_LastHitToggle.mouseInBounds);
                         }
                     }
                 }
                 else
                 {
+                    if (m_LastHitToggle != null)
+                    {
+                        m_LastHitToggle.onMouseExit();
+                        Debug.Log(m_LastHitToggle.toggleName);
+                        Debug.Log(m_LastHitToggle.mouseInBounds);
+                        m_LastHitToggle = null;
+                    }
                     if (m_AllowClickOff == true && OnLookerUtils.anyMouseButtonDown() == true)
                     {
                         unfocusToggle();
@@ -471,6 +494,66 @@ namespace OnLooker
                 uiImage.updateTransform();
                 return uiImage;
             }
+            public UIButton createUIButton(UIArguments aArgs, out UIText aText, out UITexture aTexture)
+            {
+                aText = null;
+                aTexture = null;
+                if (aArgs == null)
+                {
+                    return null;
+                }
+                if (aArgs.toggleName == string.Empty)
+                {
+                    Debug.Log("This control has no name");
+                    return null;
+                }
+                if (getControl(aArgs.toggleName) != null)
+                {
+                    Debug.Log("A Control with that name already exists");
+                    return null;
+                }
+
+                //Create GameObject
+                GameObject go = new GameObject("UI Button (" + aArgs.toggleName + ")");
+                go.layer = UI_LAYER;
+                go.transform.parent = transform;
+
+                //Store the toggleName and interactive data as it will be modified
+                string toggleName = aArgs.toggleName;
+                bool interactive = aArgs.interactive;
+
+                //Create the texture
+                aArgs.interactive = true;
+                aArgs.toggleName = toggleName + "_Texture";
+                aTexture = createUITexture(aArgs);
+                //Create the text
+                aArgs.interactive = false;
+                aArgs.toggleName = toggleName + "_Text";
+                aText = createUIText(aArgs);
+
+                //Set the text / texture parent transforms
+                aTexture.transform.parent = go.transform;
+                aText.transform.parent = go.transform;
+
+                //Create the UI button and initialize it
+                UIButton uiButton = go.AddComponent<UIButton>();
+                uiButton.init();
+                uiButton.controlName = toggleName;
+                registerControl(uiButton);
+
+                //Set the Text and Texture parent Control
+                aText.parentControl = uiButton;
+                aTexture.parentControl = uiButton;
+
+                //Reset the arguments
+                aArgs.interactive = interactive;
+                aArgs.toggleName = toggleName;
+                //Update the UIButton once
+                uiButton.updateTransform();
+
+                return uiButton;
+            }
+            
         }
     }
 }

@@ -9,12 +9,12 @@ namespace OnLooker
         [Serializable]
         public class UILabel : UIControl
         {
-            public const int NO_LIMIT = -1;
+            //public const int NO_LIMIT = -1;
 
             [SerializeField]
             private bool m_FixedBackground = false;
             [SerializeField]
-            private int m_MaxCharacter = NO_LIMIT;
+            private int m_MaxCharacter = UIUtilities.NO_LIMIT;
             [SerializeField]
             private Vector2 m_BoarderSize = Vector2.zero;
 
@@ -33,7 +33,7 @@ namespace OnLooker
                     m_TextComponent.setTextChanged(onTextChanged);
                     m_TextComponent.setTextChangedImmediate(onTextChangedImmediate);
                     //After that we can safely check for max characters
-                    if (m_MaxCharacter != NO_LIMIT)
+                    if (m_MaxCharacter != UIUtilities.NO_LIMIT)
                     {
                         if (m_TextComponent.text.Length > m_MaxCharacter)
                         {
@@ -130,7 +130,7 @@ namespace OnLooker
                     return aText;
                 }
                 //If there is a limit on the characters reduce the characters to a substring of the limit
-                if (m_MaxCharacter != NO_LIMIT)
+                if (m_MaxCharacter != UIUtilities.NO_LIMIT)
                 {
                     if (aText.Length > m_MaxCharacter)
                     {

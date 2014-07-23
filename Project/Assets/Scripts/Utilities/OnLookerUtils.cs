@@ -15,6 +15,7 @@ namespace OnLooker
     [ExecuteInEditMode()]
     public class OnLookerUtils
     {
+
         public static bool anyMouseButtonDown()
         {
             if (Input.GetMouseButtonDown((int)MouseButton.LEFT))
