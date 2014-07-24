@@ -78,14 +78,14 @@ namespace OnLooker
 
                 //Otherwise if there is no fixed background the user is free to set the background to whatever size they want
             }
-            public void registerUIEvent(UIEvent aCallback)
+            public void registerEvent(UIEvent aCallback)
             {
                 if (m_TextComponent != null)
                 {
                     m_TextComponent.registerEvent(aCallback);
                 }
             }
-            public void unregisterUIEvent(UIEvent aCallback)
+            public void unregisterEvent(UIEvent aCallback)
             {
                 if (m_TextComponent != null)
                 {

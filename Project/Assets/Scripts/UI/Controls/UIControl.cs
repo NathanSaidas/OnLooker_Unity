@@ -15,14 +15,14 @@ namespace OnLooker
             [SerializeField]
             protected string m_ControlName = string.Empty;
 
-            public void Start()
+            private void Start()
             {
                 if (Application.isPlaying)
                 {
                     init();
                 }
             }
-            public void OnDestroy()
+            private void OnDestroy()
             {
                 deinit();
             }

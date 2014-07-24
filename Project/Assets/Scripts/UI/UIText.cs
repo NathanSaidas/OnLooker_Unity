@@ -8,22 +8,10 @@ namespace OnLooker
     {
 
         public delegate string TextChanged(UIText aSender, string aText);
+
         [Serializable]
         public class UIText : UIToggle
         {
-            //Properties from UIToggle
-            //debug
-            //manager
-            //mouseInBounds
-            //isFocused
-            //isInteractive
-            //trapDoubleClick
-            //lastClick
-            //offsetPosition
-            //offsetRotation
-            //anchorTarget
-            //anchorMode
-            //smoothTransform
 
             [SerializeField]
             private TextMesh m_TextMesh = null;
@@ -76,14 +64,6 @@ namespace OnLooker
             protected override void gameUpdate()
             {
                 updateText();
-            }
-            protected override void gameFixedUpdate()
-            {
-                
-            }
-            public bool shouldUpdateText
-            {
-                get { return m_UpdateText; }
             }
             public void updateText()
             {

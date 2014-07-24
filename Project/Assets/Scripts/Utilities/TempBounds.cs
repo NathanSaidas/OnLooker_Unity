@@ -13,7 +13,7 @@ public class TempBounds : MonoBehaviour {
     {
         if (m_Label != null)
         {
-            m_Label.registerUIEvent(onUIEvent);
+            m_Label.registerEvent(onUIEvent);
             m_Label.registerTextChangedEvent(onTextChanged);
         }
 	}

@@ -59,6 +59,10 @@ namespace OnLooker
                     m_TextureComponent.registerEvent(aCallback);
                 }
             }
+            protected override void onUIEvent(UIToggle aSender, UIEventArgs aArgs)
+            {
+
+            }
             private void transparent()
             {
                 Color color = backgroundColor;
@@ -148,10 +152,7 @@ namespace OnLooker
                 }
             }
 
-            protected override void onUIEvent(UIToggle aSender, UIEventArgs aArgs)
-            {
-                
-            }
+            
 
             public string text
             {
@@ -198,7 +199,6 @@ namespace OnLooker
             public UIButtonState buttonState
             {
                 get { return m_ButtonState; }
-                set { m_ButtonState = value; }
             }
 
             public Texture backgroundTexture

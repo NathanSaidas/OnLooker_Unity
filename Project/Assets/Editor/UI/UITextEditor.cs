@@ -38,10 +38,7 @@ namespace OnLooker
                 {
                     inspected.gameObject.layer = UIManager.UI_LAYER;
                 }
-                if (inspected.shouldUpdateText == true)
-                {
-                    inspected.updateText();
-                }
+                inspected.updateText();
             }
         }
     }

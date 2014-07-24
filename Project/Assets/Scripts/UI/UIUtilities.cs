@@ -5,6 +5,12 @@ namespace OnLooker
 {
     namespace UI
     {
+        /// <summary>
+        /// Represents the anchor targets.
+        /// None: Free position and rotation depends on faceCamera property
+        /// Camera: Position is offset from the camera and rotation is facing the camera.
+        /// Object: Position is offset from the object and rotation depends on faceCamera property
+        /// </summary>
         public enum UIAnchor
         {
             NONE,
@@ -12,10 +18,17 @@ namespace OnLooker
             OBJECT
         }
 
+
+        /// <summary>
+        /// The purpose of this class is to hold data specifically for creating UIControls and UIToggles.
+        /// </summary>
         [Serializable()]
         public class UIArguments
         {
+            //Toggle name may refer to a Control name as well
             private string m_ToggleName = string.Empty;
+
+            //The following data are shared between the two UIText and UITexture
             private Vector3 m_Position = Vector3.zero;
             private Vector3 m_Rotation = Vector3.zero;
             private UIAnchor m_AnchorMode = UIAnchor.CAMERA;
@@ -23,12 +36,15 @@ namespace OnLooker
             private bool m_Interactive = true;
             private bool m_TrapDoubleClick = false;
 
-
+            //UIText specific data
             private string m_Text = string.Empty;
             private int m_FontSize = 20;
 
+            //UITexture specific data
             private Texture m_Texture = null;
 
+
+            //Accessors
             public string toggleName
             {
                 get { return m_ToggleName; }

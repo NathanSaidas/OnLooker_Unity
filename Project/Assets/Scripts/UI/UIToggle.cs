@@ -6,64 +6,57 @@ namespace OnLooker
 {
     namespace UI
     {
+        /// <summary>
+        /// This is the base class for the future classes UIText and UITexture. The purpose of this class is to offer advanced transform control including position and rotation offsets.
+        /// </summary>
         [ExecuteInEditMode()]
         [Serializable()]
         public class UIToggle : MonoBehaviour
         {
-            //Whether or not to show debug information
-            [SerializeField()][HideInInspector()]
-            private bool m_Debug = false;
-
-
             //A reference to the UI Manager
-            [SerializeField()]//[HideInInspector()]
+            [SerializeField()]
             protected UIManager m_Manager = null;
-
-
             //The name of the toggle - For UIManager
-            [SerializeField()]//[HideInInspector()]
+            [SerializeField()]
             protected string m_ToggleName = string.Empty;
-
-            
-            //Whether or not the toggle is interactive
-            [SerializeField()]//[HideInInspector()]
+            //Whether or not the toggle sends / recieves UIEvents from UIManager
+            [SerializeField()]//
             private bool m_Interactive = false;
-
-            //Input Control
-            [SerializeField()]//[HideInInspector()]
+            //Whether or not to allow a click event to pass on double click events
+            [SerializeField()]
             protected bool m_TrapDoubleClick = false;
+            //Tracks the last time the mouse was clicked on this control to detect double click events
             protected float m_LastClick = 0.0f;
+            //The control, if one exists, that controls this UIToggle
             [SerializeField()]
             private UIControl m_ParentControl;
+            //The event that any class can subscribe to recieve UIEvents from
             private event UIEvent m_UIEvent;
-
-
+            //The position offset for this UIToggle
             [SerializeField()]
             protected Vector3 m_OffsetPosition = Vector3.zero;
+            //The rotation offset for this UIToggle
             [SerializeField()]
             protected Vector3 m_OffsetRotation = Vector3.zero;
-
+            //A reference to the position of the anchor target
             [SerializeField()]
             protected Transform m_AnchorTarget = null;
+            //See UIAnchor for more details
             [SerializeField()]
             protected UIAnchor m_AnchorMode = UIAnchor.CAMERA;
+            //Whether or not this UIToggle faces the camera or not. (When AnchorMode is = Camera this is true regardless)
             [SerializeField()]
             protected bool m_FaceCamera = true;
+            //Whether or not to lerp from position to position. (This is false when anchor mode is to the camera)
             [SerializeField()]
             protected bool m_SmoothTransform = true;
-
-
-            
-
-
-            //User accessible flags
-            [SerializeField]
+            //Can check to see if the mouse is in bounds
             protected bool m_MouseInBounds = false;
-            [SerializeField]
+            //Can check to see if the toggle is focused by the UIManager
             protected bool m_IsFocused = false;
 
 
-
+            //Gets called in edit mode and while application is playing to unregister the toggle from the UIManager
             private void OnDestroy()
             {
                 if (m_Manager != null)
@@ -71,7 +64,6 @@ namespace OnLooker
                     m_Manager.unregisterToggle(this);
                 }
             }
-
             private void Update()
             {
                 if (Application.isPlaying == true)
@@ -87,31 +79,17 @@ namespace OnLooker
                     gameLateUpdate();
                 }
             }
-            private void FixedUpdate()
-            {
-                if (Application.isPlaying == true)
-                {
-                    gameFixedUpdate();
-                }
-            }
-
             protected virtual void gameUpdate()
             {
-
+            
             }
             protected virtual void gameLateUpdate()
             {
 
             }
-            protected virtual void gameFixedUpdate()
-            {
-
-            }
-
 
             public void updateTransform()
             {
-                
                 //The manager is required for the camera
                 //If there is no manager or camera this function returns and does nothing
                 if(m_Manager == null)
@@ -131,7 +109,7 @@ namespace OnLooker
                 {
                     case UIAnchor.NONE:
                         {
-                            //Position is whereever the user sets the transform
+                            //Position is wherever the user sets the transform
                             if (m_FaceCamera == true)
                             {
                                 transform.LookAt(transform.position + currentCamera.transform.rotation * Vector3.forward, currentCamera.transform.rotation * Vector3.up);
@@ -201,6 +179,7 @@ namespace OnLooker
             public void processEvents()
             {
                 bool action = false;
+                //Handle Click/Double Click Events
                 if (Input.GetMouseButtonDown((int)MouseButton.LEFT))
                 {
                     bool doubleClick = false;
@@ -274,6 +253,7 @@ namespace OnLooker
                     action = true;
                 }
 
+                //Handle release events
                 if (Input.GetMouseButtonUp((int)MouseButton.LEFT))
                 {
                     onMouseRelease(MouseButton.LEFT);
@@ -290,6 +270,7 @@ namespace OnLooker
                     action = true;
                 }
 
+                //Handle mouse down events
                 if (Input.GetMouseButton((int)MouseButton.LEFT))
                 {
                     onMouseDown(MouseButton.LEFT);
@@ -306,6 +287,7 @@ namespace OnLooker
                     action = true;
                 }
 
+                //Handle mouse over if no actions happened
                 if (action == false)
                 {
                     onMouseHover();
@@ -315,7 +297,7 @@ namespace OnLooker
             }
             public void processKeyEvents()
             {
-                if (m_Manager != null && m_IsFocused == true)
+                if (m_Manager != null && m_IsFocused == true && m_Interactive == true)
                 {
                     KeyCode[] actionKeys = m_Manager.actionKeys;
                     if (actionKeys != null && actionKeys.Length > 0)
@@ -348,6 +330,7 @@ namespace OnLooker
                     onUnfocus();
                 }
             }
+
             public void setManager(UIManager aManager)
             {
                 if (m_Manager != null)
@@ -438,11 +421,6 @@ namespace OnLooker
             }
             #endregion
             #region Properties
-            public bool debug
-            {
-                get { return m_Debug; }
-                set { m_Debug = value; }
-            }
             public UIManager manager
             {
                 get { return m_Manager; }
@@ -469,6 +447,28 @@ namespace OnLooker
                     if (m_Interactive == true)
                     {
                         gameObject.layer = UIManager.UI_LAYER;
+                        BoxCollider col = GetComponent<BoxCollider>();
+                        if (col == null)
+                        {
+                            gameObject.AddComponent<BoxCollider>();
+                        }
+
+                    }
+                    else
+                    {
+                        gameObject.layer = 0;
+                        BoxCollider col = GetComponent<BoxCollider>();
+                        if (col != null)
+                        {
+                            if (Application.isPlaying == true)
+                            {
+                                Destroy(col);
+                            }
+                            else
+                            {
+                                DestroyImmediate(col);
+                            }
+                        }
                     }
                 }
             }

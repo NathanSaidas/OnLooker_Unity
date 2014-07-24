@@ -12,10 +12,6 @@ namespace OnLooker
         [Serializable]
         public class UIImage : UIControl
         {
-            public void fun()
-            {
-
-            }
             public override void init()
             {
                 m_TextureComponent = GetComponentInChildren<UITexture>();

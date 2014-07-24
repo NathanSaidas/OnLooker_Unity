@@ -53,7 +53,7 @@ namespace OnLooker
 
             
 
-            public void Update()
+            private void Update()
             {
                 if (m_FocusedToggle != null)
                 {
@@ -62,7 +62,7 @@ namespace OnLooker
             }
             
 
-            public void LateUpdate()
+            private void LateUpdate()
             {
                 int layer = 1 << UI_LAYER;
                 RaycastHit hit;
@@ -153,32 +153,6 @@ namespace OnLooker
                 }
             }
 
-
-
-
-            public UIToggle createToggle(bool aInteractive)
-            {
-                GameObject go = new GameObject("Toggle");
-               
-
-                Transform uiTransform = go.transform;
-                uiTransform.parent = transform;
-
-                UIToggle uiToggle = go.AddComponent<UIToggle>();
-                
-
-                if (aInteractive)
-                {
-                    go.layer = UI_LAYER;
-                    go.AddComponent<BoxCollider>();
-                    //uiToggle.interactive = true;
-                }
-                else
-                {
-                    
-                }
-                return uiToggle;
-            }
 
 
             #region Properties
@@ -448,7 +422,6 @@ namespace OnLooker
 
                 return uiLabel;
             }
-
             public UIImage createUIImage(UIArguments aArgs, out UITexture aTexture)
             {
                 aTexture = null;

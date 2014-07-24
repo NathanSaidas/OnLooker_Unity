@@ -27,16 +27,6 @@ namespace OnLooker
                     meshRenderer.material = m_TextureMaterial;
                 }
             }
-
-            protected override void gameUpdate()
-            {
-                
-            }
-            protected override void gameFixedUpdate()
-            {
-                
-            }
-
             public Texture texture
             {
                 get { return m_TextureMaterial.mainTexture; }
