@@ -63,7 +63,9 @@
      <Compile Include="Assets\Scripts\Utilities\OnLookerUtils.cs" />
      <Compile Include="Assets\Scripts\Utilities\TempBounds.cs" />
      <Compile Include="Assets\Scripts\Utilities\TempMesh.cs" />
+     <None Include="Assets\Shaders\TerrBumpFirstPass.shader" />
      <None Include="Assets\Shaders\3DTextShader.shader" />
+     <None Include="Assets\Shaders\TerrBumpAddPass.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
