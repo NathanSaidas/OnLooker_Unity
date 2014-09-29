@@ -51,6 +51,12 @@
      <Compile Include="Assets\Scripts\Camera\CameraManager.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraMode.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraTester.cs" />
+     <Compile Include="Assets\Scripts\Camera\Cutscene.cs" />
+     <Compile Include="Assets\Scripts\Camera\CutsceneAction.cs" />
+     <Compile Include="Assets\Scripts\Camera\CutsceneBezier.cs" />
+     <Compile Include="Assets\Scripts\Camera\CutsceneInstruction.cs" />
+     <Compile Include="Assets\Scripts\Camera\CutsceneLookAt.cs" />
+     <Compile Include="Assets\Scripts\Camera\CutsceneStraight.cs" />
      <Compile Include="Assets\Scripts\Camera\FirstPersonCamera.cs" />
      <Compile Include="Assets\Scripts\Camera\OrbitCamera.cs" />
      <Compile Include="Assets\Scripts\Camera\ShoulderCamera.cs" />

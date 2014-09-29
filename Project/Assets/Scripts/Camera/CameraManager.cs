@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class CameraManager : MonoBehaviour
 {
@@ -32,6 +32,9 @@ public class CameraManager : MonoBehaviour
     }
     #endregion
 
+    /// <summary>
+    /// Initializes the singleton, or gives warning if there is multiple.
+    /// </summary>
     void Start()
     {
         if(s_Instance == null)
@@ -56,6 +59,7 @@ public class CameraManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         init();
     }
+    //Destroys self owned singletons.
     void OnDestroy()
     {
         if(s_Instance == this)
@@ -167,6 +171,10 @@ public class CameraManager : MonoBehaviour
     private Vector3 m_TransitionTargetPosition = Vector3.zero;
 
 
+    /// <summary>
+    /// Error message helpers.
+    /// </summary>
+    /// <param name="aField"></param>
     private void errorMissing(string aField)
     {
         Debug.LogError("Missing \'"+aField+"\' from Camera Manager.");
@@ -176,6 +184,7 @@ public class CameraManager : MonoBehaviour
         Debug.LogWarning("Missing \'" + aField + "\' from Camera Manager.");
     }
 
+    //Setup the cameras and the camera controllers
     private void init()
     {
         if(m_GameplayCamera == null)
@@ -208,6 +217,7 @@ public class CameraManager : MonoBehaviour
 
     }
 
+    
     private void Update()
     {
         switch(m_CurrentState)
@@ -223,6 +233,7 @@ public class CameraManager : MonoBehaviour
                         break;
                     case TransitionState.TO_FIRST_PERSON:
                         moveTo(m_FirstPersonCamera.getTargetPosition(targetPosition, targetRotation));
+                        
                         break;
                     case TransitionState.TO_ORBIT:
                         moveTo(m_OrbitCamera.getTargetPosition(targetPosition, targetRotation));
@@ -251,13 +262,9 @@ public class CameraManager : MonoBehaviour
                 }
                 break;
             case State.CUTSCENE_FADE_OUT:
-
-                break;
             case State.CUTSCENE_FADE_IN:
-
-                break;
             case State.CUTSCENE:
-
+                updateCutscene();
                 break;
         }
     }
@@ -300,6 +307,9 @@ public class CameraManager : MonoBehaviour
     }
 
     #region Helpers
+    /// <summary>
+    /// Sets the previous state if the current state is a valid state. (First,Shoulder,Orbit)
+    /// </summary>
     private void pushState()
     {
         if (m_CurrentState == State.FIRST_PERSON || m_CurrentState == State.SHOULDER || m_CurrentState == State.ORBIT)
@@ -343,8 +353,14 @@ public class CameraManager : MonoBehaviour
 
     #region TransitionFunctions
 
-    /// First Person Camera Transition
-
+    /// <summary>
+    /// Moves the camera from where ever it is currently to the new position given.
+    /// </summary>
+    /// <param name="aPosition">The target position to move to</param>
+    /// <param name="aTransitionMode">How to calculate the camera moving to position</param>
+    /// <param name="aTransitionSpeed">The speed at which to make the transition. (Start,End)</param>
+    /// <param name="aFallOff">Fall off rate. How fast the camera slows down</param>
+    /// <param name="aFalloffMode">How to calculate camera slow down.</param>
     public void transitionToFirstPerson(Vector3 aPosition, CameraMode aTransitionMode, Vector2 aTransitionSpeed, float aFallOff, CameraMode aFalloffMode )
     {
         if (m_CurrentState == State.CUTSCENE || m_CurrentState == State.CUTSCENE_FADE_IN || m_CurrentState == State.CUTSCENE_FADE_OUT)
@@ -723,6 +739,23 @@ public class CameraManager : MonoBehaviour
 
         }
     }
+    private void setFallOff()
+    {
+        if(m_FallOffMode == CameraMode.NONE || m_FallOffSpeed == 0.0f)
+        {
+            return;
+        }
+        switch(m_FallOffMode)
+        {
+            case CameraMode.EASE:
+                m_TransitionSpeed = Utilities.exponentialEase(m_TransitionSpeed, m_TransitionSpeedRange.x, Time.deltaTime * 2.0f);
+                break;
+            case CameraMode.LERP:
+            case CameraMode.SMOOTH_DAMP:
+                m_TransitionSpeed = Mathf.Lerp(m_TransitionSpeed, m_TransitionSpeedRange.x, Time.deltaTime * 2.0f);
+                break;
+        }
+    }
 
     //Gets called when the transition is finished
     private void onGoalReached()
@@ -856,6 +889,92 @@ public class CameraManager : MonoBehaviour
     {
         get { return m_TransitionState.ToString(); }
     }
+    #endregion
+
+
+    #region Cutscene
+    /// <summary>
+    /// How fast to fade the cutscene
+    /// </summary>
+    [SerializeField]
+    private float m_CutsceneFadeSpeed = 0.5f;
+    //Whether or not to fade the cutscene in
+    [SerializeField]
+    private bool m_CutsceneFadeIn = false;
+    /// <summary>
+    /// Whether or not to fade the cutscene out
+    /// </summary>
+    [SerializeField]
+    private bool m_CutsceneFadeOut = false;
+    /// <summary>
+    /// Whether or not to resume the transition we were left in
+    /// </summary>
+    [SerializeField]
+    private bool m_ResumeInTransition = false;
+    /// <summary>
+    /// The list of registered cutscenes in this current scene
+    /// </summary>
+    [SerializeField]
+    private List<Cutscene> m_Cutscenes = new List<Cutscene>();
+
+    /// <summary>
+    /// The current cutscene playing
+    /// </summary>
+    [SerializeField]
+    private Cutscene m_CurrentCutscene = null;
+    /// <summary>
+    /// The camera used in the cutscene
+    /// </summary>
+    [SerializeField]
+    private Camera m_CutsceneCamera = null;
+    /// <summary>
+    /// temp...
+    /// </summary>
+    [SerializeField]
+    private float m_CurrentFrame = 10.0f;
+
+    
+
+
+    public List<Cutscene> cutscenes
+    {
+        get { return m_Cutscenes; }
+    }
+    public Camera cutsceneCamera
+    {
+        get { return m_CutsceneCamera; }
+    }
+    public void registerCutscene(Cutscene aCutscene)
+    {
+        if(aCutscene == null || m_Cutscenes.Contains(aCutscene))
+        {
+            return;
+        }
+        m_Cutscenes.Add(aCutscene);
+    }
+    public void unregisterCutscene(Cutscene aCutscene)
+    {
+        if(aCutscene == null)
+        {
+            return;
+        }
+        m_Cutscenes.Remove(aCutscene);
+    }
+    public void triggerCutscene(string aCutsceneName, bool aFadeIn, bool aFadeOut)
+    {
+
+    }
+    public void skipCutscene()
+    {
+
+    }
+    public void updateCutscene()
+    {
+
+    }
+
+
+
     #endregion
 
 }

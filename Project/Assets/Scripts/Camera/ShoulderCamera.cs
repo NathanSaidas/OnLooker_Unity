@@ -16,10 +16,19 @@ public class ShoulderCamera : CameraController
 
     }
 
+    /// <summary>
+    /// The distance the camera goes back to search for a obstruction
+    /// </summary>
     [SerializeField]
     private float m_CollisionCheckDistance = 0.66f;
+    /// <summary>
+    /// The distance the camera is away from 
+    /// </summary>
     [SerializeField]
     private float m_Distance = 0.0f;
+    /// <summary>
+    /// Determines if there is an obstruction between the camera and the target
+    /// </summary>
     [SerializeField]
     private bool m_InCollision = false;
 

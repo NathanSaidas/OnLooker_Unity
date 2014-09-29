@@ -24,15 +24,15 @@ public class CameraTester : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Alpha2))
         {
-            CameraManager.instance.transitionToFirstPerson(m_Target, CameraMode.LERP, 10.0f);
+            CameraManager.instance.transitionToFirstPerson(m_Target, CameraMode.INSTANT, 10.0f);
         }
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            CameraManager.instance.transitionToShoulder(m_Target, CameraMode.LERP, 10.0f);
+            CameraManager.instance.transitionToShoulder(m_Target, CameraMode.INSTANT, 10.0f);
         }
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            CameraManager.instance.transitionToOrbit(m_Target, CameraMode.LERP, 10.0f);
+            CameraManager.instance.transitionToOrbit(m_Target, CameraMode.INSTANT, 10.0f);
         }
         if(Input.GetKeyDown(KeyCode.Alpha5))
         {
