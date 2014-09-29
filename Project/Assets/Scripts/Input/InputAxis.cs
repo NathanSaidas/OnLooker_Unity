@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using System.Runtime.Serialization;
+using OnLooker;
 
 
 [Serializable]
-public class InputAxis : NativeObject
+public class InputAxis : CustomSaveData
 {
 
     #region Constructor
@@ -19,7 +21,10 @@ public class InputAxis : NativeObject
         m_NegativeKey = new InputKey(this, false);
         axisName = aName;
     }
+    public InputAxis(SerializationInfo aInfo, StreamingContext aContext) : base (aInfo,aContext)
+    {
 
+    }
     #endregion
 
     #region Fields
@@ -226,8 +231,39 @@ public class InputAxis : NativeObject
         aInput = m_NegativeKey.input;
         aModifier = m_NegativeKey.modifier;
     }
-    
 
+
+    protected override void onSave()
+    {
+        addData("AxisName", name);
+        addData("Speed", m_Speed);
+        addData("Reset", m_ResetOnRelease);
+        addData("DeviceType", (int)m_DeviceType);
+        addData("Player", (int)m_Player);
+
+        addData("p_input", m_PositiveKey.input);
+        addData("p_modifier", (int)m_PositiveKey.modifier);
+
+        addData("n_input", m_NegativeKey.input);
+        addData("n_modifier", (int)m_NegativeKey.modifier);
+    }
+    protected override void onLoad()
+    {
+        m_PositiveKey = new InputKey(this, true);
+        m_NegativeKey = new InputKey(this, false);
+
+        name = getData<string>("AxisName");
+        m_Speed = getData<float>("Speed");
+        m_ResetOnRelease = getData<bool>("Reset");
+        m_DeviceType = (InputDevice)getData<int>("DeviceType");
+        m_Player = (InputPlayer)getData<int>("Player");
+
+        m_PositiveKey.input = getData<string>("p_input");
+        m_PositiveKey.modifier = (KeyCode)getData<int>("p_modifier");
+
+        m_NegativeKey.input = getData<string>("n_input");
+        m_NegativeKey.modifier = (KeyCode)getData<int>("n_modifier");
+    }
     #endregion
 
 

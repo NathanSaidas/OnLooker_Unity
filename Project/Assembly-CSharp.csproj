@@ -68,6 +68,10 @@
      <Compile Include="Assets\Scripts\UI\UITexture.cs" />
      <Compile Include="Assets\Scripts\UI\UIToggle.cs" />
      <Compile Include="Assets\Scripts\UI\UIUtilities.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\CustomSaveData.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\FileData.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\FileHeader.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\SaveData.cs" />
      <Compile Include="Assets\Scripts\Utilities\NativeObject.cs" />
      <Compile Include="Assets\Scripts\Utilities\OnLookerUtils.cs" />
      <Compile Include="Assets\Scripts\Utilities\TempBounds.cs" />

@@ -51,6 +51,22 @@ public static class InputUtilities
     // end constants
 
 
+    public static bool changeInputKeyboard(InputKey aKey)
+    {
+        string previousInput = aKey.input;
+        aKey.input = Input.inputString;
+        if (aKey.validateInput() == false)
+        {
+            aKey.input = "";
+            aKey.validateInput();
+        }
+        else
+        {
+            return true;
+        }
+        return false;
+    }
+
     /// <summary>
     /// Returns true where the input string was successfully parsed.
     /// Returns false where the input string was a bad string
@@ -490,5 +506,36 @@ public static class InputUtilities
                 break;
         }
         return 0;
+    }
+
+    public static KeyCode parseModifierKey(InputModifierKey aModifier)
+    {
+        switch(aModifier)
+        {
+            case InputModifierKey.LEFT_ALT:
+                return KeyCode.LeftAlt;
+            case InputModifierKey.LEFT_CONTROL:
+                return KeyCode.LeftControl;
+            case InputModifierKey.LEFT_SHIFT:
+                return KeyCode.LeftShift;
+            case InputModifierKey.NONE:
+                return KeyCode.None;
+        }
+        return KeyCode.None;
+    }
+    public static InputModifierKey parseModifierKey(KeyCode aModifier)
+    {
+        switch (aModifier)
+        {
+            case KeyCode.LeftAlt:
+                return InputModifierKey.LEFT_ALT;
+            case KeyCode.LeftControl:
+                return InputModifierKey.LEFT_CONTROL;
+            case KeyCode.LeftShift:
+                return InputModifierKey.LEFT_SHIFT;
+            case KeyCode.None:
+                return InputModifierKey.NONE;
+        }
+        return InputModifierKey.NONE;
     }
 }

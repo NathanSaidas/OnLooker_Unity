@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using OnLooker;
 
 [ExecuteInEditMode]
 public class InputManager : MonoBehaviour
@@ -109,6 +110,7 @@ public class InputManager : MonoBehaviour
         //if (Application.isPlaying == false)
         //{
         //    setDefault();
+        //    internal_SaveEditor();
         //}
         if(Application.isPlaying)
         {
@@ -151,21 +153,19 @@ public class InputManager : MonoBehaviour
 
 
     //Set the defaults for input manager.
-    void setDefault()
+    public void setDefault()
     {
-        if (m_Axis.Count == 0)
-        {
-            createInputAxis("Vertical", InputDevice.KEYBOARD, "w", "s");
-            createInputAxis("Horizontal", InputDevice.KEYBOARD, "d", "a");
-            createInputAxis("Vertical", InputDevice.KEYBOARD, InputUtilities.UP_ARROW, InputUtilities.DOWN_ARROW);
-            createInputAxis("Horizontal", InputDevice.KEYBOARD, InputUtilities.RIGHT_ARROW, InputUtilities.LEFT_ARROW);
+        clear();
+        createInputAxis("Vertical", InputDevice.KEYBOARD, "w", "s");
+        createInputAxis("Horizontal", InputDevice.KEYBOARD, "d", "a");
+        createInputAxis("Vertical", InputDevice.KEYBOARD, InputUtilities.UP_ARROW, InputUtilities.DOWN_ARROW);
+        createInputAxis("Horizontal", InputDevice.KEYBOARD, InputUtilities.RIGHT_ARROW, InputUtilities.LEFT_ARROW);
 
-            createButton("Jump", InputDevice.KEYBOARD, InputUtilities.SPACE);
+        createButton("Jump", InputDevice.KEYBOARD, InputUtilities.SPACE);
 
-            createInputAxis("Mouse X", InputDevice.MOUSE, InputUtilities.MOUSE_X);
-            createInputAxis("Mouse Y", InputDevice.MOUSE, InputUtilities.MOUSE_Y);
-            createInputAxis("Mouse ScrollWheel", InputDevice.MOUSE, InputUtilities.MOUSE_SCROLL_Y);
-        }
+        createInputAxis("Mouse X", InputDevice.MOUSE, InputUtilities.MOUSE_X);
+        createInputAxis("Mouse Y", InputDevice.MOUSE, InputUtilities.MOUSE_Y);
+        createInputAxis("Mouse ScrollWheel", InputDevice.MOUSE, InputUtilities.MOUSE_SCROLL_Y);
     }
 
     public void createInputAxis(string aName)
@@ -346,6 +346,62 @@ public class InputManager : MonoBehaviour
             return false;
         }
         return hits > 0;
+    }
+
+    public void saveEditor()
+    {
+        internal_SaveEditor();
+    }
+    public void loadEditor()
+    {
+        internal_LoadEditor();
+    }
+
+    private void internal_SaveEditor()
+    {
+        FileData file = new FileData("Input_Editor");
+        for (int i = 0; i < m_Axis.Count; i++)
+        {
+            file.add(m_Axis[i], m_Axis[i].name);
+        }
+        file.save();
+    }
+    private void internal_LoadEditor()
+    {
+        FileData file = new FileData("Input_Editor");
+        file.load();
+        InputAxis[] loadedAxis = file.get<InputAxis>();
+        if (loadedAxis != null)
+        {
+            clear();
+            for (int i = 0; i < loadedAxis.Length; i++)
+            {
+                m_Axis.Add(loadedAxis[i]);
+            }
+        }
+    }
+    private void internal_SaveUser(string aUser)
+    {
+        FileData file = new FileData("Input_" + aUser);
+        for (int i = 0; i < m_Axis.Count; i++)
+        {
+            file.add(m_Axis[i], m_Axis[i].name);
+        }
+        file.save();
+    }
+    private void internal_LoadUser(string aUser)
+    {
+        FileData file = new FileData("Input_" + aUser);
+        file.load();
+        InputAxis[] loadedAxis = file.get<InputAxis>();
+        if (loadedAxis != null)
+        {
+            clear();
+            for (int i = 0; i < loadedAxis.Length; i++)
+            {
+                m_Axis.Add(loadedAxis[i]);
+            }
+        }
     }
 
     public List<InputAxis> axisList
