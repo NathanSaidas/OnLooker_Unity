@@ -57,7 +57,7 @@ public static class InputUtilities
         aKey.input = Input.inputString;
         if (aKey.validateInput() == false)
         {
-            aKey.input = "";
+            aKey.input = ""; 
             aKey.validateInput();
         }
         else
