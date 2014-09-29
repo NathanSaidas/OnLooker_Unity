@@ -199,10 +199,10 @@ public class InputManager : MonoBehaviour
 
         createButton("Jump", InputDevice.KEYBOARD, InputUtilities.SPACE);
 
-        createInputAxis("Mouse X", InputDevice.MOUSE, InputUtilities.MOUSE_X);
-        createInputAxis("Mouse Y", InputDevice.MOUSE, InputUtilities.MOUSE_Y);
-        createInputAxis("Mouse ScrollWheel", InputDevice.MOUSE, InputUtilities.MOUSE_SCROLL_Y);
-    }
+        createInputAxis("Mouse X", InputDevice.MOUSE, InputUtilities.MOUSE_X, InputUtilities.MOUSE_X);
+        createInputAxis("Mouse Y", InputDevice.MOUSE, InputUtilities.MOUSE_Y, InputUtilities.MOUSE_Y);
+        createInputAxis("Mouse ScrollWheel", InputDevice.MOUSE, InputUtilities.MOUSE_SCROLL_Y,InputUtilities.MOUSE_SCROLL_Y);
+    }                                                                                     
 
     public void createInputAxis(string aName)
     {

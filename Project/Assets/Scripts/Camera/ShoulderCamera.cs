@@ -17,20 +17,16 @@ public class ShoulderCamera : CameraController
     }
 
     [SerializeField]
-    private float m_DistanceOffsetPercent = 0.5f;
-    [SerializeField]
     private float m_CollisionCheckDistance = 0.66f;
     [SerializeField]
     private float m_Distance = 0.0f;
     [SerializeField]
     private bool m_InCollision = false;
-    [SerializeField]
-    private bool m_Invert;
-
 
     private void missingProperty(string aName)
     {
-        Debug.LogError("Missing \'" + aName + "\' in FirstPersonCamera");
+        Debug.LogError("Missing \'" + aName + "\' in ShoulderCamera");
+        enabled = false;
     }
 
     public override void update()
@@ -120,7 +116,7 @@ public class ShoulderCamera : CameraController
             missingProperty("Parent");
             return Vector3.zero;
         }
-        parent.rotation = target.rotation;
+        parent.rotation = aTargetOrientation;
 
         bool collisionOccured = false;
 
@@ -153,6 +149,26 @@ public class ShoulderCamera : CameraController
     }
     public override Quaternion getTargetRotation(Vector3 aTargetPosition, Quaternion aTargetOrientation)
     {
-        throw new NotImplementedException();
+        return aTargetOrientation;
     }
+
+
+    
+    public float collisionCheckDistance
+    {
+        get { return m_CollisionCheckDistance; }
+        set { m_CollisionCheckDistance = value; }
+    }
+    
+    public float distance
+    {
+        get { return m_Distance; }
+    }
+    
+    public bool inCollision
+    {
+        get { return m_InCollision; }
+    }
+
+    
 }

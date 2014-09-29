@@ -18,6 +18,7 @@ public class FirstPersonCamera : CameraController
     private void missingProperty(string aName)
     {
         Debug.LogError("Missing \'" + aName + "\' in FirstPersonCamera");
+        enabled = false;
     }
 
     public override void update()

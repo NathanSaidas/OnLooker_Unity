@@ -52,10 +52,10 @@ public abstract class CameraController : NativeObject
     /// <summary>
     /// The cameras transform
     /// </summary>
-    protected Transform parent
+    public Transform parent
     {
         get { return m_Parent; }
-        set { m_Parent = value; }
+        set { if (m_Parent == null) { m_Parent = value; } }
     }
 
     /// <summary>
