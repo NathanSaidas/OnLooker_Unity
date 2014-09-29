@@ -73,6 +73,42 @@ public class InputManager : MonoBehaviour
         }
         return instance.internal_GetButtonUp(aName, aPlayer);
     }
+    public static void save(string aUser)
+    {
+        if (instance == null)
+        {
+            missingInputManager();
+            return;
+        }
+        instance.internal_SaveUser(aUser);
+    }
+    public static void load(string aUser)
+    {
+        if (instance == null)
+        {
+            missingInputManager();
+            return;
+        }
+        instance.internal_LoadUser(aUser);
+    }
+    public static void save(FileData aFile)
+    {
+        if (instance == null)
+        {
+            missingInputManager();
+            return;
+        }
+        instance.internal_SaveUser(aFile);
+    }
+    public static void load(FileData aFile)
+    {
+        if (instance == null)
+        {
+            missingInputManager();
+            return;
+        }
+        instance.internal_LoadUser(aFile);
+    }
     #endregion
 
 
@@ -394,6 +430,32 @@ public class InputManager : MonoBehaviour
         FileData file = new FileData("Input_" + aUser);
         file.load();
         InputAxis[] loadedAxis = file.get<InputAxis>();
+        if (loadedAxis != null)
+        {
+            clear();
+            for (int i = 0; i < loadedAxis.Length; i++)
+            {
+                m_Axis.Add(loadedAxis[i]);
+            }
+        }
+    }
+    private void internal_SaveUser(FileData aData)
+    {
+        if(aData != null)
+        {
+            for(int i = 0; i < m_Axis.Count; i++)
+            {
+                aData.add(m_Axis[i], m_Axis[i].name);
+            }
+        }
+    }
+    private void internal_LoadUser(FileData aData)
+    {
+        if(aData == null)
+        {
+            return;
+        }
+        InputAxis[] loadedAxis = aData.get<InputAxis>();
         if (loadedAxis != null)
         {
             clear();
