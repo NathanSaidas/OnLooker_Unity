@@ -36,17 +36,30 @@ public class Cutscene : MonoBehaviour
 
     private void Start()
     {
-        CameraManager.instance.registerCutscene(this);
+        
+    }
+    private void OnEnable()
+    {
+        
+    }
+    private void OnDisable()
+    {
+        
     }
     private void OnDestroy()
     {
         CameraManager.instance.unregisterCutscene(this);
     }
 
+    private void Update()
+    {
+        CameraManager.instance.registerCutscene(this);
+    }
 
     //Called every frame the cutscene is playing
     public void update()
     {
+        
         switch (m_State)
         {
             case State.PLAYING:
@@ -58,6 +71,7 @@ public class Cutscene : MonoBehaviour
                         m_CurrentInstruction++;
                         if (m_CurrentInstruction >= m_Instructions.Count)
                         {
+                            Debug.Log("Finished");
                             stop();
                         }
 
@@ -70,6 +84,7 @@ public class Cutscene : MonoBehaviour
 
     public void play()
     {
+        Debug.Log("Play");
         if (m_State != State.PLAYING)
         {
             if (m_ChangeOfState != null)
@@ -78,6 +93,14 @@ public class Cutscene : MonoBehaviour
             }
         }
         m_State = State.PLAYING;
+        if(m_CurrentInstruction >= m_Instructions.Count - 1)
+        {
+            m_CurrentInstruction = 0;
+        }
+        if (m_CurrentInstruction < m_Instructions.Count)
+        {
+            CameraManager.instance.cutsceneCamera.transform.position =  m_Instructions[m_CurrentInstruction].currentGoal;
+        }
     }
     //Plays from the specified index
     public void play(int aIndex)
@@ -90,6 +113,11 @@ public class Cutscene : MonoBehaviour
             }
         }
         m_CurrentInstruction = Mathf.Clamp(aIndex, 0, m_Instructions.Count);
+        if(m_CurrentInstruction < m_Instructions.Count)
+        {
+            m_Instructions[m_CurrentInstruction].reset();
+            CameraManager.instance.cutsceneCamera.transform.position = m_Instructions[m_CurrentInstruction].currentGoal;
+        }
         m_State = State.PLAYING;
     }
     //Stops the cutscene from playing, resets it aswell
@@ -221,10 +249,8 @@ public class Cutscene : MonoBehaviour
         {
             for (int i = 0; i < m_Instructions.Count; i++)
             {
-                if (m_Instructions[i].edit == true)
-                {
-                    m_Instructions[i].gizmosDrawPath();
-                }
+                m_Instructions[i].gizmosDrawPath();
+                m_Instructions[i].gizmosDrawTargets();
             }
         }
     }
@@ -236,10 +262,8 @@ public class Cutscene : MonoBehaviour
             {
                 for (int i = 0; i < m_Instructions.Count; i++)
                 {
-                    if (m_Instructions[i].edit == true)
-                    {
-                        m_Instructions[i].gizmosDrawPath();
-                    }
+                    m_Instructions[i].gizmosDrawPath();
+                    m_Instructions[i].gizmosDrawTargets();
                 }
             }
         }

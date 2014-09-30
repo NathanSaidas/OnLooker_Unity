@@ -205,8 +205,14 @@ public class CameraManager : MonoBehaviour
             m_FadeMesh = m_FadeCamera.GetComponentInChildren<FadeMesh>();
             if(m_FadeMesh != null)
             {
+                
                 m_FadeMesh.alpha = m_Alpha;
                 DontDestroyOnLoad(m_FadeCamera.gameObject);
+            }
+            MeshRenderer fadeRenderer = m_FadeCamera.GetComponentInChildren<MeshRenderer>();
+            if(fadeRenderer!=null)
+            {
+                fadeRenderer.enabled = true;
             }
             
         }
@@ -215,11 +221,17 @@ public class CameraManager : MonoBehaviour
         m_ShoulderCamera.parent = m_GameplayCamera.transform;
         m_OrbitCamera.parent = m_GameplayCamera.transform;
 
+        m_ShoulderCamera.start();
+        initCutscene();
     }
 
     
     private void Update()
     {
+        if(m_FadeMesh != null)
+        {
+            m_FadeMesh.alpha = m_Alpha;
+        }
         switch(m_CurrentState)
         {
             case State.NONE:
@@ -962,15 +974,175 @@ public class CameraManager : MonoBehaviour
     }
     public void triggerCutscene(string aCutsceneName, bool aFadeIn, bool aFadeOut)
     {
+        //Check the state to restore it after the cutscene
+        if (m_CurrentState == State.TRANSITION)
+        {
+            m_ResumeInTransition = true;
+        }
+        //A cutscene cannot occur while in a cutscene
+        else if (m_CurrentState == State.CUTSCENE || m_CurrentState == State.CUTSCENE_FADE_IN || m_CurrentState == State.CUTSCENE_FADE_OUT)
+        {
+            Debug.LogWarning("You cannot trigger a cutscene while in a cutscene.");
+            return;
+        }
+        else
+        {
+            pushState(); //save the state to return to it
+        }
 
+        //Get the Cutscene from the list
+        for (int i = 0; i < m_Cutscenes.Count; i++)
+        {
+            if (m_Cutscenes[i].cutsceneName == aCutsceneName)
+            {
+                m_CurrentCutscene = m_Cutscenes[i];
+                break;
+            }
+        }
+        //Cutscene not found
+        if (m_CurrentCutscene == null && aCutsceneName != "BACKDOOR")
+        {
+            Debug.LogWarning("Cutscene \'" + aCutsceneName + "\' could not be found.");
+            return;
+        }
+
+        m_CutsceneFadeIn = aFadeIn;
+        m_CutsceneFadeOut = aFadeOut;
+        disableForTransition();
+        
+        if (m_CutsceneFadeIn == true)
+        {
+            m_CurrentState = State.CUTSCENE_FADE_IN;
+        }
+        else
+        {
+            m_CurrentState = State.CUTSCENE;
+            m_GameplayCamera.enabled = false;
+            m_CutsceneCamera.enabled = true;
+        }
+
+        m_CurrentFrame = 15.0f;
     }
     public void skipCutscene()
     {
-
+        //Resume state
+        if (m_CurrentState == State.CUTSCENE_FADE_IN || m_CurrentState == State.CUTSCENE)
+        {
+            if (m_CutsceneFadeOut == true)
+                m_CurrentState = State.CUTSCENE_FADE_OUT;
+            else if (m_ResumeInTransition)
+            {
+                m_CurrentState = State.TRANSITION;
+                m_GameplayCamera.enabled = true;
+                m_CutsceneCamera.enabled = false;
+            }
+            else
+            {
+                m_CurrentState = m_PreviousState;
+                m_GameplayCamera.enabled = true;
+                m_CutsceneCamera.enabled = false;
+            }
+        }
     }
+    /// <summary>
+    /// Gets called when the camera manager inits to give the cutscene a chance to initialize
+    /// </summary>
+    public void initCutscene()
+    {
+        if(m_CutsceneCamera == null)
+        {
+            warnMissing("Cutscene Camera");
+        }
+        else
+        {
+            m_CutsceneCamera.enabled = false;
+        }
+    }
+    /// <summary>
+    /// Gives the cutscene a chance to update when the camera managers state is set to Cutscene.
+    /// </summary>
     public void updateCutscene()
     {
+        switch(m_CurrentState)
+        {
+            case State.CUTSCENE_FADE_IN:
+                {
+                    if (m_Alpha < 0.9f)
+                    {
+                        m_GameplayCamera.enabled = true;
+                        m_CutsceneCamera.enabled = false;
+                    }
+                    else if (m_Alpha >= 0.9f)
+                    {
+                        m_GameplayCamera.enabled = false;
+                        m_CutsceneCamera.enabled = true;
+                    }
+                    m_Alpha = Mathf.Clamp(m_Alpha + Time.deltaTime * m_CutsceneFadeSpeed, 0.0f, 1.0f);
+                    if (m_Alpha >= 1.0f)
+                    {
+                        m_Alpha = 0.0f;
+                        m_CurrentState = State.CUTSCENE;
+                        m_CurrentCutscene.play(0);
+                    }
+                    
+                }
+                break;
+            case State.CUTSCENE_FADE_OUT:
+                {
+                    if (m_Alpha < 0.9f)
+                    {
+                        m_GameplayCamera.enabled = false;
+                        m_CutsceneCamera.enabled = true;
+                    }
+                    else if (m_Alpha >= 0.9f)
+                    {
+                        m_GameplayCamera.enabled = true;
+                        m_CutsceneCamera.enabled = false;
+                    }
+                    m_Alpha = Mathf.Clamp(m_Alpha + Time.deltaTime * m_CutsceneFadeSpeed, 0.0f, 1.0f);
+                    if (m_Alpha >= 1.0f)
+                    {
+                        m_Alpha = 0.0f;
+                        if (m_ResumeInTransition)
+                        {
+                            m_CurrentState = State.TRANSITION;
+                        }
+                        else
+                        {
+                            m_CurrentState = m_PreviousState;
+                        }
 
+                    }
+                    
+                }
+                break;
+            case State.CUTSCENE:
+                //Else update the cutscene stuff
+                m_CurrentCutscene.update();
+                if (m_CurrentCutscene.isStopped)
+                {
+                    if (m_CutsceneFadeOut == true)
+                    {
+                        m_CurrentState = State.CUTSCENE_FADE_OUT;
+                    }
+                    else
+                    {
+                        if (m_ResumeInTransition)
+                        {
+                            m_GameplayCamera.enabled = true;
+                            m_CutsceneCamera.enabled = false;
+                            m_CurrentState = State.TRANSITION;
+                        }
+                        else
+                        {
+                            m_GameplayCamera.enabled = true;
+                            m_CutsceneCamera.enabled = false;
+                            m_CurrentState = m_PreviousState;
+                        }
+                    }
+                }
+                break;
+        }
     }
 
 

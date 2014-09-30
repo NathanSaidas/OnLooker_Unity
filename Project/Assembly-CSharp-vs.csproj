@@ -88,6 +88,7 @@
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileData.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileHeader.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\SaveData.cs" />
+     <Compile Include="Assets\Scripts\Utilities\IDebugDraw.cs" />
      <Compile Include="Assets\Scripts\Utilities\NativeObject.cs" />
      <Compile Include="Assets\Scripts\Utilities\OnLookerUtils.cs" />
      <Compile Include="Assets\Scripts\Utilities\TempBounds.cs" />
@@ -95,7 +96,10 @@
      <Compile Include="Assets\Scripts\Utilities\Utilities.cs" />
      <None Include="Assets\Shaders\TerrBumpFirstPass.shader" />
      <None Include="Assets\Shaders\3DTextShader.shader" />
+     <None Include="Assets\Shaders\Unlit_Tint_Blending_On.shader" />
+     <None Include="Assets\Shaders\Text.shader" />
      <None Include="Assets\Shaders\TerrBumpAddPass.shader" />
+     <None Include="Assets\Shaders\Unlit_Tint.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

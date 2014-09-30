@@ -56,7 +56,7 @@ public class CutsceneInstruction
     [SerializeField]
     private float m_CurrentTime = 0.0f;
 
-
+    private Vector3 m_CurrentLookAt = Vector3.zero;
     //Last and next position for distance calculations
     //private Vector3 m_LastPosition = Vector3.zero;
     //private Vector3 m_NextPosition = Vector3.zero;
@@ -83,7 +83,9 @@ public class CutsceneInstruction
     [SerializeField]
     private bool m_ShowLookAtPoints = true;
     [SerializeField]
-    private bool m_Edit;
+    private bool m_EditPath = false;
+    [SerializeField]
+    private bool m_EditTargets = false;
     [SerializeField]
     private Color m_LineColor = Color.green;
     [SerializeField]
@@ -134,23 +136,30 @@ public class CutsceneInstruction
         }
 
         //Valid Frame and Position path variable to work from.
-        Vector3 goal = m_PositionPath[m_CurrentFrame];
-        Vector3 lookAt = Vector3.zero;
+        
 
         //Get the look at target
         for (int i = 0; i < m_LookAtPath.Count; i++)
         {
             if (m_CurrentFrame >= m_LookAtPath[i].startFrame && m_CurrentFrame <= m_LookAtPath[i].endFrame)
             {
-                lookAt = m_LookAtPath[i].position;
+                m_CurrentLookAt = m_LookAtPath[i].position;
                 break;
             }
         }
 
-
+        Vector3 goal = m_PositionPath[m_CurrentFrame];
+        Vector3 lookAt = m_CurrentLookAt;
 
         //Grab the affected transform
-        Transform transform = CameraManager.instance.cutsceneCamera.transform;
+        Camera cutsceneCamera = CameraManager.instance.cutsceneCamera;
+        if(cutsceneCamera == null)
+        {
+            Debug.LogWarning("Missing a Cutscene Camera. Aborting instruction");
+            m_Owner.stop();
+            return;
+        }
+        Transform transform = cutsceneCamera.transform;
         if (transform != null)
         {
             Vector3 begin = Vector3.zero;
@@ -179,12 +188,14 @@ public class CutsceneInstruction
             }
 
             //Calculate distance for end position adjustment
-            float distance = Vector3.Distance(begin, end);
+            float travelDistance = Vector3.Distance(begin, end);
+            float distance = Vector3.Distance(end, goal);
             if (distance < m_DistanceClamp)
             {
                 end = goal;
                 onGoalReached();
                 m_CurrentFrame++;
+                Debug.Log("Reached goal " + m_CurrentFrame);
             }
 
             //Set the position
@@ -393,8 +404,8 @@ public class CutsceneInstruction
     }
     public bool edit
     {
-        get { return m_Edit; }
-        set { m_Edit = value; }
+        get { return m_EditPath; }
+        set { m_EditPath = value; }
     }
     public bool showInstruction
     {
@@ -446,13 +457,27 @@ public class CutsceneInstruction
 
     public void gizmosDrawPath()
     {
-        if (m_PositionPath != null && m_PositionPath.Length > 1)
+        if (m_PositionPath != null && m_PositionPath.Length > 1 && m_EditPath == true)
         {
             Gizmos.color = m_LineColor;
             Gizmos.matrix = Matrix4x4.TRS(owner.transform.position, owner.transform.rotation, owner.transform.localScale);
             for (int i = 0; i < m_PositionPath.Length - 1; i++)
             {
                 Gizmos.DrawLine(m_PositionPath[i], m_PositionPath[i + 1]);
+            }
+        }
+        
+
+    }
+    public void gizmosDrawTargets()
+    {
+        if (m_LookAtPath != null && m_LookAtPath.Count > 0 && m_EditTargets == true)
+        {
+            Gizmos.color = m_LineColor;
+            Gizmos.matrix = Matrix4x4.TRS(owner.transform.position, owner.transform.rotation, owner.transform.localScale);
+            for (int i = 0; i < m_LookAtPath.Count; i++)
+            {
+                Gizmos.DrawWireSphere(m_LookAtPath[i].position, 1.0f);
             }
         }
     }

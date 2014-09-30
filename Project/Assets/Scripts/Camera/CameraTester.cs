@@ -7,7 +7,8 @@ public class CameraTester : MonoBehaviour
     private Transform m_PositionA = null;
     [SerializeField]
     private Transform m_PositionB = null;
-
+    [SerializeField]
+    private string m_CutsceneName = string.Empty;
     private Transform m_Target = null;
 	// Use this for initialization
 	void Start () 
@@ -37,6 +38,14 @@ public class CameraTester : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Alpha5))
         {
             CameraManager.instance.disable();
+        }
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            CameraManager.instance.triggerCutscene(m_CutsceneName, true, true);
+        }
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            CameraManager.instance.skipCutscene();
         }
 	}
 

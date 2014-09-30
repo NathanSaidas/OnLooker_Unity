@@ -4,7 +4,7 @@ using System.Collections;
 
 
 [Serializable]
-public class ShoulderCamera : CameraController
+public class ShoulderCamera : CameraController, IDebugDraw
 {
     public ShoulderCamera(Transform aParent) : base(aParent)
     {
@@ -32,10 +32,24 @@ public class ShoulderCamera : CameraController
     [SerializeField]
     private bool m_InCollision = false;
 
+    [SerializeField]
+    private Vector3 m_LookAtPosition = Vector3.zero;
+
+    [SerializeField]
+    private float m_Y = 0.0f;
     private void missingProperty(string aName)
     {
         Debug.LogError("Missing \'" + aName + "\' in ShoulderCamera");
         enabled = false;
+    }
+    public void start()
+    {
+        Debug.Log("Start Camer");
+        if(GameManager.instance != null)
+        {
+            
+            GameManager.instance.registerDebugDraw(this);
+        }
     }
 
     public override void update()
@@ -56,15 +70,16 @@ public class ShoulderCamera : CameraController
         }
 
 
-        parent.rotation = target.rotation;
+        
         if (m_InCollision == false)
         {
             parent.position = target.position + target.rotation * offset;
         }
         else
         {
-            parent.position = target.position + target.rotation * new Vector3(offset.x,offset.y, m_Distance);
+            parent.position = target.position + target.rotation * new Vector3(offset.x,offset.y, -m_Distance);
         }
+        parent.LookAt(target.position + m_LookAtPosition + new Vector3(0.0f, m_Y, 0.0f));
     }
     public override void physicsUpdate()
     {
@@ -85,14 +100,13 @@ public class ShoulderCamera : CameraController
         //Check a raycast against all objects defined as a surface.
         int layerMask = 1 << GameManager.SURFACE_LAYER;
 
-        Vector3 targetLookAt = target.position + target.rotation * Vector3.forward;
+        Vector3 targetLookAt = target.position + target.rotation * offset;
         Vector3 direction = targetLookAt - parent.position;
         direction.Normalize();
 
-        float distanceBetween = Vector3.Distance(targetLookAt, parent.position) + m_CollisionCheckDistance;
-
+        float distanceBetween = Vector3.Distance(target.position, parent.position) + m_CollisionCheckDistance;
         RaycastHit hit;
-        if (Physics.Raycast(targetLookAt, direction, out hit, distanceBetween, layerMask))
+        if (Physics.Raycast(target.position, direction, out hit, distanceBetween, layerMask))
         {
             m_Distance = hit.distance - m_CollisionCheckDistance;
             m_InCollision = true;
@@ -101,6 +115,7 @@ public class ShoulderCamera : CameraController
         {
             m_Distance = offset.z;
             m_InCollision = false;
+            
         }
 
     }
@@ -179,5 +194,22 @@ public class ShoulderCamera : CameraController
         get { return m_InCollision; }
     }
 
-    
+
+
+    public void debugWatch()
+    {
+        if (enabled == true)
+        {
+            GUILayout.Label("Shoulder Camera | Collision : " + (inCollision == true ? "TRUE" : "FALSE"));
+            GUILayout.Label("Shoulder Camera | Distance : " + Vector3.Distance(target.position, parent.position));
+            GUILayout.Label("Shoulder Camera | Target Pos : " + target.position);
+            GUILayout.Label("Shoulder Camera | Parent Pos : " + parent.position);
+            GUILayout.Label("Shoulder Camera | Collision Check : " + collisionCheckDistance);
+        }
+    }
+
+    public void debugDraw()
+    {
+        
+    }
 }
