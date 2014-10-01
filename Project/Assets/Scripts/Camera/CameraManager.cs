@@ -1067,12 +1067,12 @@ public class CameraManager : MonoBehaviour
         {
             case State.CUTSCENE_FADE_IN:
                 {
-                    if (m_Alpha < 0.9f)
+                    if (m_Alpha < 0.98f)
                     {
                         m_GameplayCamera.enabled = true;
                         m_CutsceneCamera.enabled = false;
                     }
-                    else if (m_Alpha >= 0.9f)
+                    else if (m_Alpha >= 0.98f)
                     {
                         m_GameplayCamera.enabled = false;
                         m_CutsceneCamera.enabled = true;
@@ -1089,12 +1089,12 @@ public class CameraManager : MonoBehaviour
                 break;
             case State.CUTSCENE_FADE_OUT:
                 {
-                    if (m_Alpha < 0.9f)
+                    if (m_Alpha < 0.98f)
                     {
                         m_GameplayCamera.enabled = false;
                         m_CutsceneCamera.enabled = true;
                     }
-                    else if (m_Alpha >= 0.9f)
+                    else if (m_Alpha >= 0.98f)
                     {
                         m_GameplayCamera.enabled = true;
                         m_CutsceneCamera.enabled = false;

@@ -56,6 +56,8 @@ public class CutsceneInstruction
     [SerializeField]
     private float m_CurrentTime = 0.0f;
 
+
+
     private Vector3 m_CurrentLookAt = Vector3.zero;
     //Last and next position for distance calculations
     //private Vector3 m_LastPosition = Vector3.zero;
@@ -96,6 +98,8 @@ public class CutsceneInstruction
     [SerializeField]
     private CutsceneActionMode m_ActionMode = CutsceneActionMode.BEZIER;
 
+    [SerializeField]
+    private float m_CurrentTravelTime = 0.0f;
     //Called every executing frame
     public void update()
     {
@@ -122,12 +126,20 @@ public class CutsceneInstruction
             Debug.LogWarning("No path given to the \'Cutscene Instruction\'");
             return;
         }
+        if(m_PositionPath.Length == 1)
+        {
+            Debug.LogWarning("Only one segment was given for the path. There must be at least two.");
+            return;
+        }
         if (m_CurrentFrame >= m_PositionPath.Length)
         {
             onGoalReached();
             return;
         }
-
+        if (m_CurrentFrame == 0)
+        {
+            m_CurrentFrame = 1;
+        }
 
         //Calculate the target position
         if (onDelay == true)
@@ -148,6 +160,7 @@ public class CutsceneInstruction
             }
         }
 
+        Vector3 previousGoal = m_PositionPath[m_CurrentFrame - 1];
         Vector3 goal = m_PositionPath[m_CurrentFrame];
         Vector3 lookAt = m_CurrentLookAt;
 
@@ -159,6 +172,9 @@ public class CutsceneInstruction
             m_Owner.stop();
             return;
         }
+
+        m_CurrentTravelTime += Time.deltaTime * m_MoveSpeed;
+
         Transform transform = cutsceneCamera.transform;
         if (transform != null)
         {
@@ -171,10 +187,10 @@ public class CutsceneInstruction
             switch (m_MoveMode)
             {
                 case CameraMode.EASE:
-                    end = Utilities.exponentialEase(transform.position, goal, m_MoveSpeed * Time.deltaTime);
+                    end = Utilities.exponentialEase(previousGoal, goal, m_CurrentTravelTime);
                     break;
                 case CameraMode.LERP:
-                    end = Vector3.Lerp(transform.position, goal, m_MoveSpeed * Time.deltaTime);
+                    end = Vector3.Lerp(previousGoal, goal, m_CurrentTravelTime);
                     break;
                 case CameraMode.SMOOTH_DAMP:
                     {
@@ -190,11 +206,12 @@ public class CutsceneInstruction
             //Calculate distance for end position adjustment
             float travelDistance = Vector3.Distance(begin, end);
             float distance = Vector3.Distance(end, goal);
-            if (distance < m_DistanceClamp)
+            if (distance < m_DistanceClamp || m_CurrentTravelTime > 1.0f)
             {
                 end = goal;
                 onGoalReached();
                 m_CurrentFrame++;
+                m_CurrentTravelTime = 0.0f;
                 Debug.Log("Reached goal " + m_CurrentFrame);
             }
 
@@ -393,7 +410,7 @@ public class CutsceneInstruction
 
     public bool isFinished
     {
-        get { if (m_PositionPath == null) { return true; } return m_CurrentFrame > m_PositionPath.Length; }
+        get { if (m_PositionPath == null) { return true; } return m_CurrentFrame >= m_PositionPath.Length; }
     }
 
 
