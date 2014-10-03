@@ -14,7 +14,7 @@ public class CharacterComponent : EndevBehaviour
     public CharacterManager manager
     {
         get { if (m_CharacterManager == null) { Debug.LogError("Missing \'Character Manager\' on " + gameObject.name + "."); } return m_CharacterManager; }
-        set { m_CharacterManager = value; }
+        protected set { m_CharacterManager = value; }
     }
 
     public CharacterAnimation characterAnimation
@@ -91,5 +91,19 @@ public class CharacterComponent : EndevBehaviour
     {
         get { return manager == null ? false : manager.ownsCamera; }
     }
-
+    public bool lockMovement
+    {
+        get { return manager == null ? false : manager.lockMovement; }
+        set { if (manager != null) {manager.lockMovement = value;}}
+    }
+    public bool lockRotation
+    {
+        get { return manager == null ? false : manager.lockRotation; }
+        set { if (manager != null) {manager.lockRotation = value;}}
+    }
+    public bool lockGravity
+    {
+        get { return manager == null ? false : manager.lockGravity; }
+        set { if (manager != null) { manager.lockGravity = value; } }
+    }
 }

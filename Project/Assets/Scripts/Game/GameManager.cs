@@ -669,39 +669,39 @@ using EndevGame;
         #endregion
 
         //See field
-        public string requestedLevel
+        public static string requestedLevel
         {
-            get { return m_TargetScene.name; }
+            get { return instance == null ? string.Empty : instance.m_TargetScene.name; }
         }
         //See field
-        public bool loadingRequestedLevel
+        public static bool loadingRequestedLevel
         {
-            get { return m_State == State.LOADING; }
+            get { return instance == null ? false : (instance.m_State == State.LOADING); }
         }
         //See field
-        public bool isUnloading
+        public static bool isUnloading
         {
-            get { return m_State == State.UNLOADING; }
+            get { return instance == null ? false : (instance.m_State == State.UNLOADING); }
         }
         //Returns true if the state of the game is in gameplay and is paused
-        public bool isPaused
+        public static bool isPaused
         {
-            get { return m_IsPaused && isGamePlay == true; }
+            get { return instance == null ? false :  (instance.m_IsPaused && instance.m_IsGameplay == true); }
         }
         //Returns true if the state of the game is in gameplay, false for menu
         public bool isGamePlay
         {
-            get { return m_IsGameplay; }
+            get { return instance == null ? false : (instance.m_IsGameplay); }
         }
         //See field
         public string level
         {
-            get { return m_CurrentScene == null ? m_CurrentScene.name : m_TargetScene.name; }
+            get { return instance == null ? string.Empty : m_CurrentScene == null ? m_CurrentScene.name : m_TargetScene.name; }
         }
         //See field
         public int checkPoint
         {
-            get { return m_CheckPoint; }
+            get { return instance == null ? 0 : instance.m_CheckPoint; }
         }
         //See Field
         //public CharacterManager player

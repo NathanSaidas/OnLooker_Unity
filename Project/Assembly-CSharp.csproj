@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Camera\ActionCamera.cs" />
+     <Compile Include="Assets\Scripts\Camera\CameraControl.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraManager.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraMode.cs" />
@@ -62,10 +63,13 @@
      <Compile Include="Assets\Scripts\Camera\ShoulderCamera.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterAnimation.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterComponent.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterInputState.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterInteraction.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterManager.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterMotor.cs" />
      <Compile Include="Assets\Scripts\Game\CheckPoint.cs" />
      <Compile Include="Assets\Scripts\Game\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Game\LightManager.cs" />
      <Compile Include="Assets\Scripts\Game\StatModifier.cs" />
      <Compile Include="Assets\Scripts\Input\InputAxis.cs" />
      <Compile Include="Assets\Scripts\Input\InputDevice.cs" />
@@ -75,6 +79,16 @@
      <Compile Include="Assets\Scripts\Input\InputPlayer.cs" />
      <Compile Include="Assets\Scripts\Input\InputUtilities.cs" />
      <Compile Include="Assets\Scripts\Input\MouseButton.cs" />
+     <Compile Include="Assets\Scripts\Objects\Interactive.cs" />
+     <Compile Include="Assets\Scripts\Objects\InteractiveArgs.cs" />
+     <Compile Include="Assets\Scripts\Objects\InteractivePlant.cs" />
+     <Compile Include="Assets\Scripts\Objects\PickUpBounce.cs" />
+     <Compile Include="Assets\Scripts\Objects\PlantComponent.cs" />
+     <Compile Include="Assets\Scripts\Objects\PlantGrowth.cs" />
+     <Compile Include="Assets\Scripts\Objects\PlantLightVolume.cs" />
+     <Compile Include="Assets\Scripts\Objects\PlantManager.cs" />
+     <Compile Include="Assets\Scripts\Objects\PlantSeed.cs" />
+     <Compile Include="Assets\Scripts\Objects\PlantType.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UIButton.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UIControl.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UIImage.cs" />
@@ -99,6 +113,7 @@
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileData.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileHeader.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\SaveData.cs" />
+     <Compile Include="Assets\Scripts\Utilities\IConditional.cs" />
      <Compile Include="Assets\Scripts\Utilities\IDebugDraw.cs" />
      <Compile Include="Assets\Scripts\Utilities\LoadScreen.cs" />
      <Compile Include="Assets\Scripts\Utilities\NativeObject.cs" />
