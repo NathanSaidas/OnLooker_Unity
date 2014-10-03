@@ -46,21 +46,27 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Camera\CameraControl.cs" />
+     <Compile Include="Assets\Scripts\Camera\ActionCamera.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraManager.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraMode.cs" />
-     <Compile Include="Assets\Scripts\Camera\CameraTester.cs" />
      <Compile Include="Assets\Scripts\Camera\Cutscene.cs" />
      <Compile Include="Assets\Scripts\Camera\CutsceneAction.cs" />
      <Compile Include="Assets\Scripts\Camera\CutsceneBezier.cs" />
      <Compile Include="Assets\Scripts\Camera\CutsceneInstruction.cs" />
      <Compile Include="Assets\Scripts\Camera\CutsceneLookAt.cs" />
+     <Compile Include="Assets\Scripts\Camera\CutsceneManager.cs" />
      <Compile Include="Assets\Scripts\Camera\CutsceneStraight.cs" />
      <Compile Include="Assets\Scripts\Camera\FirstPersonCamera.cs" />
      <Compile Include="Assets\Scripts\Camera\OrbitCamera.cs" />
      <Compile Include="Assets\Scripts\Camera\ShoulderCamera.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterAnimation.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterComponent.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterManager.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterMotor.cs" />
+     <Compile Include="Assets\Scripts\Game\CheckPoint.cs" />
      <Compile Include="Assets\Scripts\Game\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Game\StatModifier.cs" />
      <Compile Include="Assets\Scripts\Input\InputAxis.cs" />
      <Compile Include="Assets\Scripts\Input\InputDevice.cs" />
      <Compile Include="Assets\Scripts\Input\InputKey.cs" />
@@ -83,14 +89,21 @@
      <Compile Include="Assets\Scripts\UI\UIToggle.cs" />
      <Compile Include="Assets\Scripts\UI\UIUtilities.cs" />
      <Compile Include="Assets\Scripts\Utilities\Bezier.cs" />
+     <Compile Include="Assets\Scripts\Utilities\Debug\DebugMode.cs" />
+     <Compile Include="Assets\Scripts\Utilities\Debug\DebugUtils.cs" />
+     <Compile Include="Assets\Scripts\Utilities\Debug\IDebugGizmo.cs" />
+     <Compile Include="Assets\Scripts\Utilities\Debug\IDebugWatch.cs" />
+     <Compile Include="Assets\Scripts\Utilities\EndevBehaviour.cs" />
      <Compile Include="Assets\Scripts\Utilities\FadeMesh.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\CustomSaveData.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileData.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileHeader.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\SaveData.cs" />
      <Compile Include="Assets\Scripts\Utilities\IDebugDraw.cs" />
+     <Compile Include="Assets\Scripts\Utilities\LoadScreen.cs" />
      <Compile Include="Assets\Scripts\Utilities\NativeObject.cs" />
      <Compile Include="Assets\Scripts\Utilities\OnLookerUtils.cs" />
+     <Compile Include="Assets\Scripts\Utilities\SceneFade.cs" />
      <Compile Include="Assets\Scripts\Utilities\TempBounds.cs" />
      <Compile Include="Assets\Scripts\Utilities\TempMesh.cs" />
      <Compile Include="Assets\Scripts\Utilities\Utilities.cs" />
