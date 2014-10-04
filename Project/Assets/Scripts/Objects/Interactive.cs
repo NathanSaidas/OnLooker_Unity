@@ -18,7 +18,6 @@ namespace EndevGame
     {
         //The event other components can listen in on 
         private event OnInteractiveCallback m_PlayerEvent;
-
         /// <summary>
         /// Event registration
         /// </summary>
@@ -52,42 +51,42 @@ namespace EndevGame
         //Gets called when the player enters the plant trigger area
         public virtual void onPlayerEnter(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("PlayerEnter", aPlayer));
         }
         //Gets called when the player stays within the plant trigger area
         public virtual void onPlayerStay(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("PlayerStay", aPlayer));
         }
         //Gets called when the player leaves the plant trigger area
         public virtual void onPlayerExit(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("PlayerExit", aPlayer));
         }
         //Gets called when the player looks at an object with a collider who has their layer set to "Object Interaction" ie 8th Layer
         public virtual void onPlayerFocusEnter(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("FocusBegin", aPlayer));
         }
         //Gets called for every frame the player looks at an object with a collider who has their layer set to "Object Interaction" ie 8th Layer
         public virtual void onPlayerFocus(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("FocusContinue", aPlayer));
         }
         //Gets called when the player stops looking at the object with a collider who has their layer set to "Object Interaction" ie 8th Layer
         public virtual void onPlayerFocusExit(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("FocusEnd", aPlayer));
         }
         //Gets called when the player starts using this object.
         public virtual void onUse(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("Use", aPlayer));
         }
         //Gets called when the player stops using this object
         public virtual void onUseEnd(CharacterInteraction aPlayer)
         {
-
+            invokeCallback(new InteractiveArgs("StopUsing", aPlayer));
         }
         //The condition to check before the player may use this object.
         public virtual bool condition(Transform aPlayer, Transform aPlant)

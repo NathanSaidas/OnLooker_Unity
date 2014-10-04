@@ -38,6 +38,7 @@ using EndevGame;
         public const int OBJECT_INTERACTION_LAYER = 8;
         public const int SURFACE_LAYER = 10;
         public const int PLANT_LIGHT_LAYER = SURFACE_LAYER;
+        public const int CLIMB_LAYER = 11;
         //Scene Name Constants
         public const string SPLASH_SCENE = "splash_scene";
         public const string MAIN_MENU_SCENE = "main_menu_scene";
@@ -251,12 +252,12 @@ using EndevGame;
             {
                 if(m_CurrentScene.name != MAIN_MENU_SCENE && isPaused == false)
                 {
-                    Debug.Log("Locking Cursor");
+                    //Debug.Log("Locking Cursor");
                     Screen.lockCursor = true;
                 }
                 else
                 {
-                    Debug.Log("Unlocking cursor");
+                    //Debug.Log("Unlocking cursor");
                     Screen.lockCursor = false;
                 }
             }
@@ -728,6 +729,7 @@ using EndevGame;
         
 
         public event GameEventCallback m_MushroomBounce;
+        public event GameEventCallback m_CharacterInteraction;
 
         /// <summary>
         /// Registers a function to a game event
@@ -743,9 +745,18 @@ using EndevGame;
                     case GameEventID.MUSHROOM_BOUNCE:
                         m_MushroomBounce += aCallback;
                         break;
+                    case GameEventID.INTERACTION_PLAYER_ENTER:
+                    case GameEventID.INTERACTION_PLAYER_EXIT:
+                    case GameEventID.INTERACTION_PLAYER_FOCUS_BEGIN:
+                    case GameEventID.INTERACTION_PLAYER_FOCUS_END:
+                    case GameEventID.INTERACTION_PLAYER_ON_USE:
+                    case GameEventID.INTERACTION_PLAYER_ON_USE_END:
+                        m_CharacterInteraction += aCallback;
+                        break;
                     default:
                         Debug.LogWarning("Invalid ID given in \'registerGameEvent\'.");
                         break;
+                        
                 }
             }
         }
@@ -764,6 +775,19 @@ using EndevGame;
                         if (m_MushroomBounce != null)
                         {
                             m_MushroomBounce -= aCallback;
+                        }
+                        break;
+                    case GameEventID.INTERACTION_PLAYER_ENTER:
+                    case GameEventID.INTERACTION_PLAYER_EXIT:
+                    case GameEventID.INTERACTION_PLAYER_FOCUS_BEGIN:
+                    case GameEventID.INTERACTION_PLAYER_FOCUS_END:
+                    case GameEventID.INTERACTION_PLAYER_ON_USE:
+                    case GameEventID.INTERACTION_PLAYER_ON_USE_END:
+                        {
+                            if(m_CharacterInteraction != null)
+                            {
+                                m_CharacterInteraction -= aCallback;
+                            }
                         }
                         break;
                     default:
@@ -840,6 +864,20 @@ using EndevGame;
                         m_MushroomBounce.Invoke(m_GameEventArgs.sender, aID);
                     }
                     break;
+                case GameEventID.INTERACTION_PLAYER_ENTER:
+                case GameEventID.INTERACTION_PLAYER_EXIT:
+                case GameEventID.INTERACTION_PLAYER_FOCUS_BEGIN:
+                case GameEventID.INTERACTION_PLAYER_FOCUS_END:
+                case GameEventID.INTERACTION_PLAYER_ON_USE:
+                case GameEventID.INTERACTION_PLAYER_ON_USE_END:
+                    if(m_CharacterInteraction != null)
+                    {
+                        m_CharacterInteraction.Invoke(m_GameEventArgs.sender, aID);
+                    }
+                    break;
+                default:
+                    //Unhandled event was sent
+                    break;
             }
         }
         private void setEventArgs(GameEventArgs aArgs)
@@ -864,7 +902,14 @@ using EndevGame;
     public enum GameEventID
     {
         NONE,
-        MUSHROOM_BOUNCE
+        MUSHROOM_BOUNCE,
+        INTERACTION_PLAYER_ENTER,
+        INTERACTION_PLAYER_EXIT,
+        INTERACTION_PLAYER_FOCUS_BEGIN,
+        INTERACTION_PLAYER_FOCUS_END,
+        INTERACTION_PLAYER_ON_USE,
+        INTERACTION_PLAYER_ON_USE_END
+
     }
 
     public struct GameEventArgs

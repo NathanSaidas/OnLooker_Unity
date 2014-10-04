@@ -10,6 +10,8 @@ namespace EndevGame
         [SerializeField]
         private CharacterMotor m_CharacterMotor = null;
         [SerializeField]
+        private CharacterInteraction m_CharacterInteraction = null;
+        [SerializeField]
         private CharacterAnimation m_CharacterAnimation = null;
 
 
@@ -76,7 +78,19 @@ namespace EndevGame
                 camMan.transitionToOrbit(m_CameraTarget, CameraMode.INSTANT, 0.0f);
             }
 
+            //Main Component Search
             m_CharacterMotor = GetComponent<CharacterMotor>();
+            m_CharacterInteraction = GetComponent<CharacterInteraction>();
+
+            //Child component Search
+            if(m_CharacterMotor == null)
+            {
+                m_CharacterMotor = GetComponentInChildren<CharacterMotor>();
+            }
+            if(m_CharacterInteraction == null)
+            {
+                m_CharacterInteraction = GetComponentInChildren<CharacterInteraction>();
+            }
         }
 
         // Update is called once per frame
@@ -167,6 +181,11 @@ namespace EndevGame
         public CharacterAnimation characterAnimation
         {
             get { return m_CharacterAnimation; }
+        }
+
+        public CharacterInteraction characterInteraction
+        {
+            get { return m_CharacterInteraction; }
         }
 
         /// <summary>

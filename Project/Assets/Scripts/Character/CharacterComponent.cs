@@ -6,6 +6,15 @@ public class CharacterComponent : EndevBehaviour
 {
     private CharacterManager m_CharacterManager = null;
 
+    protected virtual void init()
+    {
+        m_CharacterManager = GetComponent<CharacterManager>();
+        if(m_CharacterManager == null)
+        {
+            m_CharacterManager = getComponentInParent<CharacterManager>();
+        }
+    }
+
     protected override void Update()
     {
         base.Update();
@@ -24,6 +33,10 @@ public class CharacterComponent : EndevBehaviour
     public CharacterMotor characterMotor
     {
         get { return manager == null ? null : manager.characterMotor; }
+    }
+    public CharacterInteraction characterInteraction
+    {
+        get { return manager == null ? null : manager.characterInteraction; }
     }
 
     #region InputProperties

@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Prefabs\Prototype_Testing\CharacterInteraction\InteractiveObjectExample.cs" />
      <Compile Include="Assets\Scripts\Camera\ActionCamera.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraControl.cs" />
      <Compile Include="Assets\Scripts\Camera\CameraController.cs" />
@@ -65,6 +66,7 @@
      <Compile Include="Assets\Scripts\Character\CharacterComponent.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterInputState.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterInteraction.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterLedgeGrab.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterManager.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterMotor.cs" />
      <Compile Include="Assets\Scripts\Game\CheckPoint.cs" />
@@ -89,6 +91,7 @@
      <Compile Include="Assets\Scripts\Objects\PlantManager.cs" />
      <Compile Include="Assets\Scripts\Objects\PlantSeed.cs" />
      <Compile Include="Assets\Scripts\Objects\PlantType.cs" />
+     <Compile Include="Assets\Scripts\Objects\WorldObject.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UIButton.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UIControl.cs" />
      <Compile Include="Assets\Scripts\UI\Controls\UIImage.cs" />

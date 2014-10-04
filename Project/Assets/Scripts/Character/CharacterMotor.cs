@@ -55,7 +55,7 @@ namespace EndevGame
         void Start()
         {
             manager = GetComponent<CharacterManager>();
-            rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY;
         }
 
         protected override void Update()
@@ -79,23 +79,30 @@ namespace EndevGame
             {
                 return;
             }
+
+
+            //Ground Detection Check
             checkGrounded();
-
-
             m_GravityTimer -= Time.fixedDeltaTime;
             if (m_GravityTimer < 0.0f)
             {
                 applyGravity = true;
             }
 
-            turnWithCamera();
+            //Rotate the character towards the camera
+            if(lockRotation == false)
+            {
+                turnWithCamera();
+            }
+            
 
-
+            //Apply Gravity
             if (applyGravity == true && lockGravity == false)
             {
                 //addForce(0.0f, -m_Gravity * rigidbody.mass, 0.0f, ForceMode.VelocityChange);
                 velocity = new Vector3(velocity.x, velocity.y - (m_Gravity * rigidbody.mass * Time.fixedDeltaTime), velocity.z);
             }
+            //Check for character actions such as jump / roll
             if (jump == true && isGrounded)
             {
                 doJump();
@@ -103,9 +110,15 @@ namespace EndevGame
                 applyGravity = false;
             }
 
+            //Constantly reset the rigidbodies angular velocity to stop it from rotating.
             resetAngularVelocity();
-            move();
 
+
+            //Finally move the character.
+            if (lockMovement == false)
+            {
+                move();
+            }
 
         }
 

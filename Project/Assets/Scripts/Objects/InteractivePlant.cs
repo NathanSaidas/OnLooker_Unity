@@ -51,21 +51,21 @@ namespace EndevGame
             if(playerManager != null)
             {
                 //If the player is using the plant (In a plant action state) then force the player to stop using the plant and unlock their movement because they are no longer looking at the plant. 
-                switch(playerManager.actionState)
-                {
-                    case ActionState.PLANT_SHRINK_LOOP:
-                    case ActionState.PLANT_SHRINK_END:
-                    case ActionState.PLANT_SHRINK_BEGIN:
-                    case ActionState.PLANT_GROW_LOOP:
-                    case ActionState.PLANT_GROW_END:
-                    case ActionState.PLANT_GROW_BEGIN:
-                        playerManager.pushActionState(ActionState.NONE);
-                        playerManager.lockMovement = false;
-                        break;
-                    default:
-
-                        break;
-                }
+                //switch(playerManager.actionState)
+                //{
+                //    case ActionState.PLANT_SHRINK_LOOP:
+                //    case ActionState.PLANT_SHRINK_END:
+                //    case ActionState.PLANT_SHRINK_BEGIN:
+                //    case ActionState.PLANT_GROW_LOOP:
+                //    case ActionState.PLANT_GROW_END:
+                //    case ActionState.PLANT_GROW_BEGIN:
+                //        playerManager.pushActionState(ActionState.NONE);
+                //        playerManager.lockMovement = false;
+                //        break;
+                //    default:
+                //
+                //        break;
+                //}
             }
         }
         //Gets called when the player starts using this object.
