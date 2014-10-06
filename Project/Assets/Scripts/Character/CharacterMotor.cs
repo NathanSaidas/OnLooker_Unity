@@ -33,6 +33,20 @@ namespace EndevGame
         [SerializeField]
         private float m_GravityTimer = 0.0f;
 
+        //How
+        [SerializeField]
+        private float m_StepOffset = 0.5f;
+        [SerializeField]
+        private float m_StepForwardDistance = 1.0f;
+
+
+
+        //Debug Variables
+        [SerializeField]
+        private Vector3 m_DebugStart = Vector3.zero;
+        [SerializeField]
+        private Vector3 m_DebugEnd = Vector3.zero;
+
         //Managed State
         [SerializeField]
         private bool m_IsCrouching = false;
@@ -155,6 +169,26 @@ namespace EndevGame
             //Calculate the target direction relative to the cameras rotation on the y.
             Vector3 targetVelocity = cameraOrientation * new Vector3(sideMotion, 0.0f, forwardMotion);
 
+            //If the character is moving check to see if the slope is to high.
+            if(targetVelocity != Vector3.zero)
+            {
+                Vector3 startPoint = transform.position;
+                Vector3 endPoint = startPoint + transform.rotation * new Vector3(0.0f, m_StepOffset, 1.0f);
+                Vector3 direction = (endPoint - startPoint).normalized;
+                float distance = Vector3.Distance(startPoint, endPoint);
+                int layerMask = 1 << GameManager.SURFACE_LAYER;
+                RaycastHit hit;
+                //If the slope was to high slow the velocity down to 0 and dont bother trying to move.
+                if(Physics.Raycast(startPoint,direction, out hit, distance, layerMask ))
+                {
+                    Vector3 slopeVelocity = Vector3.Lerp(rigidbody.velocity, Vector3.zero, Time.fixedDeltaTime * 5.0f);
+                    slopeVelocity.y = rigidbody.velocity.y;
+                    rigidbody.velocity = slopeVelocity;
+                    return;
+                }
+
+
+            }
 
 
             if (isGrounded == true)
@@ -390,6 +424,20 @@ namespace EndevGame
         }
 
         #endregion
+
+
+        private void OnDrawGizmos()
+        {
+            Vector3 startPoint = transform.position;
+            Vector3 endPoint = startPoint + transform.rotation * new Vector3(0.0f, m_StepOffset, m_StepForwardDistance);
+            Vector3 direction = (endPoint - startPoint).normalized;
+
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(startPoint, endPoint);
+            m_DebugStart = startPoint;
+            m_DebugEnd = endPoint;
+        }
 
     }
 }
