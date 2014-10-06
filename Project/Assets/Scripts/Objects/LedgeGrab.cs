@@ -25,7 +25,7 @@ namespace EndevGame
         private float m_CurrentTime = 0.0f;
 
         [SerializeField]
-        CharacterManager m_TriggeringCharacter = null;
+        CharacterLedgeGrab m_TriggeringCharacter = null;
         [SerializeField]
         private bool m_InUse = false;
 
@@ -58,11 +58,23 @@ namespace EndevGame
         /// <summary>
         /// Invoke this function to have a character or something grab onto a ledge.
         /// </summary>
-        public bool grab(CharacterManager aCharacter)
+        public bool grab(CharacterLedgeGrab aCharacter)
         {
+
+
             //If there is no one currently attached the ledge (One Character only)
             if(m_TriggeringCharacter == null)
             {
+                Vector3 objectInFront = aCharacter.manager.transform.position;
+                Vector3 objectView = transform.position;
+                Vector3 direction = (objectInFront - objectView).normalized;
+                float facing = Vector3.Dot(direction, transform.forward);
+                if(facing <= 0.0f)
+                {
+                    Debug.Log("Character was behind");
+                    return false;
+                }
+
                 m_TriggeringCharacter = aCharacter;
                 m_InUse = true;
                 return true;
@@ -72,12 +84,56 @@ namespace EndevGame
         /// <summary>
         /// Invoke this function to have a character or something release themselves from the ledge.
         /// </summary>
-        public void release(CharacterManager aCharacter)
+        public void release(CharacterLedgeGrab aCharacter)
         {
             //m_CurrentTime = m_ResetTime;
             m_CurrentTime = m_LedgeGrabCooldown;
             m_InUse = false;            
         }
+
+        /// <summary>
+        /// Checks the left side of the left based on the characters position
+        /// </summary>
+        /// <param name="aCharacter">The character thats moving.</param>
+        /// <param name="aDistance">The distance that the character can move</param>
+        /// <returns></returns>
+        public bool checkSide(Transform aCharacter, float aDistance, bool aLeft, out Vector3 aTarget)
+        {
+            aTarget = Vector3.zero;
+            if(aCharacter == null)
+            {
+                return false;
+            }
+            Vector3 origin = aCharacter.position;
+            Vector3 direction = Vector3.zero;
+            if (aLeft == true)
+            {
+                direction = aCharacter.rotation * Vector3.left;
+            }
+            else
+            {
+                direction = aCharacter.rotation * Vector3.right;
+            }
+            direction.Normalize();
+            float distance = Mathf.Clamp(aDistance,1.1f,300.0f);
+            Debug.Log("Distance: " + distance);
+            aTarget = origin + direction * distance;
+            aTarget.y = origin.y;
+            int layerMask = 1 << GameManager.CLIMB_LAYER;
+            RaycastHit hit;
+            origin.y += m_TriggeringCharacter.characterHeight;
+            if(Physics.Raycast(origin,direction,out hit,distance,layerMask ))
+            {
+                aTarget = hit.point;
+                aTarget.y -= m_TriggeringCharacter.characterHeight;
+                return false;
+            }
+            
+            return true;
+        }
+
+        
+
         /*private bool checkSide(Vector3 aOffset)
         {
             //When calculating the offsets I have to use negative values or else I get the origin and direction on the other side.
@@ -136,6 +192,8 @@ namespace EndevGame
         {
 
         }
+
+
         public Vector3 origin
         {
             get { return m_MainCollider == null ? Vector3.zero : m_MainCollider.center; }

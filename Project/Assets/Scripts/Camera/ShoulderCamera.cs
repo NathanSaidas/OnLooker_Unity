@@ -51,7 +51,7 @@ namespace EndevGame
             Debug.LogError("Missing \'" + aName + "\' in ShoulderCamera");
             enabled = false;
         }
-        public void start()
+        public override void start()
         {
             if (GameManager.instance != null)
             {

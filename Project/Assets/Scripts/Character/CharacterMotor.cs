@@ -369,10 +369,18 @@ namespace EndevGame
         }
         public void resetAngularVelocity()
         {
-            if (rigidbody != null)
+            if (rigidbody != null && rigidbody.isKinematic == false)
             {
                 rigidbody.angularVelocity = Vector3.zero;
             }
+        }
+        public void disableRigidbody()
+        {
+            rigidbody.isKinematic = true;
+        }
+        public void enableRigidbody()
+        {
+            rigidbody.isKinematic = false;
         }
 
         /// <summary>
@@ -427,18 +435,18 @@ namespace EndevGame
 
 
         ///Debug Draw the Slope Height Vector
-        //private void OnDrawGizmos()
-        //{
-        //    Vector3 startPoint = transform.position;
-        //    Vector3 endPoint = startPoint + transform.rotation * new Vector3(0.0f, m_StepOffset, m_StepForwardDistance);
-        //    Vector3 direction = (endPoint - startPoint).normalized;
-        //
-        //
-        //    Gizmos.color = Color.red;
-        //    Gizmos.DrawLine(startPoint, endPoint);
-        //    m_DebugStart = startPoint;
-        //    m_DebugEnd = endPoint;
-        //}
+        private void OnDrawGizmos()
+        {
+            Vector3 startPoint = transform.position;
+            Vector3 endPoint = startPoint + transform.rotation * new Vector3(0.0f, m_StepOffset, m_StepForwardDistance);
+            Vector3 direction = (endPoint - startPoint).normalized;
+        
+        
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(startPoint, endPoint);
+            m_DebugStart = startPoint;
+            m_DebugEnd = endPoint;
+        }
 
     }
 }
