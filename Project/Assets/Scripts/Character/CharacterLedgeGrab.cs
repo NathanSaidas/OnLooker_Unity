@@ -215,7 +215,7 @@ namespace EndevGame
                     updateClimbRight();
                     break;
                 case State.IDLE:
-                    updateOn();
+                    updateIdle();
                     break;
                 case State.CLIMB_UP:
                     m_CurrentTime += Time.deltaTime * m_ClimbSpeed;
@@ -244,7 +244,7 @@ namespace EndevGame
         }
 
         //This state checks for input then transitions to the other states
-        void updateOn()
+        void updateIdle()
         {
             if(forwardMotion != 0.0f)
             {

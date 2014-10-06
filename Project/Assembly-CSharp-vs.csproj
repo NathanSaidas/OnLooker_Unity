@@ -70,6 +70,7 @@
      <Compile Include="Assets\Scripts\Character\CharacterLedgeGrab.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterManager.cs" />
      <Compile Include="Assets\Scripts\Character\CharacterMotor.cs" />
+     <Compile Include="Assets\Scripts\Character\CharacterVine.cs" />
      <Compile Include="Assets\Scripts\Game\CheckPoint.cs" />
      <Compile Include="Assets\Scripts\Game\GameManager.cs" />
      <Compile Include="Assets\Scripts\Game\LightManager.cs" />

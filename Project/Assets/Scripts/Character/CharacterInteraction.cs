@@ -346,12 +346,16 @@ namespace EndevGame
             get { return m_TriggeringObjects.ToArray(); }
         }
 
-        public void releaseUsedObject()
+        public void releaseOverride()
         {
             if (m_ObjectInUse != null)
             {
                 bool overrideUseEnd;
                 m_ObjectInUse.onUseEnd(this, out overrideUseEnd);
+                if(overrideUseEnd == false)
+                {
+                    return;
+                }
                 GameEventArgs eventArgs = new GameEventArgs(GameEventID.INTERACTION_PLAYER_ON_USE_END);
                 eventArgs.sender = this;
                 eventArgs.triggeringObject = m_ObjectInFocus;

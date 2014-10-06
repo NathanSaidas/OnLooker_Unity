@@ -29,12 +29,12 @@ namespace EndevGame
         private Vector3 m_TargetPosition = Vector3.zero;
         private Quaternion m_TargetRotation = Quaternion.identity;
 
+
+        private bool m_FallOff = false;
         /// <summary>
         /// The current time passed for a character motion. (Initial Grab, Climbing left,right up or down)
         /// </summary>
         private float m_CurrentTime = 0.0f;
-
-
         /// <summary>
         /// The offset distance the character should be from the target position for grabbing
         /// </summary>
@@ -104,6 +104,8 @@ namespace EndevGame
 
             m_CurrentTime = 0.0f;
 
+           
+            
             m_State = State.GRABBING;
 
             m_ClimbableObject = aClimbableObject;
@@ -129,6 +131,7 @@ namespace EndevGame
 
         protected override void Update()
         {
+            
             base.Update();
             ///TODO: Change this key code to whatever you want the end-user to press to release.
             if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -143,7 +146,7 @@ namespace EndevGame
                     }
                     else
                     {
-                        characterInteraction.releaseUsedObject();
+                        characterInteraction.releaseOverride();
                     }
                     release();
                 }
@@ -166,10 +169,103 @@ namespace EndevGame
 
         private void updateIdle()
         {
+            ///Check forward motion state
+            if (forwardMotion != 0.0f)
+            {
+                ///Increase time to go up
+                if (forwardMotion > 0.0f)
+                {
+                    if (m_InputUp == false)
+                    {
+                        m_InputTime.y = 0.0f;
+                    }
+                    m_InputUp = true;
+                    m_InputTime.y += Time.deltaTime;
+                    m_InputDown = false;
+                }
+                ///Increase time to go down
+                else if (forwardMotion < 0.0f)
+                {
+                    if (m_InputDown == false)
+                    {
+                        m_InputTime.y = 0.0f;
+                    }
+                    m_InputDown = true;
+                    m_InputTime.y += Time.deltaTime;
+                    m_InputUp = false;
+                }
+            }
+            else //Reset time
+            {
+                m_InputTime.y = 0.0f;
+                m_InputUp = false;
+                m_InputDown = false;
+            }
+            ///Check the side motoin
+            if (sideMotion != 0.0f)
+            {
+                //Increase time to go left
+                if (sideMotion < 0.0f)
+                {
+                    if (m_InputLeft == false)
+                    {
+                        m_InputTime.x = 0.0f;
+                    }
+                    m_InputLeft = true;
+                    m_InputTime.x += Time.deltaTime;
+                    m_InputRight = false;
+                }
+                //Increase time to go right
+                else if (sideMotion > 0.0f)
+                {
+                    if (m_InputRight == false)
+                    {
+                        m_InputTime.x = 0.0f;
+                    }
+                    m_InputRight = true;
+                    m_InputTime.x += Time.deltaTime;
+                    m_InputLeft = false;
+                }
+            }
+            else
+            {
+                m_InputTime.x = 0.0f;
+                m_InputRight = false;
+                m_InputLeft = false;
+            }
+
+            //Change states if enough input time has passed.
+            if(m_InputTime.y > m_ClimbInputSpeed)
+            {
+                if(m_InputDown == true)
+                {
+                    m_State = State.CLIMB_DOWN;
+                }
+                else if(m_InputUp == true)
+                {
+                    m_State = State.CLIMB_UP;
+                }
+                m_InputTime.y -= m_ClimbInputSpeed * 0.3f;
+            }
+            else if(m_InputTime.x > m_ClimbInputSpeed)
+            {
+                if (m_InputLeft == true)
+                {
+                    m_State = State.CLIMB_LEFT;
+                }
+                else if (m_InputRight == true)
+                {
+                    m_State = State.CLIMB_RIGHT;
+                }
+                m_InputTime.x -= m_ClimbInputSpeed * 0.3f;
+            }
+
 
         }
         private void updateGrabbing()
         {
+            
+
 
         }
         private void updateClimbingUpFinish()
@@ -178,7 +274,56 @@ namespace EndevGame
         }
         private void updateClimbLeft()
         {
+            if (m_ClimbableObject == null)
+            {
+                if (characterInteraction != null)
+                {
+                    characterInteraction.releaseOverride();
+                }
+                release();
+                return;
+            }
 
+            Vector3 targetPosition = Vector3.zero;
+            bool canMove = m_ClimbableObject.checkHorizontalSide(manager.transform, m_ClimbDistance, true, out targetPosition);
+
+            if (canMove == true)
+            {
+                m_InitialPosition = manager.transform.position;
+                m_TargetPosition = targetPosition;
+                m_State = State.CLIMBING_LEFT;
+                m_CurrentTime = 0.0f;
+            }
+            else
+            {
+                if(Vector3.Distance(targetPosition,manager.transform.position) < 0.02f)
+                {
+                    if(m_FallOff == true)
+                    {
+                        if(m_ClimbableObject != null)
+                        {
+                            m_ClimbableObject.release(this);
+                            m_ClimbableObject = null;
+                        }
+                        if(characterInteraction != null)
+                        {
+                            characterInteraction.releaseOverride();
+                        }
+                        release();
+                    }
+                    else
+                    {
+                        m_State = State.IDLE;
+                    }
+                }
+                else
+                {
+                    m_InitialPosition = manager.transform.position;
+                    m_TargetPosition = targetPosition;
+                    m_State = State.CLIMBING_LEFT;
+                    m_CurrentTime = 0.0f;
+                }
+            }
         }
         private void updateClimbRight()
         {
