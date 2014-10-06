@@ -77,8 +77,9 @@ namespace EndevGame
             invokeCallback(new InteractiveArgs("onUse", aPlayer));
         }
         //Gets called when the player stops using this object
-        public override void onUseEnd(CharacterInteraction aPlayer)
+        public override void onUseEnd(CharacterInteraction aPlayer, out bool aOverride)
         {
+            aOverride = false;
             //Debug.Log(aPlayer.name + " requested stop using");
             aPlayer.manager.lockMovement = false;
             invokeCallback(new InteractiveArgs("onUseEnd", aPlayer));

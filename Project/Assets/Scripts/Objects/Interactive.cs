@@ -84,8 +84,9 @@ namespace EndevGame
             invokeCallback(new InteractiveArgs("Use", aPlayer));
         }
         //Gets called when the player stops using this object
-        public virtual void onUseEnd(CharacterInteraction aPlayer)
+        public virtual void onUseEnd(CharacterInteraction aPlayer, out bool aOverride)
         {
+            aOverride = false;
             invokeCallback(new InteractiveArgs("StopUsing", aPlayer));
         }
         //The condition to check before the player may use this object.

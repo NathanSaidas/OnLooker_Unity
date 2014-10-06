@@ -219,11 +219,19 @@ namespace EndevGame
             //If uusing a plant stop using it and stop.
             if(m_ObjectInUse != null)
             {
+                bool overrideUseEnd = false;
+                m_ObjectInUse.onUseEnd(this,out overrideUseEnd);
+                if(overrideUseEnd )
+                {
+                    Debug.Log("On use end is being overrided.");
+                    return;
+                }
                 GameEventArgs eventArgs = new GameEventArgs(GameEventID.INTERACTION_PLAYER_ON_USE_END);
                 eventArgs.sender = this;
                 eventArgs.triggeringObject = m_ObjectInFocus;
                 GameManager.triggerEvent(eventArgs.eventID, eventArgs);
-                m_ObjectInUse.onUseEnd(this);
+
+                
                 m_ObjectInUse = null;
                 lockMovement = false;
                 lockRotation = false;
@@ -251,13 +259,21 @@ namespace EndevGame
         /// </summary>
         public void stopUsing()
         {
+            
             if(m_ObjectInUse != null)
             {
+                bool overrideUseEnd = false;
+                m_ObjectInUse.onUseEnd(this, out overrideUseEnd);
+                if(overrideUseEnd)
+                {
+                    Debug.Log("Overriding on use end.");
+                    return;
+                }
                 GameEventArgs eventArgs = new GameEventArgs(GameEventID.INTERACTION_PLAYER_ON_USE_END);
                 eventArgs.sender = this;
                 eventArgs.triggeringObject = m_ObjectInFocus;
                 GameManager.triggerEvent(eventArgs.eventID, eventArgs);
-                m_ObjectInUse.onUseEnd(this);
+                
             }
             m_ObjectInUse = null;
             lockMovement = false;
@@ -328,6 +344,24 @@ namespace EndevGame
         public Interactive[] triggeringObjects
         {
             get { return m_TriggeringObjects.ToArray(); }
+        }
+
+        public void releaseUsedObject()
+        {
+            if (m_ObjectInUse != null)
+            {
+                bool overrideUseEnd;
+                m_ObjectInUse.onUseEnd(this, out overrideUseEnd);
+                GameEventArgs eventArgs = new GameEventArgs(GameEventID.INTERACTION_PLAYER_ON_USE_END);
+                eventArgs.sender = this;
+                eventArgs.triggeringObject = m_ObjectInFocus;
+                GameManager.triggerEvent(eventArgs.eventID, eventArgs);
+
+            }
+            m_ObjectInUse = null;
+            lockMovement = false;
+            lockRotation = false;
+            lockGravity = false;
         }
             
     }

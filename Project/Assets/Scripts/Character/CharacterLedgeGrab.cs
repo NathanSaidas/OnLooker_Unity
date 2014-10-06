@@ -13,7 +13,7 @@ namespace EndevGame
         {
             NONE,
             GRABBING,
-            ON,
+            IDLE,
             CLIMB_LEFT,
             CLIMB_RIGHT,
             CLIMBING_LEFT,
@@ -106,6 +106,7 @@ namespace EndevGame
         [SerializeField]
         private bool m_FallsOff = false;
 
+        //Input Delay Variables
         [SerializeField]
         private Vector2 m_InputTime = Vector2.zero;
         [SerializeField]
@@ -196,7 +197,7 @@ namespace EndevGame
                     manager.transform.rotation = Quaternion.Slerp(m_InitialRotation, m_TargetRotation, m_CurrentTime);
                     if (m_CurrentTime > m_GrabTime || Vector3.Distance(manager.transform.position, m_TargetPosition) < 0.02f)
                     {
-                        m_State = State.ON;
+                        m_State = State.IDLE;
                     }
                     break;
                 case State.CLIMBING_LEFT:
@@ -213,7 +214,7 @@ namespace EndevGame
                 case State.CLIMB_RIGHT:
                     updateClimbRight();
                     break;
-                case State.ON:
+                case State.IDLE:
                     updateOn();
                     break;
                 case State.CLIMB_UP:
@@ -389,7 +390,7 @@ namespace EndevGame
                     }
                     else
                     {
-                        m_State = State.ON;
+                        m_State = State.IDLE;
                     }
                 }
                 else //Else move to the target
@@ -434,7 +435,7 @@ namespace EndevGame
                     }
                     else
                     {
-                        m_State = State.ON;
+                        m_State = State.IDLE;
                     }
                 }
                 else //Else move to the target
@@ -454,7 +455,7 @@ namespace EndevGame
             manager.transform.position = Vector3.Lerp(m_InitialPosition, m_TargetPosition, m_CurrentTime);
             if (m_CurrentTime > 1.0f || Vector3.Distance(manager.transform.position, m_TargetPosition) < 0.02f)
             {
-                m_State = State.ON;
+                m_State = State.IDLE;
             }
         }
         private void updateClimbingRight()
@@ -462,7 +463,7 @@ namespace EndevGame
             manager.transform.position = Vector3.Lerp(m_InitialPosition, m_TargetPosition, m_CurrentTime);
             if (m_CurrentTime > 1.0f || Vector3.Distance(manager.transform.position, m_TargetPosition) < 0.02f)
             {
-                m_State = State.ON;
+                m_State = State.IDLE;
             }
         }
         private void updateClimbingUp()

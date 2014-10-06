@@ -13,7 +13,10 @@ namespace EndevGame
         private CharacterInteraction m_CharacterInteraction = null;
         [SerializeField]
         private CharacterAnimation m_CharacterAnimation = null;
-
+        [SerializeField]
+        private CharacterLedgeGrab m_CharacterLedgeGrab = null;
+        [SerializeField]
+        private CharacterClimbing m_CharacterClimbing = null;
 
 
         /// <summary>
@@ -81,6 +84,8 @@ namespace EndevGame
             //Main Component Search
             m_CharacterMotor = GetComponent<CharacterMotor>();
             m_CharacterInteraction = GetComponent<CharacterInteraction>();
+            m_CharacterLedgeGrab = GetComponent<CharacterLedgeGrab>();
+            m_CharacterClimbing = GetComponent<CharacterClimbing>();
 
             //Child component Search
             if(m_CharacterMotor == null)
@@ -90,6 +95,14 @@ namespace EndevGame
             if(m_CharacterInteraction == null)
             {
                 m_CharacterInteraction = GetComponentInChildren<CharacterInteraction>();
+            }
+            if(m_CharacterLedgeGrab == null)
+            {
+                m_CharacterLedgeGrab = GetComponentInChildren<CharacterLedgeGrab>();
+            }
+            if(m_CharacterClimbing == null)
+            {
+                m_CharacterClimbing = GetComponentInChildren<CharacterClimbing>();
             }
         }
 
@@ -187,7 +200,14 @@ namespace EndevGame
         {
             get { return m_CharacterInteraction; }
         }
-
+        public CharacterLedgeGrab characterLedgeGrab
+        {
+            get { return m_CharacterLedgeGrab; }
+        }
+        public CharacterClimbing characterClimbing
+        {
+            get { return m_CharacterClimbing; }
+        }
         /// <summary>
         /// Returns the camera the character uses. This is used for characters movement.
         /// </summary>

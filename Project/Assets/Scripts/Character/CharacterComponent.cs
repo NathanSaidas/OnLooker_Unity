@@ -38,6 +38,15 @@ public class CharacterComponent : EndevBehaviour
     {
         get { return manager == null ? null : manager.characterInteraction; }
     }
+    public CharacterLedgeGrab characterLedgeGrab
+    {
+        get { return manager == null ? null : manager.characterLedgeGrab; }
+    }
+    public CharacterClimbing characterClimbing
+    {
+        get { return manager == null ? null : manager.characterClimbing; }
+    }
+
 
     #region InputProperties
     public float forwardMotion
