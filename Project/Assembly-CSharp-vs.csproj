@@ -84,6 +84,7 @@
      <Compile Include="Assets\Scripts\Objects\Interactive.cs" />
      <Compile Include="Assets\Scripts\Objects\InteractiveArgs.cs" />
      <Compile Include="Assets\Scripts\Objects\InteractivePlant.cs" />
+     <Compile Include="Assets\Scripts\Objects\LedgeGrab.cs" />
      <Compile Include="Assets\Scripts\Objects\PickUpBounce.cs" />
      <Compile Include="Assets\Scripts\Objects\PlantComponent.cs" />
      <Compile Include="Assets\Scripts\Objects\PlantGrowth.cs" />
