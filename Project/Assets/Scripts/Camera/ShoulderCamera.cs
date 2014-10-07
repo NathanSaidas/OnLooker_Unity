@@ -88,7 +88,7 @@ namespace EndevGame
             {
                 parent.position = target.position + target.rotation * new Vector3(offset.x, offset.y, -m_Distance);
             }
-            parent.LookAt(target.position + m_LookAtPosition + new Vector3(0.0f, m_Y, 0.0f));
+            parent.LookAt(target.position + target.rotation * (m_LookAtPosition + new Vector3(0.0f, m_Y, 0.0f)));
         }
         public override void physicsUpdate()
         {

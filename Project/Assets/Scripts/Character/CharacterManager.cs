@@ -4,39 +4,79 @@ using EndevGame;
 
 namespace EndevGame
 {
-
+    #region 
+    /* October,6,2014 - Nathan Hanlan - Added additional regions and comments.
+     * 
+    */
+    #endregion
+    /// <summary>
+    /// 
+    /// </summary>
     public class CharacterManager : EndevBehaviour
     {
+        /// <summary>
+        /// The character motor for the Character. 
+        /// </summary>
         [SerializeField]
         private CharacterMotor m_CharacterMotor = null;
+
+        /// <summary>
+        /// The character interaction for the character.
+        /// </summary>
         [SerializeField]
         private CharacterInteraction m_CharacterInteraction = null;
+
+        /// <summary>
+        /// The character animation for the character.
+        /// </summary>
         [SerializeField]
         private CharacterAnimation m_CharacterAnimation = null;
+
+        /// <summary>
+        /// The character ledge grab for the character.
+        /// </summary>
         [SerializeField]
         private CharacterLedgeGrab m_CharacterLedgeGrab = null;
+        /// <summary>
+        /// The character climbing for the character.
+        /// </summary>
         [SerializeField]
         private CharacterClimbing m_CharacterClimbing = null;
 
 
         /// <summary>
-        /// The character requires a camera to move around.
+        /// The required camera for the character. Used by CharacterMotor
         /// </summary>
         [SerializeField]
         private Camera m_CharacterCamera = null;
+        /// <summary>
+        /// The required orbit camera for the character. Used by CharacterMotor
+        /// </summary>
         [SerializeField]
         private OrbitCamera m_OrbitCamera = null;
+        /// <summary>
+        /// The target for the orbit camera to follow.
+        /// </summary>
         [SerializeField]
         private Transform m_CameraTarget = null;
 
+        /// <summary>
+        /// A data structure to hold all the input states.
+        /// </summary>
         [SerializeField]
         private CharacterInputState m_InputState = new CharacterInputState();
         #region InputNames
-        //Input Names
+
+        ///All the input names used by the character.
+        ///TODO: Make a new class file to store all these values as constants. :)
+        
+
         [SerializeField]
         private string m_ForwardAxis = "Vertical"; //W & S
         [SerializeField]
         private string m_SideAxis = "Horizontal"; //A & D
+        [SerializeField]
+        private string m_FixedSideAxis = "Mouse X"; //mouse x motion
         [SerializeField]
         private string m_JumpButton = "Jump"; //SPACE
         [SerializeField]
@@ -59,26 +99,41 @@ namespace EndevGame
         private string m_ShootMode = "ShootMode";
         #endregion
 
-        /// <summary>
+        #region State Lock Variables
         /// The variables put locks onto the player states which allow for external sources to override the player.
+        /// <summary> 
+        /// Locking the movement will prevent the Character motor from driving the character.
         /// </summary>
         [SerializeField]
         private bool m_LockMovement;
+        /// <summary>
+        /// Locking rotation will prevent the Character motor from rotating the character
+        /// </summary>
         [SerializeField]
         private bool m_LockRotation;
+        /// <summary>
+        /// Locking gravity will force gravity to not be applied to the character Motor.
+        /// </summary>
         [SerializeField]
         private bool m_LockGravity;
+        #endregion
+        
 
-        // Use this for initialization
+        /// <summary>
+        /// Invoked to initialize the character.
+        /// </summary>
         void Start()
         {
+            //Grab the camera from the camera manager.
             m_CharacterCamera = CameraManager.gameplayCamera;
             m_OrbitCamera = CameraManager.orbitCamera;
 
+            //Tell the camera manager to make a transition
             CameraManager camMan = CameraManager.instance;
             if (camMan != null)
             {
                 camMan.transitionToOrbit(m_CameraTarget, CameraMode.INSTANT, 0.0f);
+                //camMan.transitionToShoulder(m_CameraTarget, CameraMode.INSTANT, 0.0f);
             }
 
             //Main Component Search
@@ -86,6 +141,7 @@ namespace EndevGame
             m_CharacterInteraction = GetComponent<CharacterInteraction>();
             m_CharacterLedgeGrab = GetComponent<CharacterLedgeGrab>();
             m_CharacterClimbing = GetComponent<CharacterClimbing>();
+            //End sarch
 
             //Child component Search
             if(m_CharacterMotor == null)
@@ -104,9 +160,10 @@ namespace EndevGame
             {
                 m_CharacterClimbing = GetComponentInChildren<CharacterClimbing>();
             }
+            //End search
         }
 
-        // Update is called once per frame
+        
         protected override void Update()
         {
             if (m_InputState == null)
@@ -119,6 +176,7 @@ namespace EndevGame
             //Retrieve the input states of the character.
             m_InputState.forwardMotion = InputManager.getAxis(m_ForwardAxis);
             m_InputState.sideMotion = InputManager.getAxis(m_SideAxis);
+            m_InputState.fixedSideMotion = InputManager.getAxis(m_FixedSideAxis);
             m_InputState.jump = InputManager.getButtonDown(m_JumpButton);
             m_InputState.crouch = InputManager.getButtonDown(m_CrouchButton);
             m_InputState.action = InputManager.getButtonDown(m_ActionButton);
@@ -140,6 +198,10 @@ namespace EndevGame
         public float sideMotion
         {
             get { return m_InputState.sideMotion; }
+        }
+        public float fixedSideMotion
+        {
+            get { return m_InputState.fixedSideMotion; }
         }
         public bool jump
         {
@@ -181,6 +243,12 @@ namespace EndevGame
         }
         #endregion
 
+        #region ChildComponents
+        /* October,6,2014 - Nathan Hanlan - Added characterInteraction, characterLedgeGrab, characterClimbing
+         * 
+         * 
+         * 
+         */
         /// <summary>
         /// Returns the character motor attached to the Character Manager gameobject. This component is responsible for the movement of the character.
         /// </summary>
@@ -195,19 +263,31 @@ namespace EndevGame
         {
             get { return m_CharacterAnimation; }
         }
-
+        /// <summary>
+        /// Returns the character interaction component attached to the Character Manager. This component is responsible for creating the interaction link between X objects and Interactive Objects
+        /// </summary>
         public CharacterInteraction characterInteraction
         {
             get { return m_CharacterInteraction; }
         }
+        /// <summary>
+        /// Returns the character ledge grab component. This component is responsible for driving the characters motion while on a ledge.
+        /// </summary>
         public CharacterLedgeGrab characterLedgeGrab
         {
             get { return m_CharacterLedgeGrab; }
         }
+        /// <summary>
+        /// Returns the character climbing component. This component is responsible for driving the characters motoin while climbing on a surface. (Does not include legdes).
+        /// </summary>
         public CharacterClimbing characterClimbing
         {
             get { return m_CharacterClimbing; }
         }
+
+       
+
+
         /// <summary>
         /// Returns the camera the character uses. This is used for characters movement.
         /// </summary>
@@ -230,6 +310,9 @@ namespace EndevGame
             get { return m_CameraTarget; }
             set { m_CameraTarget = value; }
         }
+        #endregion
+
+        #region Character State Variables
         /// <summary>
         /// Returns true if the current camera is focused on the player.
         /// </summary>
@@ -246,7 +329,7 @@ namespace EndevGame
             set { m_LockMovement = value; }
         }
         /// <summary>
-        /// Lock the players rotation preventing them from rotating properly.
+        /// Lock the players rotation preventing them from rotating using the CharacterMotor.
         /// </summary>
         public bool lockRotation
         {
@@ -261,6 +344,7 @@ namespace EndevGame
             get { return m_LockGravity; }
             set { m_LockGravity = value; }
         }
-        
+        #endregion
+
     }
 }

@@ -102,11 +102,6 @@ namespace EndevGame
             }
 
         }
-        protected override void SlowUpdate()
-        {
-            base.SlowUpdate();
-        }
-
 
         /// <summary>
         /// Constantly check to see if an object is in focus.
@@ -323,6 +318,28 @@ namespace EndevGame
                 }
             }
         }
+        public void releaseOverride()
+        {
+            if (m_ObjectInUse != null)
+            {
+                bool overrideUseEnd;
+                m_ObjectInUse.onUseEnd(this, out overrideUseEnd);
+                if (overrideUseEnd == false)
+                {
+                    return;
+                }
+                GameEventArgs eventArgs = new GameEventArgs(GameEventID.INTERACTION_PLAYER_ON_USE_END);
+                eventArgs.sender = this;
+                eventArgs.triggeringObject = m_ObjectInFocus;
+                GameManager.triggerEvent(eventArgs.eventID, eventArgs);
+
+            }
+            m_ObjectInUse = null;
+            lockMovement = false;
+            lockRotation = false;
+            lockGravity = false;
+        }
+
 
         /// <summary>
         /// Returns the current object in use. Null if none is there.
@@ -346,27 +363,7 @@ namespace EndevGame
             get { return m_TriggeringObjects.ToArray(); }
         }
 
-        public void releaseOverride()
-        {
-            if (m_ObjectInUse != null)
-            {
-                bool overrideUseEnd;
-                m_ObjectInUse.onUseEnd(this, out overrideUseEnd);
-                if(overrideUseEnd == false)
-                {
-                    return;
-                }
-                GameEventArgs eventArgs = new GameEventArgs(GameEventID.INTERACTION_PLAYER_ON_USE_END);
-                eventArgs.sender = this;
-                eventArgs.triggeringObject = m_ObjectInFocus;
-                GameManager.triggerEvent(eventArgs.eventID, eventArgs);
-
-            }
-            m_ObjectInUse = null;
-            lockMovement = false;
-            lockRotation = false;
-            lockGravity = false;
-        }
+        
             
     }
 }

@@ -62,8 +62,8 @@ namespace EndevGame
         /// <summary>
         /// How much time must be allowed to pass before the next state
         /// </summary>
-        [SerializeField]
-        private float m_GrabTime = 1.0f;
+        //[SerializeField]
+        //private float m_GrabTime = 1.0f;
         /// <summary>
         /// How fast should the character grab onto the ledge
         /// </summary>
@@ -104,7 +104,7 @@ namespace EndevGame
         /// Determines whether or not the character falls off upon reaching the end.
         /// </summary>
         [SerializeField]
-        private bool m_FallsOff = false;
+        private bool m_FallOff = false;
 
         //Input Delay Variables
         [SerializeField]
@@ -195,7 +195,7 @@ namespace EndevGame
                     m_CurrentTime += Time.deltaTime * m_GrabSpeed;
                     manager.transform.position = Vector3.Lerp(m_InitialPosition, m_TargetPosition, m_CurrentTime);
                     manager.transform.rotation = Quaternion.Slerp(m_InitialRotation, m_TargetRotation, m_CurrentTime);
-                    if (m_CurrentTime > m_GrabTime || Vector3.Distance(manager.transform.position, m_TargetPosition) < 0.02f)
+                    if (m_CurrentTime > 1.0f || Vector3.Distance(manager.transform.position, m_TargetPosition) < 0.02f)
                     {
                         m_State = State.IDLE;
                     }
@@ -379,7 +379,7 @@ namespace EndevGame
                 if (Vector3.Distance(targetPosition, manager.transform.position) < 0.02f)
                 {
                     //release from ledge
-                    if (m_FallsOff == true)
+                    if (m_FallOff == true)
                     {
                         if (m_TriggeringLedgeGrab != null)
                         {
@@ -424,7 +424,7 @@ namespace EndevGame
                 if (Vector3.Distance(targetPosition, manager.transform.position) < 0.02f)
                 {
                     //release from ledge
-                    if (m_FallsOff == true)
+                    if (m_FallOff == true)
                     {
                         if(m_TriggeringLedgeGrab != null)
                         {
@@ -539,10 +539,10 @@ namespace EndevGame
         /// <summary>
         /// How much time must be allowed to pass before the next state
         /// </summary>
-        public float grabTime
-        {
-            get { return m_GrabTime; }
-        }
+        //public float grabTime
+        //{
+        //    get { return m_GrabTime; }
+        //}
         /// <summary>
         /// How fast should the character grab onto the ledge
         /// </summary>
@@ -581,7 +581,7 @@ namespace EndevGame
         /// </summary>
         public bool fallsOff 
         {
-            get{return m_FallsOff;}
+            get{return m_FallOff;}
         }
         public Vector2 inputTime 
         {

@@ -3,72 +3,137 @@ using System.Collections;
 
 namespace EndevGame
 {
+    public enum CharacterMotorMode
+    {
+        CAMERA_ORIENTED, //The character moves using the cameras orientation
+        FIXED //The character moves using its own orientation
+    }
 
+    #region
+    /* October,6,2014 - Nathan Hanlan - Added additional regions and comments.
+    *  October,6,2014 - Nathan Hanlan - Added support for Fixed Character movement mode.
+    */
+    #endregion
+    /// <summary>
+    /// /
+    /// </summary>
     public class CharacterMotor : CharacterComponent
     {
         /// <summary>
-        /// The speed at which the player moves at.
+        /// The speed at which the Character moves at.
         /// </summary>
         [SerializeField]
         private float m_MovementSpeed = 2.0f;
+        /// <summary>
+        /// The height at which the Character jumps at
+        /// </summary>
         [SerializeField]
         private float m_JumpHeight = 3.0f;
+        /// <summary>
+        /// The amount of gravity acceleration to apply on the Character. (g = m * a)
+        /// </summary>
         [SerializeField]
         private float m_Gravity = 9.81f;
+        /// <summary>
+        /// The speed at which the Character turns at.
+        /// </summary>
         [SerializeField]
         private float m_TurnSpeed = 45.0f;
 
+        /// <summary>
+        /// The max speed the player can travel at. (This is modified at run time depending on the state of the Character. Crouching / Sprinting)
+        /// </summary>
         [SerializeField]
         private float m_MaxVelocity = 10.0f;
 
+
+        /// <summary>
+        /// How far should the ground detection check offset from the capsule collider used on the Character
+        /// </summary>
         [SerializeField]
         private float m_GroundCheckOffset = 0.1f;
+        /// <summary>
+        /// How wide should the capsule cast be
+        /// </summary>
         [SerializeField]
         private float m_GroundCheckRadius = 0.18f;
-        [SerializeField]
+        
+        /// <summary>
+        /// Determines whether or not the player should have gravity applied.
+        /// </summary>
+#if UNITY_EDITOR
+        [SerializeField] //SerializedField  for debugging purposes
+#endif
         private bool m_ApplyGravity = true;
 
+        /// <summary>
+        /// How much time to wait before applying gravity again
+        /// </summary>
         [SerializeField]
         private float m_JumpTimeLimit = 0.5f;
-        [SerializeField]
+        /// <summary>
+        /// How much time passed to apply gravity.
+        /// </summary>
+#if UNITY_EDITOR
+        [SerializeField] //SerializedField  for debugging purposes
+#endif
         private float m_GravityTimer = 0.0f;
 
-        //How
+        /// <summary>
+        /// How far up should the character be allowed to step.
+        /// </summary>
         [SerializeField]
         private float m_StepOffset = 0.5f;
+        /// <summary>
+        /// How far forward should the characters step offset be placed.
+        /// </summary>
         [SerializeField]
         private float m_StepForwardDistance = 1.0f;
 
-
-
+        #region DEBUGVARIABLES
+#if UNITY_EDITOR
         //Debug Variables
         [SerializeField]
         private Vector3 m_DebugStart = Vector3.zero;
         [SerializeField]
         private Vector3 m_DebugEnd = Vector3.zero;
-
-        //Managed State
+#endif
+        #endregion
+        
+        /// <summary>
+        /// Determines if the player is crouching or not
+        /// </summary>
         [SerializeField]
         private bool m_IsCrouching = false;
+        /// <summary>
+        /// Stat modifiers used for sprinting. Uses multply -> add
+        /// </summary>
         [SerializeField]
         private StatModifier m_SprintModifier = new StatModifier(0.0f, 1.1f);
+        /// <summary>
+        /// State modifiers used for crouching. Uses multiply -> add
+        /// </summary>
         [SerializeField]
         private StatModifier m_CrouchModifier = new StatModifier(0.0f, 0.6f);
 
+        [SerializeField]
+        private CharacterMotorMode m_Mode = CharacterMotorMode.CAMERA_ORIENTED;
 
         /// <summary>
         /// Determines if the character is grounded or not.
         /// </summary>
+#if UNITY_EDITOR
         [SerializeField] //Serialized for debugging purposes only
+#endif
         private bool m_IsGrounded = false;
 
 
         /// <summary>
-        /// 
+        /// Freezes the rigidbody's rotation and initializes the character motor.
         /// </summary>
         void Start()
         {
-            manager = GetComponent<CharacterManager>();
+            init();
             rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezeRotationY;
         }
 
@@ -104,7 +169,7 @@ namespace EndevGame
             }
 
             //Rotate the character towards the camera
-            if(lockRotation == false)
+            if(lockRotation == false && m_Mode == CharacterMotorMode.CAMERA_ORIENTED)
             {
                 turnWithCamera();
             }
@@ -116,6 +181,30 @@ namespace EndevGame
                 //addForce(0.0f, -m_Gravity * rigidbody.mass, 0.0f, ForceMode.VelocityChange);
                 velocity = new Vector3(velocity.x, velocity.y - (m_Gravity * rigidbody.mass * Time.fixedDeltaTime), velocity.z);
             }
+            //Constantly reset the rigidbodies angular velocity to stop it from rotating.
+            resetAngularVelocity();
+
+            //If the character is moving check to see if the slope is to high.
+            if (forwardMotion != 0.0f || sideMotion != 0.0f)
+            {
+                Vector3 startPoint = transform.position;
+                Vector3 endPoint = startPoint + transform.rotation * new Vector3(0.0f, m_StepOffset, 1.0f);
+                Vector3 direction = (endPoint - startPoint).normalized;
+                float distance = Vector3.Distance(startPoint, endPoint);
+                int layerMask = 1 << GameManager.SURFACE_LAYER;
+                RaycastHit hit;
+                //If the slope was to high slow the velocity down to 0 and dont bother trying to move.
+                if (Physics.Raycast(startPoint, direction, out hit, distance, layerMask))
+                {
+                    Vector3 slopeVelocity = Vector3.Lerp(rigidbody.velocity, Vector3.zero, Time.fixedDeltaTime * 5.0f);
+                    slopeVelocity.y = rigidbody.velocity.y;
+                    velocity = slopeVelocity;
+                    return;
+                }
+
+
+            }
+
             //Check for character actions such as jump / roll
             if (jump == true && isGrounded)
             {
@@ -124,18 +213,85 @@ namespace EndevGame
                 applyGravity = false;
             }
 
-            //Constantly reset the rigidbodies angular velocity to stop it from rotating.
-            resetAngularVelocity();
+            
 
 
             //Finally move the character.
             if (lockMovement == false)
             {
-                move();
+                if (m_Mode == CharacterMotorMode.CAMERA_ORIENTED)
+                {
+                    move();
+                }
+                else
+                {
+                    moveFixed();
+                }
             }
 
         }
 
+        public void setMode(CharacterMotorMode aMode)
+        {
+            if(aMode != m_Mode)
+            {
+                if(aMode == CharacterMotorMode.CAMERA_ORIENTED)
+                {
+                    m_Mode = aMode;
+                    CameraManager.instance.transitionToOrbit(transform, CameraMode.LERP, 2.0f);
+                }
+                else
+                {
+                    m_Mode = aMode;
+                    CameraManager.instance.transitionToShoulder(transform, CameraMode.LERP, 2.0f);
+                }
+            }
+        }
+
+        private void moveFixed()
+        {
+            float rotation = (fixedSideMotion + sideMotion) * m_TurnSpeed;
+
+            Vector3 currentRotation = transform.rotation.eulerAngles;
+            currentRotation.y += rotation;
+
+            Quaternion targetRotation = Quaternion.Euler(currentRotation);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 5.0f);
+
+            Vector3 targetVelocity = transform.rotation * new Vector3(0.0f, 0.0f, forwardMotion);
+
+
+            //Scale the vector by the movement speed.
+            if (sprint == true)
+            {
+                targetVelocity *= m_SprintModifier.multiply(m_MovementSpeed);
+            }
+            else if (isCrouching == true)
+            {
+                targetVelocity *= m_CrouchModifier.multiply(m_MovementSpeed);
+            }
+            else
+            {
+                targetVelocity *= m_MovementSpeed;
+            }
+
+            //Calculate the velocity change and add the forces
+            Vector3 lVelocity = velocity;
+            Vector3 velocityChange = (targetVelocity - lVelocity);
+            float maxVel = calcMaxVelocity();
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -maxVel, maxVel);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -maxVel, maxVel);
+            velocityChange.y = 0.0f;
+
+
+            //Add the force to the rigidbody.
+            addForce(velocityChange, ForceMode.VelocityChange);
+
+        }
+
+        /// <summary>
+        /// Turns the character with the camera.
+        /// </summary>
         private void turnWithCamera()
         {
             if (characterCamera == null)
@@ -157,6 +313,9 @@ namespace EndevGame
 
         }
 
+        /// <summary>
+        /// Moves the character in a direction relative to camera
+        /// </summary>
         private void move()
         {
             if (characterCamera == null)
@@ -169,26 +328,7 @@ namespace EndevGame
             //Calculate the target direction relative to the cameras rotation on the y.
             Vector3 targetVelocity = cameraOrientation * new Vector3(sideMotion, 0.0f, forwardMotion);
 
-            //If the character is moving check to see if the slope is to high.
-            if(targetVelocity != Vector3.zero)
-            {
-                Vector3 startPoint = transform.position;
-                Vector3 endPoint = startPoint + transform.rotation * new Vector3(0.0f, m_StepOffset, 1.0f);
-                Vector3 direction = (endPoint - startPoint).normalized;
-                float distance = Vector3.Distance(startPoint, endPoint);
-                int layerMask = 1 << GameManager.SURFACE_LAYER;
-                RaycastHit hit;
-                //If the slope was to high slow the velocity down to 0 and dont bother trying to move.
-                if(Physics.Raycast(startPoint,direction, out hit, distance, layerMask ))
-                {
-                    Vector3 slopeVelocity = Vector3.Lerp(rigidbody.velocity, Vector3.zero, Time.fixedDeltaTime * 5.0f);
-                    slopeVelocity.y = rigidbody.velocity.y;
-                    rigidbody.velocity = slopeVelocity;
-                    return;
-                }
-
-
-            }
+            
 
 
             if (isGrounded == true)
@@ -201,6 +341,10 @@ namespace EndevGame
             }
         }
 
+        /// <summary>
+        /// Movement calculations on the ground
+        /// </summary>
+        /// <param name="aVelocity"></param>
         private void moveGround(Vector3 aVelocity)
         {
             //Scale the vector by the movement speed.
@@ -229,6 +373,10 @@ namespace EndevGame
             //Add the force to the rigidbody.
             addForce(velocityChange, ForceMode.VelocityChange);
         }
+        /// <summary>
+        /// Movement calculations in the air.
+        /// </summary>
+        /// <param name="aVelocity"></param>
         private void moveAir(Vector3 aVelocity)
         {
             //Scale the vector by the movement speed.
@@ -318,6 +466,8 @@ namespace EndevGame
             return m_MaxVelocity;
         }
 
+        #region Rigidbody Accessors
+
         /// <summary>
         /// Adds force onto the player
         /// </summary>
@@ -353,7 +503,7 @@ namespace EndevGame
         public Vector3 velocity
         {
             get { return rigidbody == null ? Vector3.zero : rigidbody.velocity; }
-            set { if (rigidbody.velocity != null) { rigidbody.velocity = value; } }
+            set { if (rigidbody.velocity != null && rigidbody.isKinematic == false) { rigidbody.velocity = value; } }
         }
         public bool isAscending
         {
@@ -382,6 +532,8 @@ namespace EndevGame
         {
             rigidbody.isKinematic = false;
         }
+
+        #endregion
 
         /// <summary>
         /// Toggles the players stance. (Crouching or Standing)
@@ -433,7 +585,7 @@ namespace EndevGame
 
         #endregion
 
-
+#if UNITY_EDITOR
         ///Debug Draw the Slope Height Vector
         private void OnDrawGizmos()
         {
@@ -447,6 +599,7 @@ namespace EndevGame
             m_DebugStart = startPoint;
             m_DebugEnd = endPoint;
         }
+#endif
 
     }
 }

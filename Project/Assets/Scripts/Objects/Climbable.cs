@@ -124,44 +124,64 @@ namespace EndevGame
             m_InUse = false;
         }
 
-        public bool checkVerticalSide()
-        {
-            return false;
-        }
-        public bool checkHorizontalSide(Transform aCharacter, float aDistance, bool aLeft, out Vector3 aTarget)
+
+        /// <summary>
+        /// Checks the left and right sides of the climable object
+        /// </summary>
+        /// <param name="aCharacter">The position / rotation to use for calculation</param>
+        /// <param name="aDistance">How far does the character need to move? (Min/Max 1.1f/300.0f)</param>
+        /// <param name="aDirection">The direction to check </param>
+        /// <param name="aTarget">A returned variable with the target position to go to</param>
+        /// <returns>True if can move, false if there is a collider blocking the way</returns>
+        public bool checkSide(Transform aCharacter, float aDistance, Direction aDirection, out Vector3 aTarget)
         {
             aTarget = Vector3.zero;
             if(aCharacter == null)
             {
                 return false;
             }
-
+            //Set the origin / direction
             Vector3 origin = aCharacter.position;
             Vector3 direction = Vector3.zero;
 
-            if(aLeft == true)
+            //Recalculate direction
+            switch(aDirection)
             {
-                direction = aCharacter.rotation * Vector3.left;
-            }
-            else
-            {
-                direction = aCharacter.rotation * Vector3.right;
+                case Direction.LEFT:
+                    direction = aCharacter.rotation * Vector3.left;
+                    break;
+                case Direction.RIGHT:
+                    direction = aCharacter.rotation * Vector3.right;
+                    break;
+                case Direction.UP:
+                    direction = aCharacter.rotation * Vector3.up;
+                    break;
+                case Direction.DOWN:
+                    direction = aCharacter.rotation * Vector3.down;
+                    break;
             }
             direction.Normalize();
             float distance = Mathf.Clamp(aDistance, 1.1f, 300.0f);
-            Debug.Log("Distance: " + distance);
             aTarget = origin + direction * distance;
-            aTarget.y = origin.y;
+            
             int layerMask = 1 << GameManager.CLIMB_LAYER;
             RaycastHit hit;
+
+            if(aDirection == Direction.UP)
+            {
+                aTarget.y = aCharacter.position.y + distance;
+                origin.y = aCharacter.position.y + m_TriggeringCharacter.characterHeight; 
+            }
+
             if(Physics.Raycast(origin,direction,out hit, distance,layerMask))
             {
                 aTarget = hit.point;
-                
-
+                if(aDirection == Direction.UP)
+                {
+                    aTarget.y -= m_TriggeringCharacter.characterHeight;
+                }
                 return false;
             }
-
             return true;
         }
     }

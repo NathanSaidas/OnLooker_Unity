@@ -5,6 +5,14 @@ using System.Collections;
 namespace EndevGame
 {
 
+    #region
+    /* October,6,2014 - Nathan Hanlan - Added m_FixedSideMotion for capturing Mouse X axis
+     * 
+    */
+    #endregion
+    /// <summary>
+    /// Defines the Character Input State variables
+    /// </summary>
     [Serializable]
     public class CharacterInputState : EndevGame.Object
     {
@@ -20,6 +28,10 @@ namespace EndevGame
         /// </summary>
         [SerializeField]//Only serialized for debugging purposes.
         private float m_SideMotion = 0.0f;
+
+
+        [SerializeField]
+        private float m_FixedSideMotion = 0.0f;
 
         /// <summary>
         /// This will be true if jump button is pressed. (First frame only)
@@ -86,6 +98,11 @@ namespace EndevGame
         {
             get { return m_SideMotion; }
             set { m_SideMotion = value; }
+        }
+        public float fixedSideMotion
+        {
+            get { return m_FixedSideMotion; }
+            set { m_FixedSideMotion = value; }
         }
         public bool jump
         {
