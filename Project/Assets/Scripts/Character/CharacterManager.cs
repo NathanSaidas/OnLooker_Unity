@@ -6,7 +6,7 @@ namespace EndevGame
 {
     #region 
     /* October,6,2014 - Nathan Hanlan - Added additional regions and comments.
-     * 
+     * October,7,2014 - Nathan Hanlan - Added support for CharacterAnimation.
     */
     #endregion
     /// <summary>
@@ -14,6 +14,7 @@ namespace EndevGame
     /// </summary>
     public class CharacterManager : EndevBehaviour
     {
+        #region Fields
         /// <summary>
         /// The character motor for the Character. 
         /// </summary>
@@ -65,6 +66,8 @@ namespace EndevGame
         /// </summary>
         [SerializeField]
         private CharacterInputState m_InputState = new CharacterInputState();
+        #endregion
+
         #region InputNames
 
         ///All the input names used by the character.
@@ -141,6 +144,7 @@ namespace EndevGame
             m_CharacterInteraction = GetComponent<CharacterInteraction>();
             m_CharacterLedgeGrab = GetComponent<CharacterLedgeGrab>();
             m_CharacterClimbing = GetComponent<CharacterClimbing>();
+            m_CharacterAnimation = GetComponent<CharacterAnimation>();
             //End sarch
 
             //Child component Search
@@ -159,6 +163,10 @@ namespace EndevGame
             if(m_CharacterClimbing == null)
             {
                 m_CharacterClimbing = GetComponentInChildren<CharacterClimbing>();
+            }
+            if(m_CharacterAnimation == null)
+            {
+                m_CharacterAnimation = GetComponentInChildren<CharacterAnimation>();
             }
             //End search
         }

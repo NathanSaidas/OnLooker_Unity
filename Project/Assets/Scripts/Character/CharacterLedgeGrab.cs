@@ -4,8 +4,13 @@ using System.Collections;
 namespace EndevGame
 {
 
+    #region
+    /* October,7,2014 - Nathan Hanlan - Added a method to handle animation control.
+    *  
+    */
+    #endregion
     /// <summary>
-    /// Original Design by Justin
+    /// Enables the player to grab onto ledges and interact with them.
     /// </summary>
     public class CharacterLedgeGrab : CharacterComponent
     {
@@ -20,7 +25,8 @@ namespace EndevGame
             CLIMBING_RIGHT,
             CLIMB_UP,
         }
-        
+
+        #region Fields
         /// <summary>
         /// The current ledge the player is grabbing
         /// </summary>
@@ -118,7 +124,10 @@ namespace EndevGame
         [SerializeField]
         private bool m_InputDown = false;
 
+        #endregion
 
+
+        #region Methods
         private void Start()
         {
             init();
@@ -171,6 +180,7 @@ namespace EndevGame
             lockRotation = true;
             characterMotor.resetVelocity();
             characterMotor.disableRigidbody();
+            characterAnimation.setState(CharacterAnimationState.CLIMBING_LEDGE);
         }
 
         protected override void Update()
@@ -240,7 +250,54 @@ namespace EndevGame
             lockGravity = false;
             lockRotation = false;
             m_State = State.NONE;
-            characterMotor.enableRigidbody();
+            if (characterMotor != null)
+            {
+                characterMotor.enableRigidbody();
+            }
+            if (characterAnimation != null)
+            {
+                characterAnimation.releaseState(CharacterAnimationState.CLIMBING_LEDGE);
+            }
+        }
+
+
+        /// <summary>
+        /// This method gets invoked by the CharacterAnimation component to give us a chance to animate the character while they are climbing.
+        /// </summary>
+        /// <param name="aAnimation"></param>
+        public override void onAnimateCharacter(CharacterAnimation aAnimation)
+        {
+            if(aAnimation == null)
+            {
+                return;
+            }
+            Animation animation = aAnimation.animationComponent;
+
+            if(animation == null)
+            {
+                return;
+            }
+
+            switch(m_State)
+            {
+                case State.CLIMBING_LEFT:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_LEFT,0.3f);
+                    break;
+                case State.CLIMBING_RIGHT:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_RIGHT, 0.3f);
+                    break;
+                case State.CLIMB_UP:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_IDLE, 0.3f);
+                    break;
+                case State.NONE:
+                    aAnimation.releaseState(CharacterAnimationState.CLIMBING_LEDGE);
+                    break;
+                    //animate idle for everything else
+                default:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_IDLE, 0.3f);
+                    break;
+            }
+
         }
 
         //This state checks for input then transitions to the other states
@@ -480,8 +537,9 @@ namespace EndevGame
                 m_State = State.NONE;
             }
         }
+        #endregion
 
-
+        #region Properties
 
         /// <summary>
         /// The current ledge the player is grabbing
@@ -595,7 +653,8 @@ namespace EndevGame
         {
             get { return m_InputRight; }
         }
+        #endregion
 
-        
+
     }
 }

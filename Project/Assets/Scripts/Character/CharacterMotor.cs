@@ -12,6 +12,7 @@ namespace EndevGame
     #region
     /* October,6,2014 - Nathan Hanlan - Added additional regions and comments.
     *  October,6,2014 - Nathan Hanlan - Added support for Fixed Character movement mode.
+    *  October,7,2014 - Nathan Hanlan - Implementing the new onCharacterAnimation method.
     */
     #endregion
     /// <summary>
@@ -19,6 +20,7 @@ namespace EndevGame
     /// </summary>
     public class CharacterMotor : CharacterComponent
     {
+        #region Fields
         /// <summary>
         /// The speed at which the Character moves at.
         /// </summary>
@@ -127,7 +129,9 @@ namespace EndevGame
 #endif
         private bool m_IsGrounded = false;
 
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Freezes the rigidbody's rotation and initializes the character motor.
         /// </summary>
@@ -206,7 +210,7 @@ namespace EndevGame
             }
 
             //Check for character actions such as jump / roll
-            if (jump == true && isGrounded)
+            if (jump == true && isGrounded && !lockMovement)
             {
                 doJump();
                 m_GravityTimer = m_JumpTimeLimit;
@@ -466,6 +470,8 @@ namespace EndevGame
             return m_MaxVelocity;
         }
 
+        #endregion
+
         #region Rigidbody Accessors
 
         /// <summary>
@@ -535,6 +541,140 @@ namespace EndevGame
 
         #endregion
 
+
+        public override void onAnimateCharacter(CharacterAnimation aAnimation)
+        {
+            if(aAnimation == null)
+            {
+                return;
+            }
+            Animation animation = aAnimation.animationComponent;
+            if(animation == null)
+            {
+                return;
+            }
+
+            if(aAnimation.animateJump)
+            {
+                animation.CrossFade(CharacterAnimation.ANIMATION_JUMP);
+            }
+            else if(aAnimation.animateLand)
+            {
+                animation.CrossFade(CharacterAnimation.ANIMATION_LAND);
+            }
+            else if(!isGrounded)
+            {
+                animation.CrossFade(CharacterAnimation.ANIMATION_FALL);
+            }
+            else
+            {
+                Vector3 currentVelocity = transform.InverseTransformVector(velocity);
+                
+                if((Mathf.Abs(currentVelocity.z) <= 0.7f && forwardMotion == 0.0f && sideMotion == 0.0f) || currentVelocity.z == 0.0f)
+                {
+                    if(isCrouching)
+                    {
+                        animation.CrossFade(CharacterAnimation.ANIMATION_CROUCH_IDLE);
+                    }
+                    else
+                    {
+                        animation.CrossFade(CharacterAnimation.ANIMATION_IDLE);
+                    }
+                }
+                else if(m_Mode == CharacterMotorMode.CAMERA_ORIENTED)
+                {
+                    float absVelocity = Mathf.Abs(currentVelocity.z);
+                    if(sprint)
+                    {
+                        animation.CrossFade(CharacterAnimation.ANIMATION_SPRINT_FORWARD);
+                    }
+                    else if (absVelocity < aAnimation.runVelocity)
+                    {
+                        if(isCrouching)
+                        {
+                            animation.CrossFade(CharacterAnimation.ANIMATION_WALK_FORWARD_CROUCH);
+                        }
+                        else
+                        {
+                            animation.CrossFade(CharacterAnimation.ANIMATION_WALK_FORWARD);
+                        }
+                    }
+                    else
+                    {
+                        if (isCrouching)
+                        {
+                            animation.CrossFade(CharacterAnimation.ANIMATION_WALK_FORWARD_CROUCH);
+                        }
+                        else
+                        {
+                            animation.CrossFade(CharacterAnimation.ANIMATION_RUN_FORWARD);
+                        }
+                    }
+
+                }
+                else if(m_Mode == CharacterMotorMode.FIXED)
+                {
+                    if(currentVelocity.z > 0.0f)
+                    {
+                        if (sprint)
+                        {
+                            animation.CrossFade(CharacterAnimation.ANIMATION_SPRINT_FORWARD);
+                        }
+                        else if (currentVelocity.z < aAnimation.runVelocity)
+                        {
+                            if (isCrouching)
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_WALK_FORWARD_CROUCH);
+                            }
+                            else
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_WALK_FORWARD);
+                            }
+                        }
+                        else
+                        {
+                            if (isCrouching)
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_WALK_FORWARD_CROUCH);
+                            }
+                            else
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_RUN_FORWARD);
+                            }
+                        }
+                    }
+                    else if(currentVelocity.z < 0.0f)
+                    {
+                        if (currentVelocity.z > -aAnimation.runVelocity)
+                        {
+                            if (isCrouching)
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_WALK_BACKWARD_CROUCH);
+                            }
+                            else
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_WALK_BACKWARD);
+                            }
+                        }
+                        else
+                        {
+                            if (isCrouching)
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_WALK_BACKWARD_CROUCH);
+                            }
+                            else
+                            {
+                                animation.CrossFade(CharacterAnimation.ANIMATION_WALK_BACKWARD);
+                            }
+                        }
+                    }
+                }
+
+
+            }
+            
+        }
+
         /// <summary>
         /// Toggles the players stance. (Crouching or Standing)
         /// </summary>
@@ -565,7 +705,10 @@ namespace EndevGame
         /// </summary>
         void onBeginGround()
         {
-
+            if(characterAnimation != null)
+            {
+                characterAnimation.beginLand();
+            }
         }
         /// <summary>
         /// Gets called when the player first leaves the ground and is falling or ascending
@@ -580,7 +723,10 @@ namespace EndevGame
         /// </summary>
         void onBeginJump()
         {
-
+            if(characterAnimation != null)
+            {
+                characterAnimation.beginJump();
+            }
         }
 
         #endregion

@@ -6,7 +6,7 @@ namespace EndevGame
 
     #region
     /* October,6,2014 - Nathan Hanlan - Added and implemented the first iteration of the CharacterClimbing
-     * 
+     * October,7,2014 - Nathan Hanlan - Added and implemented the onAnimation Method
     */
     #endregion
     /// <summary>
@@ -34,7 +34,7 @@ namespace EndevGame
             CLIMBING_UP,
             CLIMBING_DOWN
         }
-
+        #region Fields
         /// <summary>
         /// The object currently being used to climb
         /// </summary>
@@ -139,7 +139,9 @@ namespace EndevGame
         private bool m_InputUp = false;
         [SerializeField]
         private bool m_InputDown = false;
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Initializes the character climbing component
         /// </summary>
@@ -199,9 +201,15 @@ namespace EndevGame
             lockMovement = true;
             lockGravity = true;
             lockRotation = true;
-            characterMotor.resetVelocity();
-            characterMotor.disableRigidbody();
-            
+            if (characterMotor != null)
+            {
+                characterMotor.resetVelocity();
+                characterMotor.disableRigidbody();
+            }
+            if(characterAnimation != null)
+            {
+                characterAnimation.setState(CharacterAnimationState.CLIMBING);
+            }
         }
 
         /// <summary>
@@ -213,7 +221,14 @@ namespace EndevGame
             lockGravity = false;
             lockRotation = false;
             m_State = State.NONE;
-            characterMotor.enableRigidbody();
+            if(characterMotor != null)
+            {
+                characterMotor.enableRigidbody();
+            }
+            if(characterAnimation != null)
+            {
+                characterAnimation.releaseState(CharacterAnimationState.CLIMBING);
+            }
         }
 
 
@@ -547,6 +562,47 @@ namespace EndevGame
             }
         }
 
+        public override void onAnimateCharacter(CharacterAnimation aAnimation)
+        {
+            if (aAnimation == null)
+            {
+                return;
+            }
+            Animation animation = aAnimation.animationComponent;
+
+            if (animation == null)
+            {
+                return;
+            }
+
+            switch(m_State)
+            {
+                case State.CLIMBING_LEFT:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_LEFT);
+                    break;
+                case State.CLIMBING_RIGHT:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_RIGHT);
+                    break;
+                case State.CLIMBING_UP:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_UP);
+                    break;
+                case State.CLIMBING_DOWN:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_DOWN);
+                    break;
+                case State.NONE:
+
+                    break;
+                case State.CLIMB_UP_FINISH:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_IDLE);
+                    break;
+                default:
+                    animation.CrossFade(CharacterAnimation.ANIMATION_CLIMB_IDLE);
+                    break;
+            }
+
+        }
+
+        #endregion
 
         public float characterHeight
         {

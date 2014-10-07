@@ -4,7 +4,7 @@ using EndevGame;
 
 #region
 /* October,6,2014 - Nathan Hanlan - Added additional regions and comments.
-* 
+*  October,7,2014 - Nathan Hanlan - Added a method to handle animation control.
 */
 #endregion
 /// <summary>
@@ -46,6 +46,11 @@ public class CharacterComponent : EndevBehaviour
     protected override void Update()
     {
         base.Update();
+    }
+
+    public virtual void onAnimateCharacter(CharacterAnimation aAnimation)
+    {
+
     }
 
     /// <summary>
