@@ -83,6 +83,7 @@
      <Compile Include="Assets\Scripts\Input\InputPlayer.cs" />
      <Compile Include="Assets\Scripts\Input\InputUtilities.cs" />
      <Compile Include="Assets\Scripts\Input\MouseButton.cs" />
+     <Compile Include="Assets\Scripts\MathTest\MathTest.cs" />
      <Compile Include="Assets\Scripts\Objects\Climbable.cs" />
      <Compile Include="Assets\Scripts\Objects\Interactive.cs" />
      <Compile Include="Assets\Scripts\Objects\InteractiveArgs.cs" />
@@ -97,18 +98,6 @@
      <Compile Include="Assets\Scripts\Objects\PlantType.cs" />
      <Compile Include="Assets\Scripts\Objects\VineBehavior.cs" />
      <Compile Include="Assets\Scripts\Objects\WorldObject.cs" />
-     <Compile Include="Assets\Scripts\UI\Controls\UIButton.cs" />
-     <Compile Include="Assets\Scripts\UI\Controls\UIControl.cs" />
-     <Compile Include="Assets\Scripts\UI\Controls\UIImage.cs" />
-     <Compile Include="Assets\Scripts\UI\Controls\UILabel.cs" />
-     <Compile Include="Assets\Scripts\UI\Controls\UITextfield.cs" />
-     <Compile Include="Assets\Scripts\UI\UIBounce.cs" />
-     <Compile Include="Assets\Scripts\UI\UIEvent.cs" />
-     <Compile Include="Assets\Scripts\UI\UIEventHandler.cs" />
-     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
-     <Compile Include="Assets\Scripts\UI\UIText.cs" />
-     <Compile Include="Assets\Scripts\UI\UITexture.cs" />
-     <Compile Include="Assets\Scripts\UI\UIToggle.cs" />
      <Compile Include="Assets\Scripts\UI\UIUtilities.cs" />
      <Compile Include="Assets\Scripts\Utilities\AnimationClip.cs" />
      <Compile Include="Assets\Scripts\Utilities\AnimationTester.cs" />
@@ -130,7 +119,6 @@
      <Compile Include="Assets\Scripts\Utilities\NativeObject.cs" />
      <Compile Include="Assets\Scripts\Utilities\OnLookerUtils.cs" />
      <Compile Include="Assets\Scripts\Utilities\SceneFade.cs" />
-     <Compile Include="Assets\Scripts\Utilities\TempBounds.cs" />
      <Compile Include="Assets\Scripts\Utilities\TempMesh.cs" />
      <Compile Include="Assets\Scripts\Utilities\Utilities.cs" />
      <None Include="Assets\Shaders\TerrBumpFirstPass.shader" />
