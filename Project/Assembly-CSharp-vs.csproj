@@ -59,6 +59,7 @@
      <Compile Include="Assets\Scripts\Utilities\AnimationClip.cs" />
      <Compile Include="Assets\Scripts\Utilities\AnimationTester.cs" />
      <Compile Include="Assets\Scripts\Utilities\Bezier.cs" />
+     <Compile Include="Assets\Scripts\Utilities\Debug\ConsoleMessage.cs" />
      <Compile Include="Assets\Scripts\Utilities\Debug\DebugMode.cs" />
      <Compile Include="Assets\Scripts\Utilities\Debug\DebugUtils.cs" />
      <Compile Include="Assets\Scripts\Utilities\Debug\IDebugGizmo.cs" />
