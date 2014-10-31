@@ -1,13 +1,13 @@
-﻿using UnityEngine;
-using System.Collections;
-
-/// <summary>
-/// Defines the mouse buttons.
-/// </summary>
-public enum MouseButton
+﻿namespace Gem
 {
-    LEFT,
-    RIGHT,
-    MIDDLE,
-    NONE
+    /// <summary>
+    /// Defines the mouse buttons.
+    /// </summary>
+    public enum MouseButton
+    {
+        LEFT,
+        RIGHT,
+        MIDDLE,
+        NONE
+    }
 }

@@ -5,13 +5,19 @@ using System.Runtime.Serialization;
 using OnLooker;
 
 
-namespace EndevGame
+namespace Gem
 {
+    #region
+    /* October,7,2014 Nathan Hanlan, Adding player prefs support.
+    */
+    #endregion
 
+    /// <summary>
+    /// This class represents the an input axis which holds a value from -1 to 1. This is used to determine input states.
+    /// </summary>
     [Serializable]
     public class InputAxis : CustomSaveData, IDebugWatch
     {
-
         #region Constructor
         public InputAxis()
         {
@@ -36,6 +42,7 @@ namespace EndevGame
         /// The Last value of the input axis
         /// </summary>
         private float m_LastValue = 0.0f;
+
         /// <summary>
         /// The Current Value of the input axis
         /// </summary>
@@ -58,6 +65,7 @@ namespace EndevGame
         /// </summary>
         [SerializeField]
         private InputDevice m_DeviceType;
+
         /// <summary>
         /// The player this input axis is targeting
         /// </summary>
@@ -70,6 +78,7 @@ namespace EndevGame
         //[HideInInspector]
         [SerializeField]
         InputKey m_PositiveKey = null;
+
         /// <summary>
         /// The negative key of the input axis
         /// </summary>
@@ -85,7 +94,6 @@ namespace EndevGame
         private bool m_FoldOut = true;
         #endregion
 
-
         #region Methods
         public void start()
         {
@@ -96,16 +104,13 @@ namespace EndevGame
 
             m_PositiveKey.start();
             m_NegativeKey.start();
-            //if (axisName == "Grow")
-            //{
-            //    DebugUtils.addWatch(this);
-            //}
         }
 
         public void onReport()
         {
             //DebugUtils.drawWatch("InputAxis", "Current Value", m_CurrentValue);
         }
+
         /// <summary>
         /// Updates the InputAxis changing the current value based on the positive and negative input key states.
         /// </summary>
@@ -137,7 +142,6 @@ namespace EndevGame
 
             m_LastValue = m_CurrentValue;
 
-
             //Move to zero without input
             if (isPos == false && isNeg == false)
             {
@@ -166,8 +170,7 @@ namespace EndevGame
                 }
             }
         }
-
-
+        
         /// <summary>
         /// Moves the current value to 0
         /// </summary>
@@ -200,6 +203,7 @@ namespace EndevGame
             m_PositiveKey.input = aInput;
             m_PositiveKey.modifier = aModifier;
         }
+
         /// <summary>
         /// Set the negative key variables
         /// </summary>
@@ -210,6 +214,7 @@ namespace EndevGame
             m_NegativeKey.input = aInput;
             m_NegativeKey.modifier = aModifier;
         }
+
         /// <summary>
         /// Validate the positive key
         /// </summary>
@@ -218,6 +223,7 @@ namespace EndevGame
         {
             return m_PositiveKey.validateInput();
         }
+
         /// <summary>
         /// Validate the negative key
         /// </summary>
@@ -226,6 +232,7 @@ namespace EndevGame
         {
             return m_NegativeKey.validateInput();
         }
+
         /// <summary>
         /// Get the positive key variables
         /// </summary>
@@ -236,6 +243,7 @@ namespace EndevGame
             aInput = m_PositiveKey.input;
             aModifier = m_PositiveKey.modifier;
         }
+
         /// <summary>
         /// Get the negative key variables.
         /// </summary>
@@ -247,33 +255,88 @@ namespace EndevGame
             aModifier = m_NegativeKey.modifier;
         }
 
-
         protected override void onSave()
         {
+            
+#if UNITY_WEBPLAYER
+            PlayerPrefs.SetString(axisName + "_AxisName", axisName);
+            PlayerPrefs.SetFloat(axisName + "_Speed", m_Speed);
+            PlayerPrefs.SetInt(axisName + "_Reset", Convert.ToInt32(m_ResetOnRelease));
+            PlayerPrefs.SetInt(axisName + "_DeviceType", (int)m_DeviceType);
+            PlayerPrefs.SetInt(axisName + "_Player", (int)m_Player);
+            PlayerPrefs.SetString(axisName + "_p_input", m_PositiveKey.input);
+            PlayerPrefs.SetInt(axisName + "_p_modifier", (int)m_PositiveKey.modifier);
+            PlayerPrefs.SetString(axisName + "n_input", m_NegativeKey.input);
+            PlayerPrefs.SetInt(axisName + "_n_modifier", (int)m_NegativeKey.modifier);
+#else
             addData("AxisName", axisName);
             addData("Speed", m_Speed);
             addData("Reset", m_ResetOnRelease);
             addData("DeviceType", (int)m_DeviceType);
             addData("Player", (int)m_Player);
 
-            Debug.Log("Saving Input Axis " + axisName);
-            Debug.Log("p_input = " + m_PositiveKey.input);
-            Debug.Log("p_modifier = " + m_PositiveKey.modifier);
-            Debug.Log("n_input = " + m_NegativeKey.input);
-            Debug.Log("n_modifier = " + m_NegativeKey.modifier);
-
-
             addData("p_input", m_PositiveKey.input);
             addData("p_modifier", (int)m_PositiveKey.modifier);
 
             addData("n_input", m_NegativeKey.input);
             addData("n_modifier", (int)m_NegativeKey.modifier);
+#endif
         }
         protected override void onLoad()
         {
             m_PositiveKey = new InputKey(this, true);
             m_NegativeKey = new InputKey(this, false);
+#if UNITY_WEBPLAYER
+#if UNITY_EDITOR
+            if (PlayerPrefs.HasKey(axisName + "_AxisName") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_AxisName");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_Speed") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_Speed");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_Reset") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_Reset");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_DeviceType") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_DeviceType");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_Player") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_Player");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_p_input") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_p_input");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_p_modifier") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_p_modifier");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_n_input") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_n_input");
+            }
+            if (PlayerPrefs.HasKey(axisName + "_n_modifier") == false)
+            {
+                Debug.LogWarning("Missing key " + axisName + "_n_modifier");
+            }
+#endif
+            axisName = PlayerPrefs.GetString(axisName + "_AxisName");
+            m_Speed = PlayerPrefs.GetFloat(axisName + "_Speed");
+            m_ResetOnRelease = Convert.ToBoolean(PlayerPrefs.GetInt(axisName + "_Reset"));
+            m_DeviceType = (InputDevice)PlayerPrefs.GetInt(axisName + "_DeviceType");
+            m_Player = (InputPlayer)PlayerPrefs.GetInt(axisName + "_Player");
 
+            m_PositiveKey.input = PlayerPrefs.GetString(axisName + "_p_input");
+            m_PositiveKey.modifier = (KeyCode)PlayerPrefs.GetInt(axisName + "_p_modifier");
+
+            m_NegativeKey.input = PlayerPrefs.GetString(axisName + "_n_input");
+            m_NegativeKey.modifier = (KeyCode)PlayerPrefs.GetInt(axisName + "_n_modifier");
+#else
             axisName = getData<string>("AxisName");
             m_Speed = getData<float>("Speed");
             m_ResetOnRelease = getData<bool>("Reset");
@@ -285,18 +348,11 @@ namespace EndevGame
 
             m_NegativeKey.input = getData<string>("n_input");
             m_NegativeKey.modifier = (KeyCode)getData<int>("n_modifier");
-
-            Debug.Log("Loading Input Axis " + axisName);
-            Debug.Log("p_input = " + m_PositiveKey.input);
-            Debug.Log("p_modifier = " + m_PositiveKey.modifier);
-            Debug.Log("n_input = " + m_NegativeKey.input);
-            Debug.Log("n_modifier = " + m_NegativeKey.modifier);
+#endif
         }
         #endregion
 
-
         #region Properties
-
 
         /// <summary>
         /// Returns true if the button is down, false if up.
@@ -313,6 +369,7 @@ namespace EndevGame
         {
             get { return m_LastValue == 0.0f && m_CurrentValue != 0.0f; }
         }
+
         /// <summary>
         /// Returns true if the button is up (First Frame).
         /// </summary>
@@ -328,6 +385,7 @@ namespace EndevGame
         {
             get { return m_CurrentValue; }
         }
+
         /// <summary>
         /// The last value of the axis.
         /// </summary>
@@ -335,6 +393,7 @@ namespace EndevGame
         {
             get { return m_LastValue; }
         }
+
         /// <summary>
         /// The delta value of the axis (always positive).
         /// </summary>
@@ -360,6 +419,7 @@ namespace EndevGame
             get { return m_ResetOnRelease; }
             set { m_ResetOnRelease = value; }
         }
+
         /// <summary>
         /// The speed to move from 0 to 1 or -1.
         /// </summary>
@@ -368,6 +428,7 @@ namespace EndevGame
             get { return m_Speed; }
             set { m_Speed = value; }
         }
+
         /// <summary>
         /// A boolean for the editor to fold out and show the properties of the input axis or not.
         /// </summary>
@@ -395,6 +456,5 @@ namespace EndevGame
             set { m_Player = value; }
         }
         #endregion
-
     }
 }

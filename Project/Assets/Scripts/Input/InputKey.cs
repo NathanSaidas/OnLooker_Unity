@@ -2,9 +2,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace EndevGame
+namespace Gem
 {
-
+    #region Change Log
+    /* October,13,2014 - Nathan Hanlan, Added support for left and right triggers in the readonly state property.
+     * 
+     */
+    #endregion
     [Serializable]
     public class InputKey : EndevGame.Object, IDebugWatch
     {
@@ -88,7 +92,7 @@ namespace EndevGame
 
         #region Methods
 
-        public override void start()
+        public void start()
         {
             if(owner != null)
             {
@@ -218,22 +222,42 @@ namespace EndevGame
                 //Check Axis
                 else if (m_InputType == InputType.AXIS)
                 {
+                    float inputValue = 0.0f;
+
                     switch (owner.player)
                     {
+                            
                         case InputPlayer.ANY:
-                            return Input.GetAxis(m_AxisName + "_0");
+                            inputValue = Input.GetAxis(m_AxisName + "_0");
+                            break;
                         case InputPlayer.PLAYER_1:
-                            return Input.GetAxis(m_AxisName + "_1");
+                            inputValue = Input.GetAxis(m_AxisName + "_1");
+                            break;
                         case InputPlayer.PLAYER_2:
-                            return Input.GetAxis(m_AxisName + "_2");
+                            inputValue = Input.GetAxis(m_AxisName + "_2");
+                            break;
                         case InputPlayer.PLAYER_3:
-                            return Input.GetAxis(m_AxisName + "_3");
+                            inputValue = Input.GetAxis(m_AxisName + "_3");
+                            break;
                         case InputPlayer.PLAYER_4:
-                            return Input.GetAxis(m_AxisName + "_4");
+                            inputValue = Input.GetAxis(m_AxisName + "_4");
+                            break;
                         default:
 
                             break;
                     }
+
+                    if(m_AxisName == InputUtilities.LEFT_TRIGGER)
+                    {
+                        return Mathf.Clamp(inputValue, 0.0f, 1.0f);
+                    }
+                    else if (m_AxisName == InputUtilities.RIGHT_TRIGGER)
+                    {
+                        return Mathf.Abs(Mathf.Clamp(inputValue, -1.0f, 0.0f));
+                    }
+
+                    return inputValue;
+
                 }
                 return 0.0f;
             }

@@ -41,7 +41,7 @@ namespace EndevGame
             else
             {
                 m_Time = 0.0f;
-                GameManager.loadScene("main_menu_scene");
+                //GameManager.loadScene("main_menu_scene");
             }
 
             float percent = m_Time / m_StartTime;

@@ -2,14 +2,14 @@
 using System;
 using System.Collections;
 
-namespace EndevGame
+namespace Gem
 {
     /// <summary>
     /// InputUtilties houses constants for input strings as well as helper functions to parse input for a InputKey
     /// </summary>
     public static class InputUtilities
     {
-        // begin constants
+        #region InputConstants
         // MOUSE
         public const string MOUSE_LEFT_BUTTON = "left";
         public const string MOUSE_RIGHT_BUTTON = "right";
@@ -50,7 +50,7 @@ namespace EndevGame
         public const string RIGHT_ARROW = "rightarrow";
         public const string UP_ARROW = "uparrow";
         public const string DOWN_ARROW = "downarrow";
-        // end constants
+        #endregion
 
 
         /// <summary>

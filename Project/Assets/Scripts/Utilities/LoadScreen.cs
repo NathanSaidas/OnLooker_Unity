@@ -66,7 +66,7 @@ namespace EndevGame
             if (m_LoadingText != null)
             {
 
-                float time = GameManager.currentLoadTimePercent * 100;
+                float time = 0.0f; // GameManager.currentLoadTimePercent * 100;
                 string text = time.ToString();
 
                 if (time >= 100.0f)

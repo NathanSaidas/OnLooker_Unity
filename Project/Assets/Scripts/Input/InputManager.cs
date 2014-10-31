@@ -3,13 +3,15 @@ using System;
 using System.Collections.Generic;
 using OnLooker;
 
-namespace EndevGame
+namespace Gem
 {
 
     //[ExecuteInEditMode]
     public class InputManager : MonoBehaviour
     {
         #region SINGLETON
+
+
         private static InputManager s_Instance = null;
         public static InputManager instance
         {
@@ -117,6 +119,10 @@ namespace EndevGame
 
         #region Fields
 
+
+#if UNITY_EDITOR && (UNITY_4_5 || UNITY_5_0)
+        [Tooltip("")]
+#endif
         [SerializeField]
         private List<InputAxis> m_Axis = new List<InputAxis>();
 
@@ -167,12 +173,10 @@ namespace EndevGame
 
         void OnDestroy()
         {
-            Debug.Log("Destroying Input Manager");
             if (s_Instance == this)
             {
                 s_Instance = null;
             }
-
         }
 
 
@@ -213,7 +217,71 @@ namespace EndevGame
             
             clear();
 
-            //TODO: Create all the default axis of the game.
+            //**********Keyboard and mouse**********
+            //**************************************
+            createInputAxis("Forward", InputDevice.KEYBOARD, "w", "s");
+            createInputAxis("Side", InputDevice.KEYBOARD, "d", "a");
+            createInputAxis("Forward", InputDevice.KEYBOARD, InputUtilities.UP_ARROW, InputUtilities.DOWN_ARROW);
+            createInputAxis("Side", InputDevice.KEYBOARD, InputUtilities.RIGHT_ARROW, InputUtilities.LEFT_ARROW);
+
+            createButton("Jump", InputDevice.KEYBOARD, InputUtilities.SPACE);
+
+            createInputAxis("Mouse X", InputDevice.MOUSE, InputUtilities.MOUSE_X, InputUtilities.MOUSE_X);
+            createInputAxis("Mouse Y", InputDevice.MOUSE, InputUtilities.MOUSE_Y, InputUtilities.MOUSE_Y);
+            createInputAxis("Mouse ScrollWheel", InputDevice.MOUSE, InputUtilities.MOUSE_SCROLL_Y, InputUtilities.MOUSE_SCROLL_Y);
+
+            createInputAxis("AmmoSwitch", InputDevice.MOUSE, InputUtilities.MOUSE_SCROLL_Y, InputUtilities.MOUSE_SCROLL_Y);
+            
+            createButton("Grow", InputDevice.MOUSE, InputUtilities.MOUSE_RIGHT_BUTTON);
+
+            createButton("Shrink", InputDevice.MOUSE, InputUtilities.MOUSE_RIGHT_BUTTON);
+            //add modifier
+
+            createButton("Sprint", InputDevice.KEYBOARD, "leftshift");
+
+            createButton("Use", InputDevice.KEYBOARD, "e");
+
+            createButton("Crouch", InputDevice.KEYBOARD, "c");
+
+            createButton("Shoot", InputDevice.MOUSE, InputUtilities.MOUSE_LEFT_BUTTON);
+
+            createButton("ShootMode", InputDevice.KEYBOARD, "tab");
+
+            createButton("AimMode", InputDevice.MOUSE, InputUtilities.MOUSE_RIGHT_BUTTON);
+            //**************************************
+            //**************************************
+
+            //**********  360 Controller  **********
+            //**************************************
+            createInputAxis("Forward", InputDevice.XBOX_CONTROLLER, InputUtilities.LEFT_STICK_Y, InputUtilities.LEFT_STICK_Y);
+            createInputAxis("Side", InputDevice.XBOX_CONTROLLER, InputUtilities.LEFT_STICK_X, InputUtilities.LEFT_STICK_X);
+
+            createButton("Jump", InputDevice.XBOX_CONTROLLER, InputUtilities.A);
+
+            createInputAxis("Mouse X", InputDevice.XBOX_CONTROLLER, InputUtilities.RIGHT_STICK_X, InputUtilities.RIGHT_STICK_X);
+            createInputAxis("Mouse Y", InputDevice.XBOX_CONTROLLER, InputUtilities.RIGHT_STICK_Y, InputUtilities.RIGHT_STICK_Y);
+            createInputAxis("Mouse ScrollWheel", InputDevice.XBOX_CONTROLLER, InputUtilities.D_PAD_Y, InputUtilities.D_PAD_Y);
+
+            createInputAxis("AmmoSwitch", InputDevice.XBOX_CONTROLLER, InputUtilities.D_PAD_X, InputUtilities.D_PAD_X);
+
+            createButton("Grow", InputDevice.XBOX_CONTROLLER, InputUtilities.RIGHT_SHOULDER);
+
+            createButton("Shrink", InputDevice.XBOX_CONTROLLER, InputUtilities.LEFT_SHOULDER);
+
+            createButton("Sprint", InputDevice.XBOX_CONTROLLER, InputUtilities.B);
+
+            createButton("Use", InputDevice.XBOX_CONTROLLER, InputUtilities.X);
+
+            createButton("Crouch", InputDevice.XBOX_CONTROLLER, InputUtilities.LEFT_STICK_IN);
+
+            createInputAxis("Shoot", InputDevice.XBOX_CONTROLLER, InputUtilities.RIGHT_TRIGGER, InputUtilities.RIGHT_TRIGGER);
+
+            createButton("ShootMode", InputDevice.XBOX_CONTROLLER, InputUtilities.Y);
+
+            createInputAxis("AimMode", InputDevice.XBOX_CONTROLLER, InputUtilities.LEFT_TRIGGER, InputUtilities.LEFT_TRIGGER);
+            //**************************************
+            //**************************************
+
             //See create functions below but also note these two variables not shown below that are useful for changing input axis value.
             //InputAxis.speed - Sets the speed at which the input axis value changes at. 
             //InputAxis.resetOnRelease - Resets the axis value to 0 on release of input.
@@ -412,15 +480,39 @@ namespace EndevGame
 
         private void internal_SaveEditor()
         {
+            
+#if UNITY_WEBPLAYER
+            List<InputAxis>.Enumerator iterator = m_Axis.GetEnumerator();
+            while(iterator.MoveNext())
+            {
+                if(iterator.Current != null)
+                {
+                    iterator.Current.save();
+                }
+            }
+#else
             FileData file = new FileData("Input_Editor");
             for (int i = 0; i < m_Axis.Count; i++)
             {
                 file.add(m_Axis[i], m_Axis[i].name);
             }
             file.save();
+#endif
         }
         private void internal_LoadEditor()
         {
+            
+#if UNITY_WEBPLAYER
+            setVerdantStoryDefault();
+            List<InputAxis>.Enumerator iterator = m_Axis.GetEnumerator();
+            while (iterator.MoveNext())
+            {
+                if (iterator.Current != null)
+                {
+                    iterator.Current.load();
+                }
+            }
+#else
             FileData file = new FileData("Input_Editor");
             file.load();
             InputAxis[] loadedAxis = file.get<InputAxis>();
@@ -433,18 +525,41 @@ namespace EndevGame
                     m_Axis.Add(loadedAxis[i]);
                 }
             }
+#endif
         }
         private void internal_SaveUser(string aUser)
         {
+#if UNITY_WEBPLAYER
+            List<InputAxis>.Enumerator iterator = m_Axis.GetEnumerator();
+            while(iterator.MoveNext())
+            {
+                if(iterator.Current != null)
+                {
+                    iterator.Current.save();
+                }
+            }
+#else
             FileData file = new FileData("Input_" + aUser);
             for (int i = 0; i < m_Axis.Count; i++)
             {
                 file.add(m_Axis[i], m_Axis[i].name);
             }
             file.save();
+#endif
         }
         private void internal_LoadUser(string aUser)
         {
+#if UNITY_WEBPLAYER
+            setVerdantStoryDefault();
+            List<InputAxis>.Enumerator iterator = m_Axis.GetEnumerator();
+            while (iterator.MoveNext())
+            {
+                if (iterator.Current != null)
+                {
+                    iterator.Current.load();
+                }
+            }
+#else
             FileData file = new FileData("Input_" + aUser);
             file.load();
             InputAxis[] loadedAxis = file.get<InputAxis>();
@@ -456,9 +571,20 @@ namespace EndevGame
                     m_Axis.Add(loadedAxis[i]);
                 }
             }
+#endif
         }
         private void internal_SaveUser(FileData aData)
         {
+#if UNITY_WEBPLAYER
+            List<InputAxis>.Enumerator iterator = m_Axis.GetEnumerator();
+            while(iterator.MoveNext())
+            {
+                if(iterator.Current != null)
+                {
+                    iterator.Current.save();
+                }
+            }
+#else
             if (aData != null)
             {
                 for (int i = 0; i < m_Axis.Count; i++)
@@ -466,9 +592,21 @@ namespace EndevGame
                     aData.add(m_Axis[i], m_Axis[i].name);
                 }
             }
+#endif
         }
         private void internal_LoadUser(FileData aData)
         {
+#if UNITY_WEBPLAYER
+            setVerdantStoryDefault();
+            List<InputAxis>.Enumerator iterator = m_Axis.GetEnumerator();
+            while (iterator.MoveNext())
+            {
+                if (iterator.Current != null)
+                {
+                    iterator.Current.load();
+                }
+            }
+#else
             if (aData == null)
             {
                 return;
@@ -482,6 +620,7 @@ namespace EndevGame
                     m_Axis.Add(loadedAxis[i]);
                 }
             }
+#endif
         }
 
         public List<InputAxis> axisList
