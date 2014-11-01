@@ -46,10 +46,13 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Game\Game.cs" />
      <Compile Include="Assets\Scripts\Game\GameEventData.cs" />
      <Compile Include="Assets\Scripts\Game\GameEventID.cs" />
      <Compile Include="Assets\Scripts\Game\GameEventManager.cs" />
      <Compile Include="Assets\Scripts\Game\GameEventType.cs" />
+     <Compile Include="Assets\Scripts\Game\GameScene.cs" />
+     <Compile Include="Assets\Scripts\Game\IDynamicObject.cs" />
      <Compile Include="Assets\Scripts\Game\IGameEventReceiver.cs" />
      <Compile Include="Assets\Scripts\Game\MonoGameEventHandler.cs" />
      <Compile Include="Assets\Scripts\Input\InputAxis.cs" />
@@ -58,7 +61,6 @@
      <Compile Include="Assets\Scripts\Input\InputManager.cs" />
      <Compile Include="Assets\Scripts\Input\InputModifierKey.cs" />
      <Compile Include="Assets\Scripts\Input\InputPlayer.cs" />
-     <Compile Include="Assets\Scripts\Input\InputTest.cs" />
      <Compile Include="Assets\Scripts\Input\InputUtilities.cs" />
      <Compile Include="Assets\Scripts\Input\MouseButton.cs" />
      <Compile Include="Assets\Scripts\UI\UIUtilities.cs" />

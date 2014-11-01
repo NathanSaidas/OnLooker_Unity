@@ -31,6 +31,7 @@ namespace Gem
         private const string SEND = "send";
         private const string SHOW = "show";
         private const string HIDE = "hide";
+        private const string SIZE = "size";
         //5
         private const string FALSE = "false";
         private const string WATCH = "watch";
@@ -46,6 +47,7 @@ namespace Gem
         #region COMMAND
         //3
         private const string COMMAND_SET = "set"; //sets x context with args
+        private const string COMMAND_LOG = "log";
         //4
         private const string COMMAND_HELP = "help"; //shows help menu
         //4
@@ -386,6 +388,7 @@ namespace Gem
                         break;
                 }
             }
+            GUI.contentColor = Color.white;
             GUILayout.EndScrollView();
             GUILayout.BeginHorizontal();
 
@@ -525,6 +528,9 @@ namespace Gem
                 case COMMAND_SET:
                     OnCommandSet(aWords);
                     break;
+                case COMMAND_LOG:
+                    OnCommandLog(aWords);
+                    break;
             }
         }
         private void OnHandleCommand4(List<string> aWords)
@@ -579,6 +585,7 @@ namespace Gem
             {
                 return;
             }
+            Log(aWords[1] + " " + aWords[2]);
             //TODO Set X argument based on the context.
             switch(aWords[1])
             {
@@ -592,9 +599,46 @@ namespace Gem
                         {
                             m_ShowConsole = false;
                         }
+                        else if(aWords[2] == SIZE)
+                        {
+                            if(aWords.Count >= 5)
+                            {
+                                float width = 0.0f;
+                                float height = 0.0f;
+                                if(!float.TryParse(aWords[3],out width))
+                                {
+                                    break;
+                                }
+                                if(!float.TryParse(aWords[4], out height))
+                                {
+                                    break;
+                                }
+                                m_DebugConsoleArea.width = width;
+                                m_DebugConsoleArea.height = height;
+                            }
+                            
+                        }
                     }
                     break;
             }
+        }
+
+        private void OnCommandLog(List<string> aWords)
+        {
+            if(aWords.Count < 2)
+            {
+                return;
+            }
+            string message = string.Empty;
+            for (int i = 1; i < aWords.Count; i++)
+            {
+                message += aWords[i];
+                if(i != aWords.Count -1)
+                {
+                    message += " ";
+                }
+            }
+            ConsoleLog(message);
         }
         /// <summary>
         /// Gets called to process help commands from the console

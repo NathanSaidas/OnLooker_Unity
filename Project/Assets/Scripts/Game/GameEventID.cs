@@ -1,10 +1,19 @@
 ﻿namespace Gem
 {
+    #region CHANGE LOG
+    /* October,31,2014 - Nathan Hanlan, Added initial types of GameEventID
+     * 
+     */
+    #endregion
     /// <summary>
     /// The raw ID value of each game event.
     /// </summary>
     public enum GameEventID
     {
+        /// <summary>
+        /// Represents empty data
+        /// </summary>
+        NONE,
         /// <summary>
         /// Game loading begins
         /// </summary>
