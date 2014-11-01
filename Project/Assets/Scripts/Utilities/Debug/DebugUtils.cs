@@ -7,7 +7,7 @@ using System.Collections.Generic;
 #region CHANGE LOG
 /* October,30,2014 - Nathan Hanlan, Adding more support for the DebugUtils.
  * October,30,2014 - Nathan Hanlan, DebugUtils now extends unity debug logging.
- * 
+ * November,1,2014 - Nathan Hanlan, Added Singleton Helpers
  */
 #endregion
 
@@ -71,11 +71,58 @@ namespace Gem
         private static readonly Color CONSOLE_ERROR_COLOR = Color.red;
         #endregion
 
+        #region SINGLETON
         private static DebugUtils s_Instance;
-        public static DebugUtils instance
+        private static DebugUtils instance
         {
-            get { return s_Instance; }
+            get { if (s_Instance == null) { CreateInstance(); } return s_Instance; }
         }
+        /// <summary>
+        /// Creates an instance of the DebugUtils if it was missing.
+        /// </summary>
+        private static void CreateInstance()
+        {
+            GameObject persistant = GameObject.Find(Game.PERSISTANT_GAME_OBJECT_NAME);
+            if (persistant == null)
+            {
+                persistant = new GameObject(Game.PERSISTANT_GAME_OBJECT_NAME);
+                persistant.transform.position = Vector3.zero;
+                persistant.transform.rotation = Quaternion.identity;
+            }
+            s_Instance = persistant.GetComponent<DebugUtils>();
+            if (s_Instance == null)
+            {
+                s_Instance = persistant.AddComponent<DebugUtils>();
+            }
+        }
+        /// <summary>
+        /// Sets the instance of the DebugUtils to the instance given.
+        /// </summary>
+        /// <param name="aInstance">The instance to make singleton</param>
+        /// <returns></returns>
+        private static bool SetInstance(DebugUtils aInstance)
+        {
+            if (s_Instance != null && s_Instance != aInstance)
+            {
+                return false;
+            }
+            s_Instance = aInstance;
+            return true;
+        }
+        
+        /// <summary>
+        /// Removes the instance of the DebugUtils if the instance being destroyed is the the same as the singleton.
+        /// </summary>
+        /// <param name="aInstance">The instance to destroy</param>
+        private static void DestroyInstance(DebugUtils aInstance)
+        {
+            if (s_Instance == aInstance)
+            {
+                s_Instance = null;
+            }
+        }
+        #endregion
+
         /// <summary>
         /// The scroll position of the scroll view within the window
         /// </summary>

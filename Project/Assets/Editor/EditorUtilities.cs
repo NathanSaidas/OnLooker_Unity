@@ -3,6 +3,15 @@ using UnityEditor;
 
 public static class EditorUtilities 
 {
+    public static T ObjectField<T>(GUIContent aContent, T aGameObject) where T : Object
+    {
+        return EditorGUILayout.ObjectField(aContent, aGameObject, typeof(T), true) as T;
+    }
+    public static T ObjectField<T>(string aContent, T aGameObject) where T : Object
+    {
+        return EditorGUILayout.ObjectField(aContent, aGameObject, typeof(T), true) as T;
+    }
+
     public static GameObject gameObjectField(string aContent, GameObject aGameObject)
     {
         return (GameObject)EditorGUILayout.ObjectField(aContent, aGameObject, typeof(GameObject), true);

@@ -50,7 +50,7 @@ namespace Gem
         /// <returns></returns>
         private static bool SetInstance(GameEventManager aInstance)
         {
-            if(s_Instance != null)
+            if (s_Instance != null && s_Instance != aInstance)
             {
                 return false;
             }
@@ -100,8 +100,9 @@ namespace Gem
         }
         void OnDestroy()
         {
+            m_EventThreadRunning = false;
+            StopAllCoroutines();
             DestroyInstance(this);
-            StopEventThreadImmediate();
         }
         
         public static void InvokeEvent(GameEventData aEvent)
