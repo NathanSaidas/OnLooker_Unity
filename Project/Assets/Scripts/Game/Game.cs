@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using EndevGame;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -61,11 +62,16 @@ namespace Gem
 #endif
         #endregion
 
+        #region CONSTANTS
         public const string PERSISTANT_GAME_OBJECT_NAME = "_Persistant";
 
         public const string EMPTY_SCENE = "Empty_Scene";
         public const string INIT_SCENE = "Init_Scene";
         public const string FINAL_SCENE = "Final_Scene";
+
+        public const string FILE_PLAYER_SAVES = "Player Saves";
+        public const string FILE_OPTIONS = "Options";
+        #endregion
         #region SINGLETON
         /// <summary>
         /// A singleton instance of Game
@@ -95,6 +101,7 @@ namespace Gem
             {
                 s_Instance = persistant.AddComponent<Game>();
             }
+            
         }
         /// <summary>
         /// Sets the instance of the game manager to the instance given.
@@ -167,7 +174,14 @@ namespace Gem
         /// The texture to show for loading screen override.
         /// </summary>
         private Texture m_LoadTargetTexture = null;
-
+        /// <summary>
+        /// A stream which contains all the virtual save files.
+        /// </summary>
+        private FileStream m_FileStream = new FileStream("EndevContent", ".GD");
+        /// <summary>
+        /// A file for all player saves.
+        /// </summary>
+        private File m_PlayerSavesFile = null;
         #endregion
         /// <summary>
         /// Initialize the game manager.
@@ -399,6 +413,20 @@ namespace Gem
             }
         }
         /// <summary>
+        /// Saves the game to a file
+        /// </summary>
+        public static void SaveGame()
+        {
+            instance.OnSaveGame();
+        }
+        /// <summary>
+        /// Loads the game from a file
+        /// </summary>
+        public static void LoadGame()
+        {
+            instance.OnLoadGame();
+        }
+        /// <summary>
         /// Loads a level by scene name
         /// </summary>
         private void Load()
@@ -467,31 +495,84 @@ namespace Gem
         {
             return m_Scenes.First(Element => Element.scenePath == aPathName);
         }
+        /// <summary>
+        /// Saves the player data and the options data then invokes the event.
+        /// </summary>
+        private void OnSaveGame()
+        {
+            GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_SAVE, GameEventType.GAME, this, m_FileStream));
+            GameOptions.SaveOptions(m_FileStream);
+            m_PlayerSavesFile = m_FileStream.Get(FILE_PLAYER_SAVES);
+            if(m_PlayerSavesFile == null)
+            {
+                m_PlayerSavesFile = m_FileStream.Add(FILE_PLAYER_SAVES);
+            }
+            m_PlayerSavesFile.Clear();
+            //TODO: Add all the player saves into the file.
 
+            
+            m_FileStream.Save();
+        }
+        /// <summary>
+        /// Loads the player data and the options data
+        /// </summary>
+        private void OnLoadGame()
+        {
+            m_FileStream.Load(true);
+            m_PlayerSavesFile = m_FileStream.Get(FILE_PLAYER_SAVES);
+            GameOptions.LoadOptions(m_FileStream);
+            GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_LOAD, GameEventType.GAME, this, m_FileStream));
+        }
+
+        /// <summary>
+        /// The scene name to start at
+        /// </summary>
         public static string startScene
         {
             get { return instance.m_StartScene; }
             set { instance.m_StartScene = value; }
         }
+        /// <summary>
+        /// The currently loaded scene
+        /// </summary>
         public static GameScene loadedScene
         {
             get { return instance.m_LoadedScene; }
         }
+        /// <summary>
+        /// The scene to load
+        /// </summary>
         public static GameScene targetScene
         {
             get { return instance.m_TargetScene; }
         }
+        /// <summary>
+        /// Returns true if the game is paused.
+        /// </summary>
         public static bool isPaused
         {
             get { return instance.m_IsPaused; }
         }
+        /// <summary>
+        /// Returns true if the game is loading a scene
+        /// </summary>
         public static bool isLoading
         {
             get { return instance.m_IsLoading; }
         }
+        /// <summary>
+        /// Returns true if the game is unloading the scene
+        /// </summary>
         public static bool isUnloading
         {
             get { return instance.m_IsUnloading; }
+        }
+        /// <summary>
+        /// Returns the load progress of the target level.
+        /// </summary>
+        public static float loadProgress
+        {
+            get { return Application.GetStreamProgressForLevel(targetScene.sceneName);}
         }
 
     }

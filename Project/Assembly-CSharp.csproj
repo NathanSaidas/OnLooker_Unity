@@ -52,6 +52,7 @@
      <Compile Include="Assets\Scripts\Game\GameEventID.cs" />
      <Compile Include="Assets\Scripts\Game\GameEventManager.cs" />
      <Compile Include="Assets\Scripts\Game\GameEventType.cs" />
+     <Compile Include="Assets\Scripts\Game\GameOptions.cs" />
      <Compile Include="Assets\Scripts\Game\GameScene.cs" />
      <Compile Include="Assets\Scripts\Game\IGameEventReceiver.cs" />
      <Compile Include="Assets\Scripts\Game\IGameListener.cs" />
@@ -64,6 +65,14 @@
      <Compile Include="Assets\Scripts\Input\InputPlayer.cs" />
      <Compile Include="Assets\Scripts\Input\InputUtilities.cs" />
      <Compile Include="Assets\Scripts\Input\MouseButton.cs" />
+     <Compile Include="Assets\Scripts\Networking\AuthenticationClient.cs" />
+     <Compile Include="Assets\Scripts\Networking\AuthenticationServer.cs" />
+     <Compile Include="Assets\Scripts\Networking\NetworkManager.cs" />
+     <Compile Include="Assets\Scripts\Networking\NetworkPacket.cs" />
+     <Compile Include="Assets\Scripts\Networking\NetworkPeerInfo.cs" />
+     <Compile Include="Assets\Scripts\Networking\NetworkProperties.cs" />
+     <Compile Include="Assets\Scripts\Networking\NetworkRPC.cs" />
+     <Compile Include="Assets\Scripts\Networking\RequestStatus.cs" />
      <Compile Include="Assets\Scripts\UI\UIBoarder.cs" />
      <Compile Include="Assets\Scripts\UI\UIEvent.cs" />
      <Compile Include="Assets\Scripts\UI\UIEventListener.cs" />
@@ -86,8 +95,12 @@
      <Compile Include="Assets\Scripts\Utilities\EndevBehaviour.cs" />
      <Compile Include="Assets\Scripts\Utilities\FadeMesh.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\CustomSaveData.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\File.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\FileContent.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileData.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\FileHeader.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\FileStream.cs" />
+     <Compile Include="Assets\Scripts\Utilities\FileIO\FileStreamHeader.cs" />
      <Compile Include="Assets\Scripts\Utilities\FileIO\SaveData.cs" />
      <Compile Include="Assets\Scripts\Utilities\IConditional.cs" />
      <Compile Include="Assets\Scripts\Utilities\IDebugDraw.cs" />
