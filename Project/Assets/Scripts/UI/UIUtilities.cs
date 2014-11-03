@@ -7,28 +7,30 @@ namespace Gem
 
     public class UIUtilities : MonoBehaviour
     {
-        private const string SHADER_UNLIT = "Custom/UI/UI_Unlit";
-        private const string SHADER_UNLIT_TRANSPARENT = "Custom/UI/UI_Unlit_Transparent";
-        private const string SHADER_DIFFUSE = "Custom/UI/UI_Diffuse";
-        private const string SHADER_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Diffuse_Transparent";
-        private const string SHADER_BUMPED_DIFFUSE = "Custom/UI/UI_Bumped_Diffuse";
-        private const string SHADER_BUMPED_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Bumped_Diffuse_Transparent";
+        public const string SHADER_UNLIT = "Custom/UI/UI_Unlit";
+        public const string SHADER_UNLIT_TRANSPARENT = "Custom/UI/UI_Unlit_Transparent";
+        public const string SHADER_DIFFUSE = "Custom/UI/UI_Diffuse";
+        public const string SHADER_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Diffuse_Transparent";
+        public const string SHADER_BUMPED_DIFFUSE = "Custom/UI/UI_Bumped_Diffuse";
+        public const string SHADER_BUMPED_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Bumped_Diffuse_Transparent";
 
-        public static Mesh generateUniformPlane(string aName, float aWidth, float aHeight)
+        public const string MESH_NAME = "M_UIImage";
+
+        public static Mesh GenerateUniformPlane(string aName, float aWidth, float aHeight)
         {
-            return generateUniformPlane(aName, aWidth, aHeight, new UIBoarder(0.1f, 0.9f, 0.9f, 0.1f));
+            return GenerateUniformPlane(aName, aWidth, aHeight, new UIBoarder(0.1f, 0.9f, 0.9f, 0.1f));
         }
 
-        public static Mesh generateUniformPlane(string aName, float aWidth, float aHeight, UIBoarder aTextureBoarder)
+        public static Mesh GenerateUniformPlane(string aName, float aWidth, float aHeight, UIBoarder aTextureBoarder)
         {
-            return generateUniformPlane(aName, aWidth, aHeight, aTextureBoarder, new UIBoarder(0.1f, 0.9f, 0.9f, 0.1f), new UIBoarder(0.1f, 0.9f, 0.9f, 0.1f));
+            return GenerateUniformPlane(aName, aWidth, aHeight, aTextureBoarder, new UIBoarder(0.1f, 0.9f, 0.9f, 0.1f), new UIBoarder(0.1f, 0.9f, 0.9f, 0.1f));
         }
 
-        public static Mesh generateUniformPlane(string aName, float aWidth, float aHeight, UIBoarder aMeshBoarder, UIBoarder aOutterUV, UIBoarder aInnerUV)
+        public static Mesh GenerateUniformPlane(string aName, float aWidth, float aHeight, UIBoarder aMeshBoarder, UIBoarder aOutterUV, UIBoarder aInnerUV)
         {
             Mesh mesh = new Mesh();
             mesh.name = aName;
-            return generateUniformPlane(mesh, aWidth, aHeight, aMeshBoarder, aOutterUV, aInnerUV);
+            return GenerateUniformPlane(mesh, aWidth, aHeight, aMeshBoarder, aOutterUV, aInnerUV);
         }
 
         /// <summary>
@@ -41,7 +43,7 @@ namespace Gem
         /// <param name="aOutterUV">The outter UV percentages</param>
         /// <param name="aInnerUV"></param>
         /// <returns></returns>
-        public static Mesh generateUniformPlane(Mesh aMesh, float aWidth, float aHeight, UIBoarder aMeshBoarder, UIBoarder aOutterUV, UIBoarder aInnerUV)
+        public static Mesh GenerateUniformPlane(Mesh aMesh, float aWidth, float aHeight, UIBoarder aMeshBoarder, UIBoarder aOutterUV, UIBoarder aInnerUV)
         {
             if (aMesh == null)
             {
@@ -225,13 +227,10 @@ namespace Gem
 
         private const string IMAGE_POST_FIX = "_Image";
 
-        /// <summary>
-        /// Creates an image prefab of a UIToggle
-        /// </summary>
-        /// <returns></returns>
-        private static UIToggle CreateImage(UIToggleParams aParams, Transform aParent)
+
+        public static UIToggle CreateUIToggle(UIToggleParams aParams, Transform aParent)
         {
-            if(aParams == null || aParent == null)
+            if (aParams == null || aParent == null)
             {
                 return null;
             }
@@ -245,6 +244,7 @@ namespace Gem
             uiToggle.selectable = aParams.isSelectable;
             uiToggle.receivesActionEvents = aParams.recieveActions;
             uiToggle.uiSpace = aParams.uiSpace;
+            uiToggle.uiType = aParams.uiType;
             switch (uiToggle.uiSpace)
             {
                 case UISpace.TWO_DIMENSIONAL:
@@ -257,22 +257,49 @@ namespace Gem
                     rootGameObject.layer = UIManager.UI_WORLD_LAYER;
                     break;
             }
+            return uiToggle;
+        }
+        /// <summary>
+        /// Creates an image prefab of a UIToggle
+        /// </summary>
+        /// <returns></returns>
+        public static UIImage CreateUIImage(UIImageParams aParams, UIToggle aToggle)
+        {
+            if (aParams == null || aToggle == null)
+            {
+                return null;
+            }
+            GameObject rootGameObject = aToggle.gameObject;
 
             GameObject imageGameObject = new GameObject(aParams.name + IMAGE_POST_FIX);
             imageGameObject.transform.position = Vector3.zero;
             imageGameObject.transform.rotation = Quaternion.identity;
             imageGameObject.transform.parent = rootGameObject.transform;
+            imageGameObject.layer = rootGameObject.layer;
             imageGameObject.AddComponent<MeshRenderer>();
             imageGameObject.AddComponent<MeshFilter>();
             UIImage uiImage = imageGameObject.AddComponent<UIImage>();
+            uiImage.meshName = MESH_NAME;
+            uiImage.width = aParams.width;
+            uiImage.height = aParams.height;
+            uiImage.meshBoarder = aParams.meshBoarder;
+            uiImage.outerUVBoarder = aParams.outerUVBoarder;
+            uiImage.innerUVBoarder = aParams.innerUVBoarder;
+            uiImage.texture = aParams.texture;
+            uiImage.shader = aParams.shader;
+            uiImage.color = aParams.color;
+
+            uiImage.GenerateMaterial();
+            uiImage.GenerateMesh();
+            uiImage.SetTexture();
+            uiImage.SetColor();
+            return uiImage;
+        }
+        private static UIToggle CreateUILabel()
+        {
+
             
 
-
-
-            return null;
-        }
-        private static UIToggle CreateLabel()
-        {
             return null;
         }
 

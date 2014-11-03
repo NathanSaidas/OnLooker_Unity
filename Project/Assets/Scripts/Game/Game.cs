@@ -212,6 +212,12 @@ namespace Gem
         {
             string sceneName = Application.loadedLevelName;
 
+            if(sceneName == FINAL_SCENE)
+            {
+                Application.Quit();
+                return;
+            }
+
 
             ///Load the scene, finished unloading
             if (sceneName == EMPTY_SCENE)
@@ -426,6 +432,10 @@ namespace Gem
         {
             instance.OnLoadGame();
         }
+        public static void Quit()
+        {
+            LoadLevel(FINAL_SCENE);
+        }
         /// <summary>
         /// Loads a level by scene name
         /// </summary>
@@ -523,7 +533,7 @@ namespace Gem
             GameOptions.LoadOptions(m_FileStream);
             GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_LOAD, GameEventType.GAME, this, m_FileStream));
         }
-
+        
         /// <summary>
         /// The scene name to start at
         /// </summary>

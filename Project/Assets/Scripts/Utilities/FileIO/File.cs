@@ -287,7 +287,6 @@ namespace EndevGame
         public List<T> GetAll<T>() where T : FileContent
         {
             bool shouldClean = false;
-            Type type = typeof(T);
             List<T> types = new List<T>();
             List<FileContent>.Enumerator iter = m_FileContent.GetEnumerator();
             

@@ -2,6 +2,7 @@
 using System.Collections.Generic; //For Lists
 using System.IO; //For Saving / Loading
 using System.Runtime.Serialization.Formatters.Binary; //For Serialization/Deserialization
+using Gem;
 
 #region CHANGE LOG
 /* October,25,2014 - Nathan Hanlan, Added and implemented the class FileStream.
@@ -250,6 +251,7 @@ namespace EndevGame
                 }
                 catch(IOException aException)
                 {
+                    DebugUtils.Log(aException.Message);
                     m_ErrorFlag &= ERROR_SAVE_FAILED;
                     return;
                 }
@@ -302,7 +304,7 @@ namespace EndevGame
         public void Load()
         {
             string filePath = GetPath(m_Filename, m_Extension);
-            string directoryPath = GetDirectoryPath();
+            //string directoryPath = GetDirectoryPath();
 
 
             if(!System.IO.File.Exists(filePath))

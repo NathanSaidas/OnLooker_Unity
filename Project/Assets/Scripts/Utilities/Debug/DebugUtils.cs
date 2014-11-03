@@ -50,8 +50,8 @@ namespace Gem
         private const string COMMAND_LOG = "log";
         //4
         private const string COMMAND_HELP = "help"; //shows help menu
-        //4
         private const string COMMAND_LOAD = "load"; //load <levelname> #option<check point> loads the level, spawns the player at the check point
+        private const string COMMAND_QUIT = "quit";
         //5
         private const string COMMAND_CLEAR = "clear"; //Clears the console.
         //6
@@ -589,6 +589,9 @@ namespace Gem
                     break;
                 case COMMAND_LOAD:
                     OnCommandLoad(aWords);
+                    break;
+                case COMMAND_QUIT:
+                    Game.Quit();
                     break;
             }
         }
