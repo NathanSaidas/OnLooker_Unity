@@ -2,6 +2,13 @@
 using UnityEditor;
 using System.Collections.Generic;
 
+
+#region CHANGE LOG
+/* November,13,2014 - Nathan Hanlan, Added support for UILabel.
+ * November,13,2014 - Nathan Hanlan, Removed bug where the state would change between GUI Update Call Frames
+ * 
+ */
+#endregion 
 namespace Gem
 {
     
@@ -88,6 +95,9 @@ namespace Gem
         public const string TEXTURE = "Texture";
         public const string SHADER = "Shader";
         public const string COLOR = "Color";
+        public const string TEXT = "Text";
+        public const string FONT = "Font";
+        public const string FONT_SIZE = "Font Size";
 
         private const string TOGGLE_SELECTION = "Toggle Selection";
         private const string TOGGLE_EDITOR = "Toggle Editor";
@@ -123,6 +133,7 @@ namespace Gem
         private UIToggle m_ToggleToEdit = null;
 
         private UIToggleParams m_ToggleParams = new UIToggleParams();
+        private UIType m_NextUIType = UIType.IMAGE;
         
 
         #region GUI CONTENTs
@@ -140,7 +151,7 @@ namespace Gem
             
         }
 
-        private void OnInspectorUpdate()
+        private void Update()
         {
 
             if(m_Repaint == true)
@@ -155,6 +166,10 @@ namespace Gem
             }
             m_State = m_NextState;
             m_Repaint = repaint;
+            if (m_ToggleParams != null)
+            {
+                m_ToggleParams.uiType = m_NextUIType;
+            }
         }
 
         private void OnGUI()
@@ -216,11 +231,14 @@ namespace Gem
                 m_ToggleParams.isSelectable = EditorGUILayout.Toggle(SELECTABLE, m_ToggleParams.isSelectable);
                 m_ToggleParams.recieveActions = EditorGUILayout.Toggle(RECIEVE_ACTIONS, m_ToggleParams.recieveActions);
                 m_ToggleParams.uiSpace = (UISpace)EditorGUILayout.EnumPopup(UI_SPACE, m_ToggleParams.uiSpace);
-                m_ToggleParams.uiType = (UIType)EditorGUILayout.EnumPopup(UI_TYPE, m_ToggleParams.uiType);
+                m_NextUIType = (UIType)EditorGUILayout.EnumPopup(UI_TYPE, m_ToggleParams.uiType);
                 switch(m_ToggleParams.uiType)
                 {
                     case UIType.IMAGE:
                         DrawUIImage();
+                        break;
+                    case UIType.LABEL:
+                        DrawUILabel();
                         break;
                 }
             }
@@ -264,11 +282,14 @@ namespace Gem
                 m_ToggleParams.isSelectable = EditorGUILayout.Toggle(SELECTABLE, m_ToggleParams.isSelectable);
                 m_ToggleParams.recieveActions = EditorGUILayout.Toggle(RECIEVE_ACTIONS, m_ToggleParams.recieveActions);
                 m_ToggleParams.uiSpace = (UISpace)EditorGUILayout.EnumPopup(UI_SPACE, m_ToggleParams.uiSpace);
-                m_ToggleParams.uiType = (UIType)EditorGUILayout.EnumPopup(UI_TYPE, m_ToggleParams.uiType);
+                m_NextUIType = (UIType)EditorGUILayout.EnumPopup(UI_TYPE, m_ToggleParams.uiType);
                 switch(m_ToggleParams.uiType)
                 {
                     case UIType.IMAGE:
                         DrawUIImage();
+                        break;
+                    case UIType.LABEL:
+                        DrawUILabel();
                         break;
                 }
             }
@@ -563,6 +584,22 @@ namespace Gem
                             imageParams.texture = image.texture;
                         }
                         break;
+                    case UIType.LABEL:
+                        {
+                            UILabelParams labelParams = m_ToggleParams as UILabelParams;
+                            UILabel label = aCopyToggle.GetComponentInChildren<UILabel>();
+                            if(labelParams == null || label == null)
+                            {
+                                break;
+                            }
+                            labelParams.color = label.color;
+                            labelParams.font = label.font;
+                            labelParams.fontSize = label.fontSize;
+                            labelParams.fontTexture = label.fontTexture;
+                            labelParams.text = label.text;
+                        }
+                        break;
+
                 }
             }
         }
@@ -582,6 +619,11 @@ namespace Gem
             {
                 case UIType.IMAGE:
                     m_ToggleParams = new UIImageParams();
+                    m_ToggleParams.uiType = UIType.IMAGE;
+                    break;
+                case UIType.LABEL:
+                    m_ToggleParams = new UILabelParams();
+                    m_ToggleParams.uiType = UIType.LABEL;
                     break;
             }
         }
@@ -618,6 +660,9 @@ namespace Gem
             {
                 case UIType.IMAGE:
                     UIUtilities.CreateUIImage(m_ToggleParams as UIImageParams, toggle);
+                    break;
+                case UIType.LABEL:
+                    UIUtilities.CreateUILabel(m_ToggleParams as UILabelParams, toggle);
                     break;
             }
             m_Toggles.Add(toggle);
@@ -669,6 +714,15 @@ namespace Gem
                             }
                         }
                         break;
+                    case UIType.LABEL:
+                        {
+                            UILabel label = m_ToggleToEdit.GetComponentInChildren<UILabel>();
+                            if(label != null)
+                            {
+                                DestroyImmediate(label.gameObject);
+                            }
+                        }
+                        break;
                 }
                 //Step 2. Add the new game objects
                 switch (m_ToggleToEdit.uiType)
@@ -679,6 +733,15 @@ namespace Gem
                             if (imageParams != null)
                             {
                                 UIUtilities.CreateUIImage(imageParams, m_ToggleToEdit);
+                            }
+                        }
+                        break;
+                    case UIType.LABEL:
+                        {
+                            UILabelParams labelParams = m_ToggleParams as UILabelParams;
+                            if(labelParams != null)
+                            {
+                                UIUtilities.CreateUILabel(labelParams, m_ToggleToEdit);
                             }
                         }
                         break;
@@ -713,17 +776,36 @@ namespace Gem
 
                         }
                         break;
+                    case UIType.LABEL:
+                        {
+                            UILabel label = m_ToggleToEdit.GetComponentInChildren<UILabel>();
+                            UILabelParams labelParams = m_ToggleParams as UILabelParams;
+                            if(label == null || labelParams == null)
+                            {
+                                break;
+                            }
+                            label.text = labelParams.text;
+                            label.fontSize = labelParams.fontSize;
+                            label.font = labelParams.font;
+                            label.color = labelParams.color;
+                            label.fontTexture = labelParams.fontTexture;
+                            label.UpdateComponents();
+                        }
+                        break;
                 }
             }
         }
 
+        /// <summary>
+        /// Draws the parameters of a UIImage
+        /// </summary>
         private void DrawUIImage()
         {
             UIImageParams imageParams = m_ToggleParams as UIImageParams;
             if(imageParams == null)
             {
                 CreateParamsForType(m_ToggleParams.uiType);
-                return;
+                imageParams = m_ToggleParams as UIImageParams;
             }
             EditorGUILayout.BeginHorizontal();
             imageParams.width = EditorGUILayout.FloatField(WIDTH, imageParams.width);
@@ -735,6 +817,24 @@ namespace Gem
             imageParams.texture = EditorUtilities.ObjectField<Texture>(TEXTURE, imageParams.texture);
             imageParams.shader = EditorUtilities.ObjectField<Shader>(SHADER, imageParams.shader);
             imageParams.color = EditorGUILayout.ColorField(COLOR, imageParams.color);
+        }
+
+        /// <summary>
+        /// Draws the parameters of the UILabel
+        /// </summary>
+        private void DrawUILabel()
+        {
+            UILabelParams labelParams = m_ToggleParams as UILabelParams;
+            if(labelParams == null)
+            {
+                CreateParamsForType(m_ToggleParams.uiType);
+                labelParams = m_ToggleParams as UILabelParams;
+            }
+            labelParams.text = EditorGUILayout.TextField(TEXT, labelParams.text);
+            labelParams.fontSize = EditorGUILayout.IntField(FONT_SIZE, labelParams.fontSize);
+            labelParams.font = EditorUtilities.fontField(FONT, labelParams.font);
+            labelParams.color = EditorGUILayout.ColorField(COLOR, labelParams.color);
+            labelParams.fontTexture = EditorUtilities.textureField(TEXTURE, labelParams.fontTexture);
         }
         
     }

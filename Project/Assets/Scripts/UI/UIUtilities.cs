@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+#region CHANGE LOG
+/* November,13,2014 - Nathan Hanlan, Added support for a new shader for text only.
+ * November,13,2014 - Nathan Hanlan, Added support for creating UILabel prefabs.
+ * November,13,2014 - Nathan Hanlan, Added constants for shader string names.
+ */
+#endregion
+
 namespace Gem
 {
 
@@ -13,6 +20,12 @@ namespace Gem
         public const string SHADER_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Diffuse_Transparent";
         public const string SHADER_BUMPED_DIFFUSE = "Custom/UI/UI_Bumped_Diffuse";
         public const string SHADER_BUMPED_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Bumped_Diffuse_Transparent";
+        public const string SHADER_TEXT = "Custom/UI/UI_Text";
+
+        public const string SHADER_TEXTURE = "_Texture";
+        public const string SHADER_COLOR = "_Color";
+        public const string SHADER_TILE_X = "_TileX";
+        public const string SHADER_TILE_Y = "_TileY";
 
         public const string MESH_NAME = "M_UIImage";
 
@@ -207,6 +220,11 @@ namespace Gem
             return mesh;
         }
 
+        /// <summary>
+        /// Returns true if the string given is a valid shader name
+        /// </summary>
+        /// <param name="aName"></param>
+        /// <returns></returns>
         public static bool IsUIShader(string aName)
         {
             switch(aName)
@@ -217,6 +235,7 @@ namespace Gem
                 case SHADER_DIFFUSE_TRANSPARENT:
                 case SHADER_BUMPED_DIFFUSE:
                 case SHADER_BUMPED_DIFFUSE_TRANSPARENT:
+                case SHADER_TEXT:
                     return true;
                 default:
                     return false;
@@ -225,9 +244,21 @@ namespace Gem
 
         #region PREFAB
 
+        #region PREFAB POST FIXES
+        /// <summary>
+        /// Postfixes.
+        /// </summary>
         private const string IMAGE_POST_FIX = "_Image";
+        private const string LABEL_POST_FIX = "_Label";
+        #endregion
 
 
+        /// <summary>
+        /// Creates a UI Toggle using the parent as the root
+        /// </summary>
+        /// <param name="aParams">The parameters for creating the toggle</param>
+        /// <param name="aParent">The root of the object</param>
+        /// <returns></returns>
         public static UIToggle CreateUIToggle(UIToggleParams aParams, Transform aParent)
         {
             if (aParams == null || aParent == null)
@@ -260,8 +291,10 @@ namespace Gem
             return uiToggle;
         }
         /// <summary>
-        /// Creates an image prefab of a UIToggle
+        /// Creates a UI Image prefab at using the toggle as the root
         /// </summary>
+        /// <param name="aParams">The parameters for creating the toggle</param>
+        /// <param name="aToggle">The root of creation</param>
         /// <returns></returns>
         public static UIImage CreateUIImage(UIImageParams aParams, UIToggle aToggle)
         {
@@ -295,6 +328,37 @@ namespace Gem
             uiImage.SetColor();
             return uiImage;
         }
+
+        /// <summary>
+        /// Creates the UI Label prefab using the toggle as the root.
+        /// </summary>
+        /// <param name="aParams">The parameters for creating</param>
+        /// <param name="aToggle">The toggle to create</param>
+        /// <returns></returns>
+        public static UILabel CreateUILabel(UILabelParams aParams, UIToggle aToggle)
+        {
+            if(aParams == null || aToggle == null)
+            {
+                return null;
+            }
+            GameObject rootGameObject = aToggle.gameObject;
+            GameObject labelGameObject = new GameObject(aParams.name + LABEL_POST_FIX);
+            labelGameObject.transform.position = Vector3.zero;
+            labelGameObject.transform.rotation = Quaternion.identity;
+            labelGameObject.transform.parent = rootGameObject.transform;
+            labelGameObject.layer = rootGameObject.layer;
+            labelGameObject.AddComponent<MeshRenderer>();
+            labelGameObject.AddComponent<TextMesh>();
+            UILabel uiLabel = labelGameObject.AddComponent<UILabel>();
+            uiLabel.text = aParams.text;
+            uiLabel.fontSize = aParams.fontSize;
+            uiLabel.font = aParams.font;
+            uiLabel.color = aParams.color;
+            uiLabel.fontTexture = aParams.fontTexture;
+            uiLabel.UpdateComponents();
+            return uiLabel;
+        }
+
         private static UIToggle CreateUILabel()
         {
 
