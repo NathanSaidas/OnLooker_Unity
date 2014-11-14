@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 #region CHANGE LOG
 /* November,13,2014 - Nathan Hanlan, Added support for updating components. Added FontTexture to pass to the shader.
- * 
+ * November,14,2014 - Nathan Hanlan, UILabel now executes in editor mode and releases material resource
  */
 #endregion
 
@@ -14,8 +17,32 @@ namespace Gem
     /// This class renders text out on the screen using TextMesh and MeshRenderer components.
     /// </summary>
     [RequireComponent(typeof(MeshRenderer),typeof(TextMesh))]
+    [ExecuteInEditMode]
     public class UILabel : MonoBehaviour
     {
+#if UNITY_EDITOR
+        [MenuItem("CONTEXT/UILabel/Create Material")]
+        private static void CreateMaterial(MenuCommand aCommand)
+        {
+            UILabel label = aCommand.context as UILabel;
+            if(label != null)
+            {
+                label.m_MeshRenderer = label.GetComponent<MeshRenderer>();
+                label.m_Material = new Material(Shader.Find(UIUtilities.SHADER_TEXT));
+                label.m_MeshRenderer.material = label.m_Material;
+            }
+        }
+
+        [MenuItem("CONTEXT/UILabel/Update Components")]
+        private static void UpdateComponents(MenuCommand aCommand)
+        {
+            UILabel label = aCommand.context as UILabel;
+            if (label != null)
+            {
+                label.UpdateComponents();
+            }
+        }
+#endif
 
         private MeshRenderer m_MeshRenderer = null;
         private TextMesh m_TextMesh = null;
@@ -54,6 +81,17 @@ namespace Gem
         [SerializeField]
         private Material m_Material = null;
 
+        void OnDestroy()
+        {
+            if(Application.isPlaying)
+            {
+                Destroy(m_Material);
+            }
+            else
+            {
+                DestroyImmediate(m_Material);
+            }    
+        }
         /// <summary>
         /// Gets called when text has changed.
         /// </summary>
@@ -74,6 +112,18 @@ namespace Gem
                 collider.center = transform.InverseTransformPoint(renderer.bounds.center);
                 collider.size = renderer.bounds.size;
             }
+            transform.rotation = rotation;
+        }
+        public void UpdateBounds(BoxCollider aCollider)
+        {
+            if(aCollider == null)
+            {
+                return;
+            }
+            Quaternion rotation = transform.rotation;
+            transform.rotation = Quaternion.identity;
+            aCollider.center = transform.InverseTransformPoint(renderer.bounds.center);
+            aCollider.size = renderer.bounds.size;
             transform.rotation = rotation;
         }
         /// <summary>

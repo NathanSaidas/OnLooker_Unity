@@ -2,6 +2,12 @@
 using UnityEditor;
 using System.Collections;
 
+#region CHANGE LOG
+/* November,14,2014 - Nathan Hanlan, Adding support for UILabel as well as additional error handling
+ * 
+ */
+#endregion
+
 namespace Gem
 {
 
@@ -29,6 +35,9 @@ namespace Gem
                 case UIType.IMAGE:
                     DrawUIImage();
                     break;
+                case UIType.LABEL:
+                    DrawUILabel();
+                    break;
             }
             if(GUI.changed)
             {
@@ -36,38 +45,77 @@ namespace Gem
             }
         }
 
-
+        /// <summary>
+        /// Draw the UI Image GUI on the UI Toggle Editor Menu
+        /// </summary>
         private void DrawUIImage()
         {
             UIImage image = inspected.GetComponentInChildren<UIImage>();
-            EditorGUILayout.BeginHorizontal();
-            image.width = EditorGUILayout.FloatField(UIEditor.WIDTH, image.width);
-            image.height = EditorGUILayout.FloatField(UIEditor.HEIGHT, image.height);
-            EditorGUILayout.EndHorizontal();
-            image.meshBoarder = EditorUtilities.UIBoarderField(UIEditor.MESH_BOARDER, image.meshBoarder);
-            image.outerUVBoarder = EditorUtilities.UIBoarderField(UIEditor.OUTER_UV_BOARDER, image.outerUVBoarder);
-            image.innerUVBoarder = EditorUtilities.UIBoarderField(UIEditor.INNER_UV_BOARDER, image.innerUVBoarder);
-            image.texture = EditorUtilities.ObjectField<Texture>(UIEditor.TEXTURE, image.texture);
-            image.shader = EditorUtilities.ObjectField<Shader>(UIEditor.SHADER, image.shader);
-            image.color = EditorGUILayout.ColorField(UIEditor.COLOR, image.color);
-            if(GUI.changed)
+            if (image != null)
             {
-                image.GenerateMesh();
-                image.SetColor();
-                image.SetTexture();
-                BoxCollider boxCollider = inspected.GetComponent<BoxCollider>();
-                if(boxCollider != null)
+                EditorGUILayout.BeginHorizontal();
+                image.width = EditorGUILayout.FloatField(UIEditor.WIDTH, image.width);
+                image.height = EditorGUILayout.FloatField(UIEditor.HEIGHT, image.height);
+                EditorGUILayout.EndHorizontal();
+                image.meshBoarder = EditorUtilities.UIBoarderField(UIEditor.MESH_BOARDER, image.meshBoarder);
+                image.outerUVBoarder = EditorUtilities.UIBoarderField(UIEditor.OUTER_UV_BOARDER, image.outerUVBoarder);
+                image.innerUVBoarder = EditorUtilities.UIBoarderField(UIEditor.INNER_UV_BOARDER, image.innerUVBoarder);
+                image.texture = EditorUtilities.ObjectField<Texture>(UIEditor.TEXTURE, image.texture);
+                image.shader = EditorUtilities.ObjectField<Shader>(UIEditor.SHADER, image.shader);
+                image.color = EditorGUILayout.ColorField(UIEditor.COLOR, image.color);
+                if (GUI.changed)
                 {
-                    boxCollider.isTrigger = true;
-                    boxCollider.size = new Vector3(image.width, image.height, 0.1f);
+                    image.GenerateMesh();
+                    image.SetColor();
+                    image.SetTexture();
+                    BoxCollider boxCollider = inspected.GetComponent<BoxCollider>();
+                    if (boxCollider == null && (inspected.receivesActionEvents == true || inspected.selectable == true))
+                    {
+                        boxCollider = inspected.gameObject.AddComponent<BoxCollider>();
+                    }
+                    if (boxCollider != null)
+                    {
+                        boxCollider.isTrigger = true;
+                        boxCollider.size = new Vector3(image.width, image.height, 0.1f);
+                    }
+                    EditorUtility.SetDirty(image);
                 }
-                EditorUtility.SetDirty(image);
             }
         }
+        /// <summary>
+        /// Draw the UI Label GUI on the UI Toggle Editor Menu
+        /// </summary>
+        private void DrawUILabel()
+        {
+            UILabel label = inspected.GetComponentInChildren<UILabel>();
+            if(label != null)
+            {
+                label.text = EditorGUILayout.TextField(UIEditor.TEXT, label.text);
+                label.fontSize = EditorGUILayout.IntField(UIEditor.FONT_SIZE, label.fontSize);
+                label.fontTexture = EditorUtilities.textureField(UIEditor.TEXTURE, label.fontTexture);
+                label.font = EditorUtilities.fontField(UIEditor.FONT, label.font);
+                label.color = EditorGUILayout.ColorField(UIEditor.COLOR, label.color);
+                if(GUI.changed)
+                {
+                    label.UpdateComponents();
+                    BoxCollider boxCollider = inspected.GetComponent<BoxCollider>();
+                    if(boxCollider == null && (inspected.receivesActionEvents == true || inspected.selectable == true))
+                    {
+                        boxCollider = inspected.gameObject.AddComponent<BoxCollider>();
+                    }
 
+                    if(boxCollider != null)
+                    {
+                        boxCollider.isTrigger = true;
+                        label.UpdateBounds(boxCollider);
+                    }
+                    EditorUtility.SetDirty(label);
+                }
+            }
+        }
         public UIToggle inspected
         {
-            get { return target as UIToggle; }
+            get { return m_Inspected.targetObject as UIToggle; }
         }
     }
 }

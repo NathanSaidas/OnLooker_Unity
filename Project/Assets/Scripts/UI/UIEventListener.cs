@@ -8,23 +8,20 @@ namespace Gem
     public class UIEventListener : MonoBehaviour
     {
         protected UIToggle m_Toggle = null;
-        protected MeshRenderer m_MeshRenderer = null;
+        //protected MeshRenderer m_MeshRenderer = null;
         // Use this for initialization
-        void Start()
+        protected virtual void Start()
         {
             m_Toggle = GetComponent<UIToggle>();
-            m_MeshRenderer = GetComponent<MeshRenderer>();
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
+            if(m_Toggle == null)
+            {
+                m_Toggle = GetComponentInParent<UIToggle>();
+            }
+            //m_MeshRenderer = GetComponent<MeshRenderer>();
         }
 
         public void OnEvent(UIEvent aEvent)
         {
-            //TODO: Sync this up with EndevGame.GameManager Event
             switch(aEvent)
             {
                 case UIEvent.MOUSE_CLICK:
@@ -75,7 +72,7 @@ namespace Gem
         }
         protected virtual void OnMouseClickEvent()
         {
-            Debug.Log("Click Event Yay");
+            
         }
         protected virtual void OnMouseDoubleClickedEvent()
         {
@@ -83,11 +80,11 @@ namespace Gem
         }
         protected virtual void OnSelectedEvent()
         {
-            Debug.Log("Selected Ouuu");
+           
         }
         protected virtual void OnUnselectedEvent()
         {
-            Debug.Log("Unselected :(");
+            
         }
         protected virtual void OnActionEvent()
         {

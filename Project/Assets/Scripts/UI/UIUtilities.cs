@@ -250,6 +250,7 @@ namespace Gem
         /// </summary>
         private const string IMAGE_POST_FIX = "_Image";
         private const string LABEL_POST_FIX = "_Label";
+        private const string BUTTON_POST_FIX = "_Button";
         #endregion
 
 
@@ -326,6 +327,9 @@ namespace Gem
             uiImage.GenerateMesh();
             uiImage.SetTexture();
             uiImage.SetColor();
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(uiImage);
+#endif
             return uiImage;
         }
 
@@ -356,15 +360,88 @@ namespace Gem
             uiLabel.color = aParams.color;
             uiLabel.fontTexture = aParams.fontTexture;
             uiLabel.UpdateComponents();
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(uiLabel);
+#endif
             return uiLabel;
         }
+        
 
-        private static UIToggle CreateUILabel()
+        public static UIButton CreateUIButton(UIButtonParams aParams, UIToggle aToggle)
         {
+            if(aParams == null || aToggle == null)
+            {
+                return null;
+            }
+            GameObject rootGameObject = aToggle.gameObject;
+            GameObject buttonGameObject = new GameObject(aParams.name + BUTTON_POST_FIX);
+            buttonGameObject.transform.position = Vector3.zero;
+            buttonGameObject.transform.rotation = Quaternion.identity;
+            buttonGameObject.transform.parent = rootGameObject.transform;
+            buttonGameObject.layer = rootGameObject.layer;
+            UIButton uiButton = buttonGameObject.AddComponent<UIButton>();
+            if (aParams.disabled == true)
+            {
+                uiButton.Disable();
+            }
+            else
+            {
+                uiButton.Enable();
+            }
+            uiButton.disabledTexture = aParams.disabledTexture;
+            uiButton.normalTexture = aParams.normalTexture;
+            uiButton.hoverTexture = aParams.hoverTexture;
+            uiButton.downTexture = aParams.downTexture;
+            uiButton.enabledTextColor = aParams.enabledTextColor;
+            uiButton.disabledTextColor = aParams.disabledTextColor;
+            uiButton.eventListener = aParams.eventListener;
 
-            
+            ///create label
+            GameObject labelGameObject = new GameObject(aParams.name + LABEL_POST_FIX);
+            labelGameObject.transform.position = Vector3.zero;
+            labelGameObject.transform.rotation = Quaternion.identity;
+            labelGameObject.transform.parent = rootGameObject.transform;
+            labelGameObject.layer = buttonGameObject.layer;
+            labelGameObject.AddComponent<MeshRenderer>();
+            labelGameObject.AddComponent<TextMesh>();
+            UILabel uiLabel = labelGameObject.AddComponent<UILabel>();
+            uiLabel.text = aParams.labelText;
+            uiLabel.fontSize = aParams.labelFontSize;
+            uiLabel.font = aParams.labelFont;
+            uiLabel.color = aParams.labelColor;
+            uiLabel.fontTexture = aParams.labelFontTexture;
+            uiLabel.UpdateComponents();
 
-            return null;
+            ///create image
+            GameObject imageGameObject = new GameObject(aParams.name + IMAGE_POST_FIX);
+            imageGameObject.transform.position = Vector3.zero;
+            imageGameObject.transform.rotation = Quaternion.identity;
+            imageGameObject.transform.parent = rootGameObject.transform;
+            imageGameObject.layer = buttonGameObject.layer;
+            imageGameObject.AddComponent<MeshFilter>();
+            imageGameObject.AddComponent<MeshRenderer>();
+            UIImage uiImage = imageGameObject.AddComponent<UIImage>();
+            uiImage.meshName = MESH_NAME;
+            uiImage.width = aParams.imageWidth;
+            uiImage.height = aParams.imageHeight;
+            uiImage.meshBoarder = aParams.imageMeshBoarder;
+            uiImage.outerUVBoarder = aParams.imageOuterUVBoarder;
+            uiImage.innerUVBoarder = aParams.imageInnerUVBoarder;
+            uiImage.texture = aParams.imageTexture;
+            uiImage.shader = aParams.imageShader;
+            uiImage.color = aParams.imageColor;
+
+            uiImage.GenerateMaterial();
+            uiImage.GenerateMesh();
+            uiImage.SetTexture();
+            uiImage.SetColor();
+
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(uiButton);
+            UnityEditor.EditorUtility.SetDirty(uiLabel);
+            UnityEditor.EditorUtility.SetDirty(uiImage);
+#endif
+            return uiButton;
         }
 
         #endregion

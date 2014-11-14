@@ -123,7 +123,9 @@ namespace Gem
         private GameObject m_WorldUI = null;
         private bool m_Repaint = false;
 
-        private Vector2 m_ScrollPosition = Vector2.zero;
+        private Vector2 m_SelectScrollPosition = Vector2.zero;
+        private Vector2 m_EditScrollPosition = Vector2.zero;
+        private Vector2 m_CreateScrollPosition = Vector2.zero;
 
 
         private string m_ToggleSearchField = string.Empty;
@@ -223,6 +225,7 @@ namespace Gem
                     m_NextState = State.TOGGLE_SELECT;
                 }
             }
+            m_CreateScrollPosition = EditorGUILayout.BeginScrollView(m_CreateScrollPosition);
 
             if(m_ToggleParams != null)
             {
@@ -242,7 +245,7 @@ namespace Gem
                         break;
                 }
             }
-
+            EditorGUILayout.EndScrollView();
             if(GUILayout.Button(CREATE) && m_ToggleParams.name != string.Empty)
             {
                 if (GetToggle(m_ToggleParams.name) == null)
@@ -274,6 +277,7 @@ namespace Gem
                     m_NextState = State.TOGGLE_SELECT;
                 }
             }
+            m_EditScrollPosition = EditorGUILayout.BeginScrollView(m_EditScrollPosition);
 
             if (m_ToggleParams != null && m_ToggleToEdit != null)
             {
@@ -293,7 +297,7 @@ namespace Gem
                         break;
                 }
             }
-
+            EditorGUILayout.EndScrollView();
             if(GUILayout.Button(SAVE))
             {
                 if(m_ToggleToEdit != null)
@@ -359,7 +363,7 @@ namespace Gem
             EditorGUILayout.EndHorizontal();
 
 
-            m_ScrollPosition = EditorGUILayout.BeginScrollView(m_ScrollPosition);
+            m_SelectScrollPosition = EditorGUILayout.BeginScrollView(m_SelectScrollPosition);
             m_TogglesToRemove.Clear();
             m_TogglesToDisplay.Clear();
 
