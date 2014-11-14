@@ -98,6 +98,17 @@ namespace Gem
         public const string TEXT = "Text";
         public const string FONT = "Font";
         public const string FONT_SIZE = "Font Size";
+        public const string DISABLED = "Disabled";
+        public const string NORMAL = "Normal";
+        public const string HOVER = "Hover";
+        public const string DOWN = "Down";
+        public const string ENABLED_TEXT_COLOR = "Enabled Text Color";
+        public const string DISABLED_TEXT_COLOR = "Disabled Text Color";
+        public const string UI_EVENT_LISTENER = "Event Listener";
+
+        public const string LABEL = "Label";
+        public const string IMAGE = "Image";
+        public const string BUTTON = "Button";
 
         private const string TOGGLE_SELECTION = "Toggle Selection";
         private const string TOGGLE_EDITOR = "Toggle Editor";
@@ -629,6 +640,10 @@ namespace Gem
                     m_ToggleParams = new UILabelParams();
                     m_ToggleParams.uiType = UIType.LABEL;
                     break;
+                case UIType.BUTTON:
+                    m_ToggleParams = new UIButtonParams();
+                    m_ToggleParams.uiType = UIType.BUTTON;
+                    break;
             }
         }
         private void CreateUIToggle()
@@ -841,5 +856,25 @@ namespace Gem
             labelParams.fontTexture = EditorUtilities.textureField(TEXTURE, labelParams.fontTexture);
         }
         
+        private void DrawUIButton()
+        {
+            UIButtonParams buttonParams = m_ToggleParams as UIButtonParams;
+            if(buttonParams == null)
+            {
+                CreateParamsForType(m_ToggleParams.uiType);
+                buttonParams = m_ToggleParams as UIButtonParams;
+            }
+            buttonParams.disabled = EditorGUILayout.Toggle(DISABLED, buttonParams.disabled);
+            EditorGUILayout.LabelField(BUTTON + TEXTURE);
+            buttonParams.disabledTexture = EditorUtilities.textureField(DISABLED, buttonParams.disabledTexture);
+            buttonParams.normalTexture = EditorUtilities.textureField(NORMAL, buttonParams.normalTexture);
+            buttonParams.hoverTexture = EditorUtilities.textureField(HOVER, buttonParams.hoverTexture);
+            buttonParams.downTexture = EditorUtilities.textureField(DOWN, buttonParams.downTexture);
+            buttonParams.enabledTextColor = EditorGUILayout.ColorField(ENABLED_TEXT_COLOR, buttonParams.enabledTextColor);
+            buttonParams.disabledTextColor = EditorGUILayout.ColorField(DISABLED_TEXT_COLOR, buttonParams.disabledTextColor);
+            buttonParams.eventListener = EditorUtilities.ObjectField<UIEventListener>(UI_EVENT_LISTENER, buttonParams.eventListener);
+
+            
+        }
     }
 }

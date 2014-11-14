@@ -7,6 +7,8 @@ using UnityEditor;
 #region CHANGE LOG
 /* November,13,2014 - Nathan Hanlan, Added support for updating components. Added FontTexture to pass to the shader.
  * November,14,2014 - Nathan Hanlan, UILabel now executes in editor mode and releases material resource
+ * November,14,2014 - Nathan Hanlan, Fixed issue where material created didnt always contain the appropriate shader.
+ * 
  */
 #endregion
 
@@ -153,12 +155,19 @@ namespace Gem
             {
                 if(m_Material == null && m_MeshRenderer.material != null)
                 {
-                    m_Material = m_MeshRenderer.material;
+                    m_Material = m_MeshRenderer.sharedMaterial;
                 }
                 if(m_Material == null || m_MeshRenderer.material == null)
                 {
                     m_Material = new Material(Shader.Find(UIUtilities.SHADER_TEXT));
                     m_MeshRenderer.material = m_Material;
+                }
+                else
+                {
+                    if(!(UIUtilities.IsUIShader(m_Material.shader.name)))
+                    {
+                        m_Material.shader = Shader.Find(UIUtilities.SHADER_TEXT);
+                    }
                 }
                 m_Material.SetTexture(UIUtilities.SHADER_TEXTURE, m_FontTexture);
                 m_Material.SetColor(UIUtilities.SHADER_COLOR, m_Color);
@@ -244,6 +253,11 @@ namespace Gem
         {
             get { return m_Color; }
             set { m_Color = value; m_Color.a = 0.0f; if (m_Material != null) { m_Material.SetColor(UIUtilities.SHADER_COLOR, m_Color); } }
+        }
+
+        public Material material
+        {
+            get { return m_Material; }
         }
     }
 }

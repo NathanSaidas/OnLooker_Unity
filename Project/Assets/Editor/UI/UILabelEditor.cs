@@ -12,10 +12,14 @@ namespace Gem
     {
         public override void OnInspectorGUI()
         {
+            UILabel inspected = target as UILabel;
             DrawDefaultInspector();
+            GUI.enabled = false;
+            EditorUtilities.ObjectField<Material>("Material",inspected.material);
+            GUI.enabled = true;
             if(GUI.changed)
             {
-                UILabel inspected = target as UILabel;
+                
                 if(inspected != null)
                 {
                     inspected.UpdateComponents();
