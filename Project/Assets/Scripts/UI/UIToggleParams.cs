@@ -1,5 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+#region CHANGE LOG
+/* November,14,2014 - Nathan Hanlan, Added a copy method to allow toggle params to be copied to one another.
+ * 
+ */
+#endregion
 
 namespace Gem
 {
@@ -23,6 +28,19 @@ namespace Gem
             m_RecieveActions = false;
             m_IsSelectable = false;
             m_UISpace = UISpace.TWO_DIMENSIONAL;
+        }
+        /// <summary>
+        /// Copies the contents from one param to another
+        /// </summary>
+        /// <param name="aParams">The parameters to copy</param>
+        public void Copy(UIToggleParams aParams)
+        {
+            m_Name = aParams.name;
+            m_ID = aParams.id;
+            m_RecieveActions = aParams.recieveActions;
+            m_IsSelectable = aParams.isSelectable;
+            m_UISpace = aParams.uiSpace;
+            m_UIType = aParams.uiType;
         }
 
         public string name

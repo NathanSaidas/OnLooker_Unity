@@ -38,6 +38,10 @@ namespace Gem
                 case UIType.LABEL:
                     DrawUILabel();
                     break;
+                case UIType.BUTTON:
+                    DrawUIButton();
+                    break;
+
             }
             if(GUI.changed)
             {
@@ -73,6 +77,10 @@ namespace Gem
                     {
                         boxCollider = inspected.gameObject.AddComponent<BoxCollider>();
                     }
+                    else if (boxCollider != null && (inspected.receivesActionEvents == false || inspected.selectable == false))
+                    {
+                        DestroyImmediate(boxCollider);
+                    }
                     if (boxCollider != null)
                     {
                         boxCollider.isTrigger = true;
@@ -103,12 +111,99 @@ namespace Gem
                     {
                         boxCollider = inspected.gameObject.AddComponent<BoxCollider>();
                     }
+                    else if (boxCollider != null && (inspected.receivesActionEvents == false || inspected.selectable == false))
+                    {
+                        DestroyImmediate(boxCollider);
+                    }
 
                     if(boxCollider != null)
                     {
                         boxCollider.isTrigger = true;
                         label.UpdateBounds(boxCollider);
                     }
+                    EditorUtility.SetDirty(label);
+                }
+            }
+        }
+
+        private void DrawUIButton()
+        {
+            UIButton button = inspected.GetComponentInChildren<UIButton>();
+            if(button != null)
+            {
+                bool enabled = button.buttonState != UIButtonState.DISABLED;
+                enabled = EditorGUILayout.Toggle(UIEditor.BUTTON_STATE, enabled);
+                if(enabled == true)
+                {
+                    button.Enable();
+                }
+                else
+                {
+                    button.Disable();
+                }
+                button.disabledTexture = EditorUtilities.textureField(UIEditor.DISABLED, button.disabledTexture);
+                button.normalTexture = EditorUtilities.textureField(UIEditor.NORMAL, button.normalTexture);
+                button.hoverTexture = EditorUtilities.textureField(UIEditor.HOVER, button.hoverTexture);
+                button.downTexture = EditorUtilities.textureField(UIEditor.DOWN, button.downTexture);
+                button.enabledTextColor = EditorGUILayout.ColorField(UIEditor.ENABLED_TEXT_COLOR, button.enabledTextColor);
+                button.disabledTextColor = EditorGUILayout.ColorField(UIEditor.DISABLED_TEXT_COLOR, button.disabledTextColor);
+                button.eventListener = EditorUtilities.ObjectField<UIEventListener>(UIEditor.UI_EVENT_LISTENER, button.eventListener);
+
+                UILabel label = button.GetComponentInChildren<UILabel>();
+                if (label != null)
+                {
+                    label.text = EditorGUILayout.TextField(UIEditor.TEXT, label.text);
+                    label.fontSize = EditorGUILayout.IntField(UIEditor.FONT_SIZE, label.fontSize);
+                    label.fontTexture = EditorUtilities.textureField(UIEditor.TEXTURE, label.fontTexture);
+                    label.font = EditorUtilities.fontField(UIEditor.FONT, label.font);
+                    label.color = EditorGUILayout.ColorField(UIEditor.COLOR, label.color);
+                }
+                UIImage image = button.GetComponentInChildren<UIImage>();
+                if(image != null)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    image.width = EditorGUILayout.FloatField(UIEditor.WIDTH, image.width);
+                    image.height = EditorGUILayout.FloatField(UIEditor.HEIGHT, image.height);
+                    EditorGUILayout.EndHorizontal();
+                    image.meshBoarder = EditorUtilities.UIBoarderField(UIEditor.MESH_BOARDER, image.meshBoarder);
+                    image.outerUVBoarder = EditorUtilities.UIBoarderField(UIEditor.OUTER_UV_BOARDER, image.outerUVBoarder);
+                    image.innerUVBoarder = EditorUtilities.UIBoarderField(UIEditor.INNER_UV_BOARDER, image.innerUVBoarder);
+                    image.texture = EditorUtilities.ObjectField<Texture>(UIEditor.TEXTURE, image.texture);
+                    image.shader = EditorUtilities.ObjectField<Shader>(UIEditor.SHADER, image.shader);
+                    image.color = EditorGUILayout.ColorField(UIEditor.COLOR, image.color);
+                }
+
+                if(GUI.changed)
+                {
+
+                    button.UpdateComponents();
+                    label.UpdateComponents();
+                    
+
+
+                    BoxCollider boxCollider = inspected.GetComponent<BoxCollider>();
+                    if (boxCollider == null && (inspected.receivesActionEvents == true || inspected.selectable == true))
+                    {
+                        boxCollider = inspected.gameObject.AddComponent<BoxCollider>();
+                    }
+                    else if (boxCollider != null && (inspected.receivesActionEvents == false || inspected.selectable == false))
+                    {
+                        DestroyImmediate(boxCollider);
+                    }
+
+                    if (boxCollider != null)
+                    {
+                        boxCollider.isTrigger = true;
+                        label.UpdateBounds(boxCollider);
+                        image.width = boxCollider.size.x;
+                        image.height = boxCollider.size.y;
+                    }
+                    
+                    image.GenerateMesh();
+                    image.SetColor();
+                    image.SetTexture();
+                    EditorUtility.SetDirty(image);
+                    EditorUtility.SetDirty(button);
                     EditorUtility.SetDirty(label);
                 }
             }

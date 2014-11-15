@@ -6,8 +6,8 @@ using System.Collections.Generic;
 
 
 #region CHANGE LOG
-/* October, 26, 2014 - Nathan Hanlan, Added the UIManager class and implemeneted 10% of features.
- * 
+/* October,  26, 2014 - Nathan Hanlan, Added the UIManager class and implemeneted 10% of features.
+ * November, 14,2014 - Nathan Hanlan, Removed the Init and DeInit methods as they were not used.
  */
 #endregion
 
@@ -64,7 +64,6 @@ namespace Gem
         }
         private static void CreateInstance()
         {
-            Debug.Log("Getting Instance");
             GameObject persistant = GameObject.Find(Game.PERSISTANT_GAME_OBJECT_NAME);
             if (persistant == null)
             {
@@ -105,12 +104,10 @@ namespace Gem
                 return;
             }
             DontDestroyOnLoad(gameObject);
-            Init();
         }
         void OnDestroy()
         {
             DestroyInstance(this);
-            OnDeInit();
         }
         #endregion
 
@@ -207,20 +204,6 @@ namespace Gem
 
 
         #region METHODS
-        /// <summary>
-        /// Use this method to do initialization
-        /// </summary>
-        void Init()
-        {
-
-        }
-        /// <summary>
-        /// Use this method to do de initialization
-        /// </summary>
-        void OnDeInit()
-        {
-			
-        }
 
         /// <summary>
         /// Checks stores the input and handles action / selection events.
@@ -610,7 +593,7 @@ namespace Gem
         /// </summary>
         /// <returns>The toggle found.</returns>
         /// <param name="aID">The ID to search for.</param>
-		UIToggle FindToggle(int aID)
+		private UIToggle FindToggle(int aID)
 		{
 			List<UIToggle>.Enumerator iter = m_Toggles.GetEnumerator();
 			while(iter.MoveNext())

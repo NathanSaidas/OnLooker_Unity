@@ -6,7 +6,7 @@ using System.Collections.Generic;
 #region CHANGE LOG
 /* November,13,2014 - Nathan Hanlan, Added support for UILabel.
  * November,13,2014 - Nathan Hanlan, Removed bug where the state would change between GUI Update Call Frames
- * 
+ * November,14,2014 - Nathan Hanlan, Added additional error handling in CopyEditMenu method to better handle setting parameters of multiple components
  */
 #endregion 
 namespace Gem
@@ -105,6 +105,7 @@ namespace Gem
         public const string ENABLED_TEXT_COLOR = "Enabled Text Color";
         public const string DISABLED_TEXT_COLOR = "Disabled Text Color";
         public const string UI_EVENT_LISTENER = "Event Listener";
+        public const string BUTTON_STATE = "Button State";
 
         public const string LABEL = "Label";
         public const string IMAGE = "Image";
@@ -113,6 +114,13 @@ namespace Gem
         private const string TOGGLE_SELECTION = "Toggle Selection";
         private const string TOGGLE_EDITOR = "Toggle Editor";
         private const string TOGGLE_CREATOR = "Toggle Creator";
+
+
+        #region DEBUG ONLY
+        private const string MISSING_BUTTON = "Missing UIButton in child game object";
+        private const string MISSING_LABEL = "Missing UILabel in child game object";
+        private const string MISSING_IMAGE = "Missing UIImage in child game object";
+        #endregion
         #endregion
 
         /// <summary>
@@ -184,7 +192,6 @@ namespace Gem
                 m_ToggleParams.uiType = m_NextUIType;
             }
         }
-
         private void OnGUI()
         {
             switch(m_State)
@@ -203,7 +210,6 @@ namespace Gem
                     break;
             }
         }
-
         private void InitializationGUI()
         {
             m_UIRoot = EditorUtilities.ObjectField<GameObject>(m_InitRootGameObject, m_UIRoot);
@@ -218,6 +224,8 @@ namespace Gem
             GUI.enabled = true;
             
         }
+
+
         private void ToggleCreateGUI()
         {
             EditorGUILayout.BeginHorizontal();
@@ -254,6 +262,9 @@ namespace Gem
                     case UIType.LABEL:
                         DrawUILabel();
                         break;
+                    case UIType.BUTTON:
+                        DrawUIButton();
+                        break;
                 }
             }
             EditorGUILayout.EndScrollView();
@@ -265,7 +276,7 @@ namespace Gem
                 }
                 else
                 {
-                    Debug.LogError(TOGGLE_WITH_NAME_EXISTS);
+                    DebugUtils.LogError(TOGGLE_WITH_NAME_EXISTS);
                 }
             }
 
@@ -306,6 +317,9 @@ namespace Gem
                     case UIType.LABEL:
                         DrawUILabel();
                         break;
+                    case UIType.BUTTON:
+                        DrawUIButton();
+                        break;
                 }
             }
             EditorGUILayout.EndScrollView();
@@ -316,7 +330,7 @@ namespace Gem
                     UIToggle toggleWithName = GetToggle(m_ToggleParams.name);
                     if(toggleWithName != null && toggleWithName != m_ToggleToEdit)
                     {
-                        Debug.LogError(TOGGLE_WITH_NAME_EXISTS);
+                        DebugUtils.LogError(TOGGLE_WITH_NAME_EXISTS);
                     }
                     else
                     {
@@ -459,6 +473,10 @@ namespace Gem
             EditorGUILayout.EndHorizontal();
         }
 
+
+        /// <summary>
+        /// Clears toggles from the toggles to remove list and destroys them
+        /// </summary>
         private void CleanList()
         {
             List<UIToggle>.Enumerator iter = m_TogglesToRemove.GetEnumerator();
@@ -587,6 +605,7 @@ namespace Gem
                             UIImage image = aCopyToggle.GetComponentInChildren<UIImage>();
                             if(imageParams == null || image == null)
                             {
+                                DebugUtils.LogError(MISSING_IMAGE);
                                 break;
                             }
                             imageParams.color = image.color;
@@ -605,6 +624,7 @@ namespace Gem
                             UILabel label = aCopyToggle.GetComponentInChildren<UILabel>();
                             if(labelParams == null || label == null)
                             {
+                                DebugUtils.LogError(MISSING_LABEL);
                                 break;
                             }
                             labelParams.color = label.color;
@@ -612,6 +632,55 @@ namespace Gem
                             labelParams.fontSize = label.fontSize;
                             labelParams.fontTexture = label.fontTexture;
                             labelParams.text = label.text;
+                        }
+                        break;
+                    case UIType.BUTTON:
+                        {
+                            UIButtonParams buttonParams = m_ToggleParams as UIButtonParams;
+                            UIButton button = aCopyToggle.GetComponentInChildren<UIButton>();
+                            if (buttonParams == null || button == null)
+                            {
+                                DebugUtils.LogError(MISSING_BUTTON);
+                                break;
+                            }
+                            buttonParams.disabled = button.buttonState == UIButtonState.DISABLED;
+                            buttonParams.disabledTexture = button.disabledTexture;
+                            buttonParams.normalTexture = button.normalTexture;
+                            buttonParams.hoverTexture = button.hoverTexture;
+                            buttonParams.downTexture = button.downTexture;
+                            buttonParams.enabledTextColor = button.enabledTextColor;
+                            buttonParams.disabledTextColor = button.disabledTextColor;
+                            buttonParams.eventListener = button.eventListener;
+                            
+                            UILabel label = button.GetComponentInChildren<UILabel>();
+                            if(label == null)
+                            {
+                                DebugUtils.LogError(MISSING_LABEL);
+                            }
+                            else
+                            {
+                                label.color = buttonParams.labelColor;
+                                label.font = buttonParams.labelFont;
+                                label.fontSize = buttonParams.labelFontSize;
+                                label.fontTexture = buttonParams.labelFontTexture;
+                                label.text = buttonParams.labelText;
+                            }
+                            UIImage image = button.GetComponentInChildren<UIImage>();
+                            if(image == null)
+                            {
+                                DebugUtils.LogError(MISSING_IMAGE);
+                            }
+                            else
+                            {
+                                image.color = buttonParams.imageColor;
+                                image.height = buttonParams.imageHeight;
+                                image.width = buttonParams.imageWidth;
+                                image.meshBoarder = buttonParams.imageMeshBoarder;
+                                image.innerUVBoarder = buttonParams.imageInnerUVBoarder;
+                                image.outerUVBoarder = buttonParams.imageInnerUVBoarder;
+                                image.shader = buttonParams.imageShader;
+                                image.texture = buttonParams.imageTexture;
+                            }
                         }
                         break;
 
@@ -626,23 +695,28 @@ namespace Gem
                 m_ToggleParams.isSelectable = aCopyToggle.selectable;
                 m_ToggleParams.recieveActions = aCopyToggle.receivesActionEvents;
                 m_ToggleParams.uiSpace = aCopyToggle.uiSpace;
+                m_ToggleParams.uiType = aCopyToggle.uiType;
             }
         }
         private void CreateParamsForType(UIType aType)
         {
+            UIToggleParams tempParams = m_ToggleParams;
             switch(aType)
             {
                 case UIType.IMAGE:
                     m_ToggleParams = new UIImageParams();
                     m_ToggleParams.uiType = UIType.IMAGE;
+                    m_ToggleParams.Copy(tempParams);
                     break;
                 case UIType.LABEL:
                     m_ToggleParams = new UILabelParams();
                     m_ToggleParams.uiType = UIType.LABEL;
+                    m_ToggleParams.Copy(tempParams);
                     break;
                 case UIType.BUTTON:
                     m_ToggleParams = new UIButtonParams();
                     m_ToggleParams.uiType = UIType.BUTTON;
+                    m_ToggleParams.Copy(tempParams);
                     break;
             }
         }
@@ -653,9 +727,6 @@ namespace Gem
                 m_NextState = State.INITIALIZATION;
                 return;
             }
-            //GameObject uiToggle = new GameObject(m_ToggleParams.name);
-            //uiToggle.transform.position = Vector3.zero;
-            //uiToggle.transform.rotation = Quaternion.identity;
             Transform parent = null;
             switch(m_ToggleParams.uiSpace)
             {
@@ -669,11 +740,6 @@ namespace Gem
                     parent = m_WorldUI.transform;
                     break;
             }
-            //UIToggle toggle = uiToggle.AddComponent<UIToggle>();
-            //toggle.uiSpace = m_ToggleParams.uiSpace;
-            //toggle.id = m_ToggleParams.id;
-            //toggle.selectable = m_ToggleParams.isSelectable;
-            //toggle.receivesActionEvents = m_ToggleParams.recieveActions;
             UIToggle toggle = UIUtilities.CreateUIToggle(m_ToggleParams, parent);
             switch(toggle.uiType)
             {
@@ -682,6 +748,9 @@ namespace Gem
                     break;
                 case UIType.LABEL:
                     UIUtilities.CreateUILabel(m_ToggleParams as UILabelParams, toggle);
+                    break;
+                case UIType.BUTTON:
+                    UIUtilities.CreateUIButton(m_ToggleParams as UIButtonParams, toggle);
                     break;
             }
             m_Toggles.Add(toggle);
@@ -742,6 +811,15 @@ namespace Gem
                             }
                         }
                         break;
+                    case UIType.BUTTON:
+                        {
+                            UIButton button = m_ToggleToEdit.GetComponentInChildren<UIButton>();
+                            if(button != null)
+                            {
+                                DestroyImmediate(button.gameObject);
+                            }
+                        }
+                        break;
                 }
                 //Step 2. Add the new game objects
                 switch (m_ToggleToEdit.uiType)
@@ -764,6 +842,15 @@ namespace Gem
                             }
                         }
                         break;
+                    case UIType.BUTTON:
+                        {
+                            UIButtonParams buttonParams = m_ToggleParams as UIButtonParams;
+                            if(buttonParams != null)
+                            {
+                                UIUtilities.CreateUIButton(buttonParams, m_ToggleToEdit);
+                            }
+                        }
+                        break;
                 }
             }
             else
@@ -776,6 +863,7 @@ namespace Gem
                             UIImageParams imageParams = m_ToggleParams as UIImageParams;
                             if(image == null || imageParams == null)
                             {
+                                DebugUtils.LogError(MISSING_LABEL);
                                 break;
                             }
                             image.width = imageParams.width;
@@ -787,7 +875,7 @@ namespace Gem
                             image.shader = imageParams.shader;
                             image.color = imageParams.color;
                             image.material.shader = image.shader;
-                            image.material.SetTexture("_Texture", image.texture);
+                            image.material.SetTexture(UIUtilities.SHADER_TEXTURE, image.texture);
 
                             image.GenerateMesh();
                             image.SetTexture();
@@ -801,6 +889,7 @@ namespace Gem
                             UILabelParams labelParams = m_ToggleParams as UILabelParams;
                             if(label == null || labelParams == null)
                             {
+                                DebugUtils.LogError(MISSING_LABEL);
                                 break;
                             }
                             label.text = labelParams.text;
@@ -809,6 +898,55 @@ namespace Gem
                             label.color = labelParams.color;
                             label.fontTexture = labelParams.fontTexture;
                             label.UpdateComponents();
+                        }
+                        break;
+                    case UIType.BUTTON:
+                        {
+                            UIButton button = m_ToggleToEdit.GetComponentInChildren<UIButton>();
+                            UIButtonParams buttonParams = m_ToggleParams as UIButtonParams;
+                            if(button == null || buttonParams == null)
+                            {
+                                DebugUtils.LogError(MISSING_BUTTON);
+                                break;
+                            }
+                            buttonParams.disabled = button.buttonState == UIButtonState.DISABLED;
+                            buttonParams.disabledTexture = button.disabledTexture;
+                            buttonParams.normalTexture = button.normalTexture;
+                            buttonParams.hoverTexture = button.hoverTexture;
+                            buttonParams.downTexture = button.downTexture;
+                            buttonParams.enabledTextColor = button.enabledTextColor;
+                            buttonParams.disabledTextColor = button.disabledTextColor;
+                            buttonParams.eventListener = button.eventListener;
+
+                            UILabel label = button.GetComponentInChildren<UILabel>();
+                            if (label == null)
+                            {
+                                DebugUtils.LogError(MISSING_LABEL);
+                            }
+                            else
+                            {
+                                label.color = buttonParams.labelColor;
+                                label.font = buttonParams.labelFont;
+                                label.fontSize = buttonParams.labelFontSize;
+                                label.fontTexture = buttonParams.labelFontTexture;
+                                label.text = buttonParams.labelText;
+                            }
+                            UIImage image = button.GetComponentInChildren<UIImage>();
+                            if (image == null)
+                            {
+                                DebugUtils.LogError(MISSING_IMAGE);
+                            }
+                            else
+                            {
+                                image.color = buttonParams.imageColor;
+                                image.height = buttonParams.imageHeight;
+                                image.width = buttonParams.imageWidth;
+                                image.meshBoarder = buttonParams.imageMeshBoarder;
+                                image.innerUVBoarder = buttonParams.imageInnerUVBoarder;
+                                image.outerUVBoarder = buttonParams.imageInnerUVBoarder;
+                                image.shader = buttonParams.imageShader;
+                                image.texture = buttonParams.imageTexture;
+                            }
                         }
                         break;
                 }
@@ -874,6 +1012,22 @@ namespace Gem
             buttonParams.disabledTextColor = EditorGUILayout.ColorField(DISABLED_TEXT_COLOR, buttonParams.disabledTextColor);
             buttonParams.eventListener = EditorUtilities.ObjectField<UIEventListener>(UI_EVENT_LISTENER, buttonParams.eventListener);
 
+            buttonParams.labelText = EditorGUILayout.TextField(TEXT, buttonParams.labelText);
+            buttonParams.labelFontSize = EditorGUILayout.IntField(FONT_SIZE, buttonParams.labelFontSize);
+            buttonParams.labelFont = EditorUtilities.fontField(FONT, buttonParams.labelFont);
+            buttonParams.labelColor = EditorGUILayout.ColorField(COLOR, buttonParams.labelColor);
+            buttonParams.labelFontTexture = EditorUtilities.textureField(TEXTURE, buttonParams.labelFontTexture);
+
+            EditorGUILayout.BeginHorizontal();
+            buttonParams.imageWidth = EditorGUILayout.FloatField(WIDTH, buttonParams.imageWidth);
+            buttonParams.imageHeight = EditorGUILayout.FloatField(HEIGHT, buttonParams.imageHeight);
+            EditorGUILayout.EndHorizontal();
+            buttonParams.imageMeshBoarder = EditorUtilities.UIBoarderField(MESH_BOARDER, buttonParams.imageMeshBoarder);
+            buttonParams.imageOuterUVBoarder = EditorUtilities.UIBoarderField(OUTER_UV_BOARDER, buttonParams.imageOuterUVBoarder);
+            buttonParams.imageInnerUVBoarder = EditorUtilities.UIBoarderField(INNER_UV_BOARDER, buttonParams.imageInnerUVBoarder);
+            buttonParams.imageTexture = EditorUtilities.ObjectField<Texture>(TEXTURE, buttonParams.imageTexture);
+            buttonParams.imageShader = EditorUtilities.ObjectField<Shader>(SHADER, buttonParams.imageShader);
+            buttonParams.imageColor = EditorGUILayout.ColorField(COLOR, buttonParams.imageColor);
             
         }
     }

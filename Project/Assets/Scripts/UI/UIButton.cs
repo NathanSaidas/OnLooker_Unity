@@ -1,8 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+
+#region CHANGE LOG
+/* November,14,2014 - Nathan Hanlan, Added and implemented the UIButton class as well as Button state
+ * 
+ */
+#endregion
+
 namespace Gem
 {
-    public enum ButtonState
+    public enum UIButtonState
     {
         /// <summary>
         /// Represents a disabled button state. The button does not relay events to its listener
@@ -29,7 +36,7 @@ namespace Gem
         [Tooltip("The current state of the button.")]
 #endif
         [SerializeField]
-        private ButtonState m_State = ButtonState.NORMAL;
+        private UIButtonState m_State = UIButtonState.NORMAL;
 #if UNITY_EDITOR && (UNITY_4_5 || UNITY_4_6)
         [Tooltip("The texture for the buttons disabled state.")]
 #endif
@@ -80,42 +87,31 @@ namespace Gem
         protected override void Start()
         {
             base.Start();
+            m_Image = GetComponentInChildren<UIImage>();
+            m_Label = GetComponentInChildren<UILabel>();
+
         }
 
         protected virtual void Update()
         {
-            if(m_State != ButtonState.DISABLED)
+            if(m_State != UIButtonState.DISABLED)
             {
                 if (m_MouseDown == true)
                 {
-                    m_State = ButtonState.DOWN;
+                    m_State = UIButtonState.DOWN;
                 }
                 else if(m_MouseInBounds == true)
                 {
-                    m_State = ButtonState.HOVER;
+                    m_State = UIButtonState.HOVER;
                 }
                 else
                 {
-                    m_State = ButtonState.NORMAL;
+                    m_State = UIButtonState.NORMAL;
                 }
             }
 
-            ///TODO: Set texture of mesh based on state.
-            switch(m_State)
-            {
-                case ButtonState.NORMAL:
-
-                    break;
-                case ButtonState.DISABLED:
-
-                    break;
-                case ButtonState.DOWN:
-
-                    break;
-                case ButtonState.HOVER:
-
-                    break;
-            }
+            SetTexture();
+            SetTextColor();
         }
 
         protected override void OnMouseDownEvent()
@@ -169,14 +165,102 @@ namespace Gem
 
         public void Disable()
         {
-            m_State = ButtonState.DISABLED;
+            m_State = UIButtonState.DISABLED;
         }
         public void Enable()
         {
-            m_State = ButtonState.NORMAL;
+            m_State = UIButtonState.NORMAL;
         }
 
-        public ButtonState buttonState
+        /// <summary>
+        /// Updates the UILabel and UIImage components
+        /// </summary>
+        public void UpdateComponents()
+        {
+            if(m_Image == null)
+            {
+                m_Image = GetComponentInChildren<UIImage>();
+            }
+            if(m_Label == null)
+            {
+                m_Label = GetComponentInChildren<UILabel>();
+            }
+
+            SetTexture();
+
+
+        }
+
+        /// <summary>
+        /// Sets the UIImage texture based on the state of the button
+        /// </summary>
+        private void SetTexture()
+        {
+            switch (m_State)
+            {
+                case UIButtonState.NORMAL:
+                    if(m_Image != null)
+                    {
+                        m_Image.texture = m_NormalTexture;
+                    }
+                    break;
+                case UIButtonState.DISABLED:
+                    if(m_Image != null)
+                    {
+                        if(m_DisabledTexture == null)
+                        {
+                            m_Image.texture = m_NormalTexture;
+                        }
+                        else
+                        {
+                            m_Image.texture = m_DisabledTexture;
+                        }
+                    }
+                    break;
+                case UIButtonState.DOWN:
+                    if (m_Image != null)
+                    {
+                        if (m_DownTexture == null)
+                        {
+                            m_Image.texture = m_NormalTexture;
+                        }
+                        else
+                        {
+                            m_Image.texture = m_DownTexture;
+                        }
+                    }
+                    break;
+                case UIButtonState.HOVER:
+                    if (m_Image != null)
+                    {
+                        if (m_HoverTexture == null)
+                        {
+                            m_Image.texture = m_NormalTexture;
+                        }
+                        else
+                        {
+                            m_Image.texture = m_HoverTexture;
+                        }
+                    }
+                    break;
+            }
+        }
+        private void SetTextColor()
+        {
+            if (m_Label != null)
+            {
+                if (m_State == UIButtonState.DISABLED)
+                {
+                    m_Label.color = m_DisabledTextColor;
+                }
+                else
+                {
+                    m_Label.color = m_EnabledTextColor;
+                }
+            }
+        }
+
+        public UIButtonState buttonState
         {
             get{return m_State;}
         }

@@ -189,6 +189,12 @@ namespace Gem
             get { return m_UIType; }
             set { m_UIType = value; }
         }
+
+        public UIEventListener eventListener
+        {
+            get { return m_EventListener; }
+            set { m_EventListener = value; }
+        }
         #endregion
 
     }

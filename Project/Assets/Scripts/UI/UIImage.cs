@@ -248,7 +248,7 @@ namespace Gem
         public Texture texture
         {
             get { return m_Texture; }
-            set { m_Texture = value; }
+            set { bool change = m_Texture != value; m_Texture = value; if (change) { SetTexture(); } }
         }
         /// <summary>
         /// The shader to use, Accepts only UI Shaders will default to Unlit UI if invalid shader given

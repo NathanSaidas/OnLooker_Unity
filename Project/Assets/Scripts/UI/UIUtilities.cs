@@ -5,6 +5,7 @@ using System.Collections.Generic;
 /* November,13,2014 - Nathan Hanlan, Added support for a new shader for text only.
  * November,13,2014 - Nathan Hanlan, Added support for creating UILabel prefabs.
  * November,13,2014 - Nathan Hanlan, Added constants for shader string names.
+ * November,14,2014 - Nathan Hanlan, Added support for creating UI Buttons
  */
 #endregion
 
@@ -14,6 +15,8 @@ namespace Gem
 
     public class UIUtilities : MonoBehaviour
     {
+        /// Shader Names
+
         public const string SHADER_UNLIT = "Custom/UI/UI_Unlit";
         public const string SHADER_UNLIT_TRANSPARENT = "Custom/UI/UI_Unlit_Transparent";
         public const string SHADER_DIFFUSE = "Custom/UI/UI_Diffuse";
@@ -22,11 +25,17 @@ namespace Gem
         public const string SHADER_BUMPED_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Bumped_Diffuse_Transparent";
         public const string SHADER_TEXT = "Custom/UI/UI_Text";
 
+
+        /// Shader Keywords
+
         public const string SHADER_TEXTURE = "_Texture";
         public const string SHADER_COLOR = "_Color";
         public const string SHADER_TILE_X = "_TileX";
         public const string SHADER_TILE_Y = "_TileY";
 
+        /// <summary>
+        /// Default name of the meshes
+        /// </summary>
         public const string MESH_NAME = "M_UIImage";
 
         public static Mesh GenerateUniformPlane(string aName, float aWidth, float aHeight)
@@ -400,7 +409,7 @@ namespace Gem
             GameObject labelGameObject = new GameObject(aParams.name + LABEL_POST_FIX);
             labelGameObject.transform.position = Vector3.zero;
             labelGameObject.transform.rotation = Quaternion.identity;
-            labelGameObject.transform.parent = rootGameObject.transform;
+            labelGameObject.transform.parent = buttonGameObject.transform;
             labelGameObject.layer = buttonGameObject.layer;
             labelGameObject.AddComponent<MeshRenderer>();
             labelGameObject.AddComponent<TextMesh>();
@@ -410,13 +419,13 @@ namespace Gem
             uiLabel.font = aParams.labelFont;
             uiLabel.color = aParams.labelColor;
             uiLabel.fontTexture = aParams.labelFontTexture;
-            uiLabel.UpdateComponents();
+            
 
             ///create image
             GameObject imageGameObject = new GameObject(aParams.name + IMAGE_POST_FIX);
             imageGameObject.transform.position = Vector3.zero;
             imageGameObject.transform.rotation = Quaternion.identity;
-            imageGameObject.transform.parent = rootGameObject.transform;
+            imageGameObject.transform.parent = buttonGameObject.transform;
             imageGameObject.layer = buttonGameObject.layer;
             imageGameObject.AddComponent<MeshFilter>();
             imageGameObject.AddComponent<MeshRenderer>();
@@ -431,16 +440,21 @@ namespace Gem
             uiImage.shader = aParams.imageShader;
             uiImage.color = aParams.imageColor;
 
+
+            uiButton.UpdateComponents();
+            uiLabel.UpdateComponents();
             uiImage.GenerateMaterial();
             uiImage.GenerateMesh();
             uiImage.SetTexture();
             uiImage.SetColor();
-
+            aToggle.eventListener = uiButton;
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(uiButton);
             UnityEditor.EditorUtility.SetDirty(uiLabel);
             UnityEditor.EditorUtility.SetDirty(uiImage);
 #endif
+
+            
             return uiButton;
         }
 

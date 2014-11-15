@@ -176,6 +176,15 @@ namespace Gem
             UpdateBounds();
         }
 
+        public MeshRenderer meshRenderer
+        {
+            get { return m_MeshRenderer; }
+        }
+        public TextMesh textMesh
+        {
+            get { return m_TextMesh; }
+        }
+
         /// <summary>
         /// The text to display.
         /// </summary>
