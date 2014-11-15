@@ -691,11 +691,115 @@ namespace Gem
         {
             if(m_ToggleParams != null && aCopyToggle != null)
             {
-                m_ToggleParams.Clear();
-                m_ToggleParams.isSelectable = aCopyToggle.selectable;
-                m_ToggleParams.recieveActions = aCopyToggle.receivesActionEvents;
-                m_ToggleParams.uiSpace = aCopyToggle.uiSpace;
-                m_ToggleParams.uiType = aCopyToggle.uiType;
+                switch(aCopyToggle.uiType)
+                {
+                    case UIType.IMAGE:
+                        {
+                            UIImageParams imageParams = new UIImageParams();
+                            m_ToggleParams = imageParams;
+                            m_ToggleParams.isSelectable = aCopyToggle.selectable;
+                            m_ToggleParams.recieveActions = aCopyToggle.receivesActionEvents;
+                            m_ToggleParams.uiSpace = aCopyToggle.uiSpace;
+                            m_ToggleParams.uiType = aCopyToggle.uiType;
+
+                            UIImage image = aCopyToggle.GetComponentInChildren<UIImage>();
+                            if(image != null)
+                            {
+                                imageParams.color = image.color;
+                                imageParams.height = image.height;
+                                imageParams.width = image.width;
+                                imageParams.meshBoarder = image.meshBoarder;
+                                imageParams.innerUVBoarder = image.innerUVBoarder;
+                                imageParams.outerUVBoarder = image.innerUVBoarder;
+                                imageParams.shader = image.shader;
+                                imageParams.texture = image.texture;
+                            }
+                            else
+                            {
+                                DebugUtils.LogError(MISSING_IMAGE);
+                            }
+                        }
+                        break;
+                    case UIType.LABEL:
+                        {
+                            UILabelParams labelParams = new UILabelParams();
+                            m_ToggleParams = labelParams;
+                            m_ToggleParams.isSelectable = aCopyToggle.selectable;
+                            m_ToggleParams.recieveActions = aCopyToggle.receivesActionEvents;
+                            m_ToggleParams.uiSpace = aCopyToggle.uiSpace;
+                            m_ToggleParams.uiType = aCopyToggle.uiType;
+
+                            UILabel label = aCopyToggle.GetComponentInChildren<UILabel>();
+                            if (label != null)
+                            {
+                                labelParams.color = label.color;
+                                labelParams.font = label.font;
+                                labelParams.fontSize = label.fontSize;
+                                labelParams.fontTexture = label.fontTexture;
+                                labelParams.text = label.text;
+                            }
+                            else
+                            {
+                                DebugUtils.LogError(MISSING_LABEL);
+                            }
+                        }
+                        break;
+                    case UIType.BUTTON:
+                        {
+                            UIButtonParams buttonParams = new UIButtonParams();
+                            m_ToggleParams = buttonParams;
+                            m_ToggleParams.isSelectable = aCopyToggle.selectable;
+                            m_ToggleParams.recieveActions = aCopyToggle.receivesActionEvents;
+                            m_ToggleParams.uiSpace = aCopyToggle.uiSpace;
+                            m_ToggleParams.uiType = aCopyToggle.uiType;
+
+                            UIButton button = aCopyToggle.GetComponentInChildren<UIButton>();
+                            if (button == null)
+                            {
+                                DebugUtils.LogError(MISSING_BUTTON);
+                                break;
+                            }
+                            buttonParams.disabled = button.buttonState == UIButtonState.DISABLED;
+                            buttonParams.disabledTexture = button.disabledTexture;
+                            buttonParams.normalTexture = button.normalTexture;
+                            buttonParams.hoverTexture = button.hoverTexture;
+                            buttonParams.downTexture = button.downTexture;
+                            buttonParams.enabledTextColor = button.enabledTextColor;
+                            buttonParams.disabledTextColor = button.disabledTextColor;
+                            buttonParams.eventListener = button.eventListener;
+
+                            UILabel label = button.GetComponentInChildren<UILabel>();
+                            if (label == null)
+                            {
+                                DebugUtils.LogError(MISSING_LABEL);
+                            }
+                            else
+                            {
+                                label.color = buttonParams.labelColor;
+                                label.font = buttonParams.labelFont;
+                                label.fontSize = buttonParams.labelFontSize;
+                                label.fontTexture = buttonParams.labelFontTexture;
+                                label.text = buttonParams.labelText;
+                            }
+                            UIImage image = button.GetComponentInChildren<UIImage>();
+                            if (image == null)
+                            {
+                                DebugUtils.LogError(MISSING_IMAGE);
+                            }
+                            else
+                            {
+                                image.color = buttonParams.imageColor;
+                                image.height = buttonParams.imageHeight;
+                                image.width = buttonParams.imageWidth;
+                                image.meshBoarder = buttonParams.imageMeshBoarder;
+                                image.innerUVBoarder = buttonParams.imageInnerUVBoarder;
+                                image.outerUVBoarder = buttonParams.imageInnerUVBoarder;
+                                image.shader = buttonParams.imageShader;
+                                image.texture = buttonParams.imageTexture;
+                            }
+                        }
+                        break;
+                }
             }
         }
         private void CreateParamsForType(UIType aType)

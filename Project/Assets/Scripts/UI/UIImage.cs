@@ -156,7 +156,10 @@ namespace Gem
         /// </summary>
         public void SetTexture()
         {
-            m_Material.SetTexture("_Texture", m_Texture);
+            if (m_Material != null)
+            {
+                m_Material.SetTexture("_Texture", m_Texture);
+            }
         }
         /// <summary>
         /// Updates the color in the shader.

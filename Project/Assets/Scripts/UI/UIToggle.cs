@@ -2,7 +2,7 @@
 using System.Collections;
 #region CHANGE LOG
 /* October,27,2014 - Nathan Hanlan, Added and implemented UIToggle
- * 
+ * November,14,2014 - Nathan Hanlan, Exposed the UIEventListener field as a property.
  */
 #endregion
 

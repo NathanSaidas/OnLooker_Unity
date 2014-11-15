@@ -407,7 +407,7 @@ namespace Gem
 
             ///create label
             GameObject labelGameObject = new GameObject(aParams.name + LABEL_POST_FIX);
-            labelGameObject.transform.position = Vector3.zero;
+            labelGameObject.transform.position = new Vector3(0.0f, 0.0f, 0.04f);
             labelGameObject.transform.rotation = Quaternion.identity;
             labelGameObject.transform.parent = buttonGameObject.transform;
             labelGameObject.layer = buttonGameObject.layer;
