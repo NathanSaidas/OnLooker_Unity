@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Gem
 {
@@ -13,31 +14,57 @@ namespace Gem
             OPENING,
             CLOSING
         }
+        /// <summary>
+        /// The position the door goes when its closed.
+        /// </summary>
         [SerializeField]
         private Vector3 m_ClosedPosition = Vector3.zero;
+        /// <summary>
+        /// The position the door goes when its open
+        /// </summary>
         [SerializeField]
         private Vector3 m_OpenPosition = Vector3.zero;
+        /// <summary>
+        /// The speed at which the door opens at.
+        /// </summary>
         [SerializeField]
         private float m_OpenSpeed = 1.0f;
-
+        /// <summary>
+        /// The name of the door.
+        /// </summary>
         [SerializeField]
         string m_DoorName = string.Empty;
+        /// <summary>
+        /// The item needed to open the door. This can be empty to not require any items.
+        /// </summary>
         [SerializeField]
         string m_RequiredItemName = string.Empty;
 
         private DoorState m_State = DoorState.CLOSED;
         private float m_CurrentTime = 0.0f;
         private Vector3 m_StartPosition = Vector3.zero;
+
+        /// <summary>
+        /// The time to wait before closing the door.
+        /// </summary>
+        [SerializeField]
+        private float m_MaxTime = 1.0f;
+
+        private List<Unit> m_TriggeringUnits = new List<Unit>();
+        private float m_CloseTime = 0.0f;
+
         // Use this for initialization
         void Start()
         {
             m_StartPosition = transform.position;
             RegisterEvent(GameEventID.TRIGGER_AREA);
+            RegisterEvent(GameEventID.TRIGGER_AREA_EXIT);
             Game.Register(this);
         }
         void OnDestroy()
         {
             UnregisterEvent(GameEventID.TRIGGER_AREA);
+            UnregisterEvent(GameEventID.TRIGGER_AREA_EXIT);
             Game.Unregister(this);
         }
 
@@ -51,11 +78,32 @@ namespace Gem
                 {
                     return;
                 }
+                m_TriggeringUnits.Add(unit);
                 UnitInventory inventory = unit.inventory;
-                if(trigger.triggerName == m_DoorName && inventory != null && inventory.GetItem(m_RequiredItemName) != null)
+                if(trigger.triggerName == m_DoorName)
                 {
-                    Open();
+                    if(m_RequiredItemName.Length > 0)
+                    {
+                        if(inventory != null && inventory.GetItem(m_RequiredItemName) != null)
+                        {
+                            Open();
+                        }
+                    }
+                    else
+                    {
+                        Open();
+                    }
                 }
+            }
+            else if(aEventType == GameEventID.TRIGGER_AREA_EXIT)
+            {
+                AreaTrigger trigger = eventData.sender as AreaTrigger;
+                Unit unit = eventData.triggeringObject as Unit;
+                if (unit == null || trigger == null)
+                {
+                    return;
+                }
+                m_TriggeringUnits.Remove(unit);
             }
         }
 
@@ -75,20 +123,37 @@ namespace Gem
                     {
                         m_State = DoorState.OPEN;
                         m_CurrentTime = 0.0f;
+                        break;
                     }
                     transform.position = Vector3.Lerp(m_StartPosition + m_ClosedPosition,m_StartPosition + m_OpenPosition, m_CurrentTime);
                     break;
                 case DoorState.CLOSING:
                     m_CurrentTime += Time.deltaTime * m_OpenSpeed;
-                    if(m_CurrentTime > 0.0f)
+                    if(m_CurrentTime > 1.0f)
                     {
                         m_State = DoorState.CLOSED;
                         m_CurrentTime = 0.0f;
+                        break;
                     }
                     transform.position = Vector3.Lerp(m_StartPosition + m_OpenPosition, m_StartPosition + m_ClosedPosition, m_CurrentTime);
                     break;
-
             }
+
+            if (m_TriggeringUnits.Count > 0)
+            {
+                m_CloseTime = m_MaxTime;
+            }
+            else
+            {
+                m_CloseTime -= Time.deltaTime;
+            }
+            m_CloseTime = Mathf.Clamp(m_CloseTime, 0.0f, m_MaxTime);
+
+            if (m_CloseTime <= 0.0f && m_State != DoorState.OPENING)
+            {
+                Close();
+            }
+
         }
 
         public void Open()

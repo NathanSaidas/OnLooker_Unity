@@ -17,13 +17,7 @@ using UnityEditor;
 
 namespace Gem
 {
-    public static class MonoBehaviourExtensions
-    {
-        public static void GlobalFunction(this MonoBehaviour behaviour)
-        {
-            Debug.Log("This is an extended function all mono behaviours can use globally.");
-        }
-    }
+
 
 
     public class Game : MonoBehaviour
@@ -218,8 +212,6 @@ namespace Gem
         /// </summary>
         void Start()
         {
-            this.GlobalFunction();
-            
 
             if(!SetInstance(this))
             {

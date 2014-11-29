@@ -64,6 +64,7 @@ namespace Gem
                     m_UnitEventsRegistered++;
                     break;
                 case GameEventID.TRIGGER_AREA:
+                case GameEventID.TRIGGER_AREA_EXIT:
                     if(m_TriggerEventsRegistered == 0)
                     {
                         GameEventManager.RegisterEventListener(GameEventType.TRIGGER, this);
@@ -111,6 +112,7 @@ namespace Gem
                     m_GameEventsRegistered--;
                     break;
                 case GameEventID.TRIGGER_AREA:
+                case GameEventID.TRIGGER_AREA_EXIT:
                     {
                         GameEventManager.UnregisterEventListener(GameEventType.TRIGGER, this);
                     }

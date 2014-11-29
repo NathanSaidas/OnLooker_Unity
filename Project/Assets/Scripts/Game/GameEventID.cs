@@ -63,6 +63,10 @@
         /// Area trigger was triggered.
         /// </summary>
         TRIGGER_AREA,
+        /// <summary>
+        /// Area trigger has stopped being triggered.
+        /// </summary>
+        TRIGGER_AREA_EXIT,
 
     }
 }

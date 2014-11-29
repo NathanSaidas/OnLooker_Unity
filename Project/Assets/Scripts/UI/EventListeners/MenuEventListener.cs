@@ -12,6 +12,9 @@ namespace Gem
             ONLINE,
             OPTIONS
         }
+        [SerializeField]
+        private string m_LoadScene = "Level_01";
+
         private UIButton m_Singleplayer = null;
         private UIButton m_Online = null;
         private UIButton m_Options = null;
@@ -106,8 +109,8 @@ namespace Gem
         private void SinglePlayerClicked()
         {
             m_State = MenuState.SINGLE_PLAYER;
-            UpdateMenuItems();
-            Game.LoadLevel(Game.LEVEL_01);
+            //UpdateMenuItems();
+            Game.LoadLevel(m_LoadScene);
         }
         private void OnlineClicked()
         {

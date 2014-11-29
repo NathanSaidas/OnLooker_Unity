@@ -12,19 +12,41 @@ namespace Gem
         private void OnTriggerEnter(Collider aCollider)
         {
             Unit unit = aCollider.GetComponent<Unit>();
-            if(unit == null)
-            {
-                unit = aCollider.GetComponentInChildren<Unit>();
-            }
-            if(unit == null)
-            {
-                unit = aCollider.GetComponentInParent<Unit>();
-            }
+            //if(unit == null)
+            //{
+            //    unit = aCollider.GetComponentInChildren<Unit>();
+            //}
+            //if(unit == null)
+            //{
+            //    unit = aCollider.GetComponentInParent<Unit>();
+            //}
             if (unit != null)
             {
                 Debug.Log("Invoking Event");
                 GameEventManager.InvokeEvent(new GameEventData(Time.time,
                     GameEventID.TRIGGER_AREA,
+                    GameEventType.TRIGGER,
+                    this,
+                    unit));
+            }
+        }
+
+        private void OnTriggerExit(Collider aCollider)
+        {
+            Unit unit = aCollider.GetComponent<Unit>();
+            //if (unit == null)
+            //{
+            //    unit = aCollider.GetComponentInChildren<Unit>();
+            //}
+            //if (unit == null)
+            //{
+            //    unit = aCollider.GetComponentInParent<Unit>();
+            //}
+            if (unit != null)
+            {
+                Debug.Log("Invoking Event");
+                GameEventManager.InvokeEvent(new GameEventData(Time.time,
+                    GameEventID.TRIGGER_AREA_EXIT,
                     GameEventType.TRIGGER,
                     this,
                     unit));
