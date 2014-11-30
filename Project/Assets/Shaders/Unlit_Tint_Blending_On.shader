@@ -7,9 +7,11 @@
 	}
 	SubShader 
 	{
-		Blend SrcAlpha OneMinusSrcAlpha
+		
 		Pass
 		{
+			Blend SrcAlpha OneMinusSrcAlpha
+			Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
 			CGPROGRAM
 			#pragma vertex vertShader
 			#pragma fragment fragShader

@@ -4,16 +4,18 @@ using System.Collections.Generic;
 
 namespace Gem
 {
+    public enum DoorState
+    {
+        OPEN,
+        CLOSED,
+        OPENING,
+        CLOSING,
+        NONE
+    }
 
     public class OpenDoor : MonoGameEventHandler, IGameListener
     {
-        private enum DoorState
-        {
-            OPEN,
-            CLOSED,
-            OPENING,
-            CLOSING
-        }
+        
         /// <summary>
         /// The position the door goes when its closed.
         /// </summary>
@@ -40,9 +42,15 @@ namespace Gem
         [SerializeField]
         string m_RequiredItemName = string.Empty;
 
+        [SerializeField]
+        bool m_RequirePower = false;
+
+
+
         private DoorState m_State = DoorState.CLOSED;
         private float m_CurrentTime = 0.0f;
         private Vector3 m_StartPosition = Vector3.zero;
+        private PowerReceiver m_Receiver = null;
 
         /// <summary>
         /// The time to wait before closing the door.
@@ -56,6 +64,7 @@ namespace Gem
         // Use this for initialization
         void Start()
         {
+            m_Receiver = GetComponent<PowerReceiver>();
             m_StartPosition = transform.position;
             RegisterEvent(GameEventID.TRIGGER_AREA);
             RegisterEvent(GameEventID.TRIGGER_AREA_EXIT);
@@ -122,20 +131,20 @@ namespace Gem
                     if(m_CurrentTime > 1.0f)
                     {
                         m_State = DoorState.OPEN;
-                        m_CurrentTime = 0.0f;
+                        m_CurrentTime = 1.0f;
                         break;
                     }
                     transform.position = Vector3.Lerp(m_StartPosition + m_ClosedPosition,m_StartPosition + m_OpenPosition, m_CurrentTime);
                     break;
                 case DoorState.CLOSING:
-                    m_CurrentTime += Time.deltaTime * m_OpenSpeed;
-                    if(m_CurrentTime > 1.0f)
+                    m_CurrentTime -= Time.deltaTime * m_OpenSpeed;
+                    if(m_CurrentTime < 0.0f)
                     {
                         m_State = DoorState.CLOSED;
                         m_CurrentTime = 0.0f;
                         break;
                     }
-                    transform.position = Vector3.Lerp(m_StartPosition + m_OpenPosition, m_StartPosition + m_ClosedPosition, m_CurrentTime);
+                    transform.position = Vector3.Lerp(m_StartPosition + m_ClosedPosition, m_StartPosition + m_OpenPosition, m_CurrentTime);
                     break;
             }
 
@@ -158,6 +167,13 @@ namespace Gem
 
         public void Open()
         {
+            if(m_RequirePower == true)
+            {
+                if (m_Receiver != null && m_Receiver.isPowered == false)
+                {
+                    return;
+                }
+            }
             if (m_State != DoorState.OPEN)
             {
                 m_State = DoorState.OPENING;
@@ -165,6 +181,13 @@ namespace Gem
         }
         public void Close()
         {
+            if (m_RequirePower == true)
+            {
+                if (m_Receiver != null && m_Receiver.isPowered == false)
+                {
+                    return;
+                }
+            }
             if(m_State != DoorState.CLOSED)
             {
                 m_State = DoorState.CLOSING;

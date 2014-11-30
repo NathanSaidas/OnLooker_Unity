@@ -206,6 +206,9 @@ namespace Gem
         /// A file for all player saves.
         /// </summary>
         private File m_PlayerSavesFile = null;
+
+        [SerializeField]
+        private UIToggle m_InteractToggle = null;
         #endregion
         /// <summary>
         /// Initialize the game manager.
@@ -272,6 +275,7 @@ namespace Gem
                 m_LoadedScene = m_TargetScene;
                 m_IsLoading = false;
                 GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_LEVEL_LOAD_FINISH, GameEventType.GAME, this, targetScene));
+                StartCoroutine(OnLevelLoaded());
             }
         }
 
@@ -578,6 +582,37 @@ namespace Gem
             m_PlayerSavesFile = m_FileStream.Get(FILE_PLAYER_SAVES);
             GameOptions.LoadOptions(m_FileStream);
             GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_LOAD, GameEventType.GAME, this, m_FileStream));
+        }
+
+        /// <summary>
+        /// Gets called when a level has loaded.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator OnLevelLoaded()
+        {
+            yield return new WaitForEndOfFrame();
+            m_InteractToggle = UIManager.Find("Interact");
+        }
+
+        public static void ShowInteract()
+        {
+            if(instance.m_InteractToggle != null)
+            {
+                if(instance.m_InteractToggle.gameObject.activeSelf == false)
+                {
+                    instance.m_InteractToggle.gameObject.SetActive(true);
+                }
+            }
+        }
+        public static void HideInteract()
+        {
+            if (instance.m_InteractToggle != null)
+            {
+                if (instance.m_InteractToggle.gameObject.activeSelf == true)
+                {
+                    instance.m_InteractToggle.gameObject.SetActive(false);
+                }
+            }
         }
         
         /// <summary>

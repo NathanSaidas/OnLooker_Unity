@@ -749,7 +749,7 @@ namespace Gem
             {
                 return;
             }
-            TODO: Game.LoadLevel(aWords[1]);
+            //TODO: Game.LoadLevel(aWords[1]);
             ConsoleLog("Load Level: " + aWords[1]);
         }
         /// <summary>
@@ -775,7 +775,7 @@ namespace Gem
         /// <param name="aWords"></param>
         private void OnCommandRestart(List<string> aWords)
         {
-            TODO: Game.Restart();
+            //TODO: Game.Restart();
             ConsoleLog("Restart");
         }
 

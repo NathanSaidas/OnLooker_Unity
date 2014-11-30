@@ -4,10 +4,10 @@ using System.Collections;
 public class BatchingUtil : MonoBehaviour 
 {
     [SerializeField]
-    GameObject m_Root;
+    GameObject m_Root = null;
 
     [SerializeField]
-    GameObject []m_Targets;
+    GameObject[] m_Targets = null;
 	// Use this for initialization
 	void Start () 
     {

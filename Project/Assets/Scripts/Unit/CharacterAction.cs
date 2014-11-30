@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Gem
 {
@@ -24,6 +25,7 @@ namespace Gem
 
 
         private float m_CurrentTime = 0.0f;
+        private List<Interactive> m_InteractiveObjects = new List<Interactive>();
 
         
         // Use this for initialization
@@ -66,7 +68,59 @@ namespace Gem
             {
                 StopAttack();
             }
-            
+
+            bool canUse = false;
+            IEnumerator<Interactive> enumerator = m_InteractiveObjects.GetEnumerator();
+            while(enumerator.MoveNext())
+            {
+                if(enumerator.Current == null)
+                {
+                    continue;
+                }
+                if(enumerator.Current.CanUse(transform))
+                {
+                    canUse = true;
+                    break;
+                }
+            }
+
+            if(canUse == true)
+            {
+                Game.ShowInteract();
+            }
+            else
+            {
+                Game.HideInteract();
+            }
+
+            if(InputManager.GetButtonDown(GameConstants.INPUT_INTERACT))
+            {
+                Debug.Log("Do something...");
+                if(m_InteractiveObjects.Count == 1)
+                {
+                    m_InteractiveObjects[0].OnUse();
+                }
+            }
+
+        }
+
+        void OnTriggerEnter(Collider aCollider)
+        {
+            Interactive interactive = aCollider.GetComponent<Interactive>();
+            if(interactive == null || m_InteractiveObjects.Contains(interactive))
+            {
+                return;
+            }
+            m_InteractiveObjects.Add(interactive);
+        }
+        void OnTriggerExit(Collider aCollider)
+        {
+            Interactive interactive = aCollider.GetComponent<Interactive>();
+            if(interactive == null)
+            {
+                return;
+            }
+            m_InteractiveObjects.Remove(interactive);
         }
 
         private void Attack()

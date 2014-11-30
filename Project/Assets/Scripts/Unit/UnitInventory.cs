@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -17,6 +18,11 @@ namespace Gem
         /// </summary>
         [SerializeField]
         private int m_MaxItemCount = 8;
+
+        [SerializeField]
+        private List<ItemType> m_AcceptedTypes = new List<ItemType>();
+
+
         private List<Item> m_Items = new List<Item>();
 
         private void Start()
@@ -37,6 +43,37 @@ namespace Gem
         private void OnDestroy()
         {
             Game.Unregister(this);
+        }
+
+        private void OnTriggerEnter(Collider aCollider)
+        {
+            ItemPickUp pickup = aCollider.GetComponent<ItemPickUp>();
+            if(pickup != null && pickup.itemType != ItemType.NONE)
+            {
+                if(!m_AcceptedTypes.Any(Element => Element == pickup.itemType))
+                {
+                    return;
+                }
+
+                Item item = GetItem(pickup.itemType);
+                if(item != null)
+                {
+                    if (item.isStackable && item.isFull == false)
+                    {
+                        item.AddStack();
+                    }
+                    else
+                    {
+                        DebugUtils.Log("Item is not stabkle or is full");
+                    }
+                }
+                else
+                {
+                    AddItem(ItemDatabase.QueryItem(pickup.itemType));
+                }
+
+                pickup.gameObject.SetActive(false);
+            }
         }
 
         public bool AddItem(Item aItem)

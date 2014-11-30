@@ -36,7 +36,7 @@ namespace Gem
 
         IEnumerator LateStart()
         {
-            yield return Game.WAIT_QUATER;
+            yield return new WaitForEndOfFrame();
             //Late Start Code Goes Here.
             m_Singleplayer = UIManager.Find<UIButton>("SinglePlayer");
             m_Online = UIManager.Find<UIButton>("Online");

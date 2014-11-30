@@ -44,7 +44,7 @@ namespace Gem
 
         void PlayerPickUpKey(UnitInventory aInventory)
         {
-            aInventory.AddItem(ItemDatabase.QueryItem(ItemType.KEY));
+            aInventory.AddItem(ItemDatabase.QueryItem(ItemType.SILVER_ACCESS_CARD));
         }
 
         public void OnGamePaused()
