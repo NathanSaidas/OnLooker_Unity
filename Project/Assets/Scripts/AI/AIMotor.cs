@@ -7,7 +7,8 @@ namespace Gem
     {
         NONE,
         SWORD,
-        WAND
+        WAND,
+        GUN
     }
 
     /// <summary>

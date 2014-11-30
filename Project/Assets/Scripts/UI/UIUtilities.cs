@@ -24,6 +24,7 @@ namespace Gem
         public const string SHADER_BUMPED_DIFFUSE = "Custom/UI/UI_Bumped_Diffuse";
         public const string SHADER_BUMPED_DIFFUSE_TRANSPARENT = "Custom/UI/UI_Bumped_Diffuse_Transparent";
         public const string SHADER_TEXT = "Custom/UI/UI_Text";
+        public const string SHADER_CUTOFF_TRANSPARENT = "Custom/UI/UI_Cutoff_Transparent";
 
 
         /// Shader Keywords
@@ -32,6 +33,8 @@ namespace Gem
         public const string SHADER_COLOR = "_Color";
         public const string SHADER_TILE_X = "_TileX";
         public const string SHADER_TILE_Y = "_TileY";
+        public const string SHADER_CUTOFF_X = "_CutoffX";
+        public const string SHADER_CUTOFF_Y = "_CutoffY";
 
         /// <summary>
         /// Default name of the meshes
@@ -245,6 +248,7 @@ namespace Gem
                 case SHADER_BUMPED_DIFFUSE:
                 case SHADER_BUMPED_DIFFUSE_TRANSPARENT:
                 case SHADER_TEXT:
+                case SHADER_CUTOFF_TRANSPARENT:
                     return true;
                 default:
                     return false;

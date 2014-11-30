@@ -19,6 +19,13 @@ namespace Gem
         private float m_RunSpeed = 5.0f;
         [SerializeField]
         private float m_SprintSpeed = 6.5f;
+
+        private Ability m_TriggeredAbility = null;
+
+
+        private float m_CurrentTime = 0.0f;
+
+        
         // Use this for initialization
         void Start()
         {
@@ -31,13 +38,8 @@ namespace Gem
         {
             m_AttackTime -= Time.deltaTime;
 
-            if(Input.GetMouseButtonDown(0) && m_AttackTime < 0.0f)
-            {
-                StartAttack();
-                m_Motor.attackType = m_Unit.selectedAbility.attackType;
-                m_AttackTime = m_Unit.selectedAbility.abilityCooldown;
-            }
-            if(InputManager.GetButton("Sprint"))
+            ///Check Sprint
+            if(InputManager.GetButton(GameConstants.INPUT_SPRINT))
             {
                 m_Unit.movementSpeed = m_SprintSpeed;
             }
@@ -45,39 +47,127 @@ namespace Gem
             {
                 m_Unit.movementSpeed = m_RunSpeed;
             }
+
+
+            if(InputManager.GetButtonDown(GameConstants.INPUT_NEXT))
+            {
+                m_Unit.NextAbility(false);
+            }
+            if (InputManager.GetButtonDown(GameConstants.INPUT_PREVIOUS))
+            {
+                m_Unit.PreviousAbility(false);
+            }
+
+            if(InputManager.GetButton(GameConstants.INPUT_ATTACK))
+            {
+                Attack(); 
+            }
+            else
+            {
+                StopAttack();
+            }
             
-            if(Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                m_Unit.SelectAbility(0);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                m_Unit.SelectAbility(1);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                m_Unit.SelectAbility(2);
-            }
         }
 
-        private void StartAttack()
+        private void Attack()
         {
-            StartCoroutine(Attack());
-        }
-
-        IEnumerator Attack()
-        {
-            m_Motor.attackMotion = 1.0f;
-            //TODO: Check Ability Cast Time
-            yield return new WaitForSeconds(m_AttackWindup);
-            m_Motor.attackMotion = 0.0f;
-            CharacterCamera cam = Game.gameplayCamera.GetComponent<CharacterCamera>();
-            if (cam != null)
+            ///Get current ability
+            if(m_Unit == null)
             {
-                cam.ShakeCamera(0.10f, CameraShakeMode.DECREASE, new Vector3(0.05f, 0.05f, 0.05f));
+                return;
             }
-            m_Motor.attackType = AttackType.NONE;
-            m_Unit.ExecuteAbility();
+            Ability currentAbility = m_Unit.selectedAbility;
+            if(currentAbility == null)
+            {
+                DebugUtils.LogWarning("Unit is missing an ability to attack with.");
+                return;
+            }
+            ///Check the last ability with the current ability
+            if(currentAbility != m_TriggeredAbility)
+            {
+                ///Cancelled attack?
+                if(m_TriggeredAbility != null)
+                {
+                    GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.UNIT_ATTACK_CANCELLED, GameEventType.UNIT, this, m_TriggeredAbility));
+                }
+                m_CurrentTime = 0.0f;
+            }
+            ///Update time and ability.
+            m_TriggeredAbility = currentAbility;
+            ///Ability first started
+            if(m_CurrentTime == 0.0f)
+            {
+                if (m_TriggeredAbility != null)
+                {
+                    GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.UNIT_ATTACK_BEGIN, GameEventType.UNIT, this, m_TriggeredAbility));
+                }
+            }
+            m_CurrentTime += Time.deltaTime;
+
+
+            ///Start executing ability
+            if(m_CurrentTime > m_AttackWindup)
+            {
+                ///Execute ability event
+                if (m_TriggeredAbility != null)
+                {
+                    GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.UNIT_ATTACK_EXECUTE, GameEventType.UNIT, this, m_TriggeredAbility));
+                }
+                DebugUtils.Log("Unit is executing an ability");
+                m_Unit.ExecuteAbility();
+                if(m_TriggeredAbility.abilityType != AbilityType.CHANNELED)
+                {
+                    m_Motor.attackMotion = 0.0f;
+                    m_Motor.attackType = AttackType.NONE;
+                    if (m_TriggeredAbility != null)
+                    {
+                        GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.UNIT_ATTACK_FINISHED, GameEventType.UNIT, this, m_TriggeredAbility));
+                    }
+                }
+            }
+            else
+            {
+                m_Motor.attackMotion = 1.0f;
+                m_Motor.attackType = m_Unit.selectedAbility.attackType;
+            }
+        }
+        /// <summary>
+        /// Stops the attack and resets the timer.
+        /// </summary>
+        private void StopAttack()
+        {
+            if(m_CurrentTime < m_AttackWindup)
+            {
+                //Cancelled attack
+                if (m_TriggeredAbility != null)
+                {
+                    GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.UNIT_ATTACK_CANCELLED, GameEventType.UNIT, this, m_TriggeredAbility));
+                }
+            }
+            else
+            {
+                if (m_TriggeredAbility != null)
+                {
+                    if(m_TriggeredAbility.abilityType != AbilityType.CHANNELED)
+                    {
+                        GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.UNIT_ATTACK_STOPPED, GameEventType.UNIT, this, m_TriggeredAbility));
+                    }
+                    else
+                    {
+                        GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.UNIT_ATTACK_FINISHED, GameEventType.UNIT, this, m_TriggeredAbility));
+                    }
+                }
+            }
+            m_CurrentTime = 0.0f;
+            if(m_Motor != null)
+            {
+                m_Motor.attackMotion = 0.0f;
+                m_Motor.attackType = AttackType.NONE;
+            }
+            if(m_TriggeredAbility != null)
+            {
+                m_TriggeredAbility.EndExecute();
+            }
         }
     }
 }

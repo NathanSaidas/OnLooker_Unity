@@ -58,6 +58,8 @@ namespace Gem
         [SerializeField]
         private float m_Health = 0.0f;
         [SerializeField]
+        private float m_MaxResource = 0.0f;
+        [SerializeField]
         private float m_Resource = 0.0f;
         [SerializeField]
         private float m_MovementSpeed = 0.0f;
@@ -65,6 +67,19 @@ namespace Gem
         [SerializeField]
         private List<Ability> m_Abilities = new List<Ability>();
         private Ability m_SelectedAbility = null;
+
+        [SerializeField]
+        private Transform m_LeftHand = null;
+        [SerializeField]
+        private Transform m_RightHand = null;
+        [SerializeField]
+        private Transform m_Origin = null;
+        [SerializeField]
+        private Transform m_Head = null;
+        [SerializeField]
+        private Transform m_Torso = null;
+
+        UIAbilities m_AbilityHud = null;
 
         protected virtual void Start()
         {
@@ -79,7 +94,7 @@ namespace Gem
                 {
                     continue;
                 }
-                abilities.Add(Object.Instantiate(iter.Current) as Ability);
+                abilities.Add(Instantiate(iter.Current) as Ability);
             }
 
             m_Abilities = abilities;
@@ -114,6 +129,11 @@ namespace Gem
                 float deltaTime = Time.deltaTime;
                 iter.Current.UpdateAbility(deltaTime);
             }
+
+            if(isAlive)
+            {
+                RestoreResource(UnitResourceType.RESOURCE, 0.05f);
+            }
         }
 
         public void ReceiveOrder(UnitOrderParams aParams)
@@ -145,6 +165,29 @@ namespace Gem
             if (m_Health > m_MaxHealth)
             {
                 m_Health = m_MaxHealth;
+            }
+        }
+        public void UseResource(UnitResourceType aType, float aAmount)
+        {
+            switch(aType)
+            {
+                case UnitResourceType.HEALTH:
+                    ReceiveDamage(aAmount);
+                    break;
+                case UnitResourceType.RESOURCE:
+                    m_Resource -= aAmount;
+                    m_Resource = Mathf.Clamp(m_Resource, 0.0f, m_MaxResource);
+                    break;
+            }
+        }
+        public void RestoreResource(UnitResourceType aType, float aAmount)
+        {
+            switch (aType)
+            {
+                case UnitResourceType.RESOURCE:
+                    m_Resource += aAmount;
+                    m_Resource = Mathf.Clamp(m_Resource, 0.0f, m_MaxResource);
+                    break;
             }
         }
         public void Revive()
@@ -219,8 +262,16 @@ namespace Gem
                         continue;
                     }
                     m_SelectedAbility = ability;
+                    if (m_AbilityHud != null)
+                    {
+                        m_AbilityHud.SelectAbility(m_SelectedAbility);
+                    }
                     return;
                 }
+            }
+            else if(m_Abilities.Count > 0)
+            {
+                m_SelectedAbility = m_Abilities[0];
             }
         }
         public void PreviousAbility(bool aCheckCooldown)
@@ -243,8 +294,16 @@ namespace Gem
                         continue;
                     }
                     m_SelectedAbility = ability;
+                    if (m_AbilityHud != null)
+                    {
+                        m_AbilityHud.SelectAbility(m_SelectedAbility);
+                    }
                     return;
                 }
+            }
+            else if (m_Abilities.Count > 0)
+            {
+                m_SelectedAbility = m_Abilities[0];
             }
         }
         public void SelectAbility(int aIndex)
@@ -252,6 +311,10 @@ namespace Gem
             if(aIndex >= 0 && aIndex < m_Abilities.Count)
             {
                 m_SelectedAbility = m_Abilities[aIndex];
+                if (m_AbilityHud != null)
+                {
+                    m_AbilityHud.SelectAbility(m_SelectedAbility);
+                }
             }
         }
         public void SelectAbility(string aName)
@@ -266,6 +329,10 @@ namespace Gem
                 if (iter.Current.abilityName == aName)
                 {
                     m_SelectedAbility = iter.Current;
+                    if (m_AbilityHud != null)
+                    {
+                        m_AbilityHud.SelectAbility(m_SelectedAbility);
+                    }
                     return;
                 }
             }
@@ -282,6 +349,10 @@ namespace Gem
                 if(iter.Current.abilityType == aType)
                 {
                     m_SelectedAbility = iter.Current;
+                    if(m_AbilityHud != null)
+                    {
+                        m_AbilityHud.SelectAbility(m_SelectedAbility);
+                    }
                     return;
                 }
             }
@@ -292,7 +363,14 @@ namespace Gem
         {
             if(m_SelectedAbility != null && m_SelectedAbility.isOnCooldown == false)
             {
-                m_SelectedAbility.Execute();
+                if(m_SelectedAbility.CheckResource())
+                {
+                    m_SelectedAbility.Execute();
+                }
+                else
+                {
+                    DebugUtils.Log("Not enough resource");
+                }
             }
         }
         public void ExecuteAbilityIgnoreCooldown()
@@ -305,8 +383,26 @@ namespace Gem
             
         public void AddAbility(Ability aAbility)
         {
+            if(aAbility == null)
+            {
+                return;
+            }
+            if ( m_Abilities.Any(Elemenet => Elemenet.abilityName == aAbility.abilityName))
+            {
+                DebugUtils.LogWarning("Unit " + unitName + " already knows " + aAbility.abilityName);
+                return;
+            }
+            aAbility = Instantiate(aAbility) as Ability;
             m_Abilities.Add(aAbility);
             UpdateAbilityReferences();
+            if(m_Abilities.Count > 0 && m_SelectedAbility == null)
+            {
+                m_SelectedAbility = m_Abilities[0];
+                if(m_AbilityHud != null)
+                {
+                    m_AbilityHud.SelectAbility(m_SelectedAbility);
+                }
+            }
         }
         public void RemoveAbility(AbilityType aType)
         {
@@ -319,6 +415,17 @@ namespace Gem
                 }
                 if(aType == iter.Current.abilityType)
                 {
+                    if(iter.Current == m_SelectedAbility)
+                    {
+                        if(m_Abilities.Count == 1)
+                        {
+                            m_SelectedAbility = null;
+                        }
+                        else
+                        {
+                            NextAbility(false);
+                        }
+                    }
                     m_Abilities.Remove(iter.Current);
                     break;
                 }
@@ -333,6 +440,7 @@ namespace Gem
                 m_Abilities[i].previous = m_Abilities[i - 1];
                 m_Abilities[i - 1].next = m_Abilities[i];
                 m_Abilities[i].owner = this;
+                m_Abilities[i].UpdateReference();
             }
 
             if (m_Abilities.Count > 0)
@@ -340,6 +448,7 @@ namespace Gem
                 m_Abilities[0].owner = this;
                 m_Abilities[0].previous = m_Abilities[m_Abilities.Count - 1];
                 m_Abilities[m_Abilities.Count - 1].next = m_Abilities[0];
+                m_Abilities[0].UpdateReference();
             }
 
         }
@@ -378,6 +487,11 @@ namespace Gem
             get { return m_MaxHealth; }
             set { m_MaxHealth = value; }
         }
+        public float maxResource
+        {
+            get { return m_MaxResource; }
+            set { m_MaxResource = value; }
+        }
         public float health
         {
             get { return m_Health; }
@@ -398,8 +512,32 @@ namespace Gem
             get { return m_SelectedAbility; }
             set { m_SelectedAbility = value; }
         }
+        public UIAbilities abilityHud
+        {
+            get { return m_AbilityHud; }
+            set { m_AbilityHud = value; }
+        }
 
-        
+        public Transform leftHand
+        {
+            get { return m_LeftHand; }
+        }
+        public Transform rightHand
+        {
+            get { return m_RightHand; }
+        }
+        public Transform origin
+        {
+            get { return m_Origin; }
+        }
+        public Transform head
+        {
+            get { return m_Head; }
+        }
+        public Transform torso
+        {
+            get { return m_Torso; }
+        }
         
     }
 }

@@ -73,6 +73,13 @@ namespace Gem
         [SerializeField]
         private UIType m_UIType = UIType.IMAGE;
 
+        [HideInInspector]
+        [SerializeField]
+        private Vector3 m_Position = Vector3.zero;
+#if UNITY_EDITOR
+        [SerializeField]
+        private Camera m_PositionCamera = null;
+#endif
         #endregion
         /// <summary>
         /// Searches for an event listener in sibling / children heirarchy.
@@ -129,7 +136,75 @@ namespace Gem
                         gameObject.layer = UIManager.UI_3D_LAYER;
                         break;
                 }
+                SetPosition(m_Position);
             }
+        }
+
+        /// <summary>
+        /// Sets the position of the UI Element based on 0-1 view space.
+        /// </summary>
+        /// <param name="aPosition"></param>
+        public void SetPosition(Vector3 aPosition)
+        {
+            m_Position = aPosition;
+#if UNITY_EDITOR
+            if(Application.isPlaying)
+            {
+                switch (m_UISpace)
+                {
+                    case UISpace.TWO_DIMENSIONAL:
+                        if (UIManager.camera2D != null)
+                        {
+                            transform.position = UIManager.camera2D.ViewportToWorldPoint(aPosition);
+                        }
+                        break;
+                    case UISpace.THREE_DIMENSIONAL:
+                        if (UIManager.camera3D != null)
+                        {
+                            transform.position = UIManager.camera3D.ViewportToWorldPoint(aPosition);
+                        }
+                        break;
+                    case UISpace.WORLD:
+                        transform.position = aPosition;
+                        break;
+                }
+            }
+            else if(m_PositionCamera != null)
+            {
+                switch (m_UISpace)
+                {
+                    case UISpace.TWO_DIMENSIONAL:
+                        transform.position = m_PositionCamera.ViewportToWorldPoint(aPosition);
+                        break;
+                    case UISpace.THREE_DIMENSIONAL:
+                        transform.position = m_PositionCamera.ViewportToWorldPoint(aPosition);
+                        break;
+                    case UISpace.WORLD:
+                        transform.position = aPosition;
+                        break;
+                }
+            }
+#else
+            switch(m_UISpace)
+            {
+                case UISpace.TWO_DIMENSIONAL:
+                    if(UIManager.camera2D != null)
+                    {
+                        transform.position = UIManager.camera2D.ViewportToWorldPoint(aPosition);
+                    }
+                    break;
+                case UISpace.THREE_DIMENSIONAL:
+                    if(UIManager.camera3D != null)
+                    {
+                        transform.position = UIManager.camera3D.ViewportToWorldPoint(aPosition);
+                    }
+                    break;
+                case UISpace.WORLD:
+                    transform.position = aPosition;
+                    break;
+            }
+#endif
+
         }
 
         #region PROPERTIES
@@ -217,6 +292,11 @@ namespace Gem
         {
             get { return m_EventListener; }
             set { m_EventListener = value; }
+        }
+        public Vector3 viewPosition
+        {
+            get { return m_Position; }
+            set { m_Position = value; }
         }
         #endregion
 

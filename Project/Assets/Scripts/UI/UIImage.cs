@@ -174,6 +174,10 @@ namespace Gem
         /// </summary>
         public void SetColor()
         {
+            if(m_Material == null)
+            {
+                GenerateMaterial();
+            }
             m_Material.SetColor("_Color", m_Color);
         }
         /// <summary>

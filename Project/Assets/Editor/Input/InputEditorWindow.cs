@@ -24,9 +24,9 @@ namespace Gem
         public const string EDITOR_INSTRUCTIONS_B = "It appears there is already a InputManager in the scene. Would you like to use that one instead?";
         public const string YES = "yes";
         public const string NO = "no";
-        public const string SETUP = "setup";
-        public const string SAVE = "save";
-        public const string HIDE_ALL = "hide all";
+        public const string SETUP = "Setup";
+        public const string SAVE = "Save";
+        public const string HIDE_ALL = "Hide all";
         public const string DEFAULT = "Default";
         public const string LOAD = "Load";
         public const string SHOW_ALL = "Show All";
@@ -109,7 +109,7 @@ namespace Gem
         private bool m_StartPressed = false;
         private bool m_YesPressed = false;
         private bool m_NoPressed = false;
-
+        private bool m_Repaint = false;
         private Vector2 m_ScrollPosition = Vector2.zero;
         private string m_AxisName = string.Empty;
 
@@ -117,7 +117,11 @@ namespace Gem
 
         private void OnInspectorUpdate()
         {
-
+            if(m_Repaint == true)
+            {
+                Repaint();
+                m_Repaint = false;
+            }
 
 
             if (m_State == State.INIT)
@@ -215,6 +219,7 @@ namespace Gem
                 if (GUILayout.Button(START) && m_Root != null)
                 {
                     m_StartPressed = true;
+                    m_Repaint = true;
                 }
                 GUI.enabled = true;
             }
@@ -235,6 +240,11 @@ namespace Gem
             else if (m_State == State.SETUP)
             {
                 drawSetupWindow();
+            }
+
+            if(GUI.changed && m_InputManager != null)
+            {
+                EditorUtility.SetDirty(m_InputManager);
             }
         }
 
@@ -306,7 +316,7 @@ namespace Gem
 
             EditorGUILayout.EndScrollView();
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button(CLEAR))
+            if (GUILayout.Button(CREATE))
             {
                 m_InputManager.createInputAxis(m_AxisName);
                 m_AxisName = string.Empty;

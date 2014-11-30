@@ -57,6 +57,11 @@ namespace Gem
                 case GameEventID.UNIT_KILLED:
                 case GameEventID.UNIT_REVIVED:
                 case GameEventID.UNIT_SPAWNED:
+                case GameEventID.UNIT_ATTACK_BEGIN:
+                case GameEventID.UNIT_ATTACK_CANCELLED:
+                case GameEventID.UNIT_ATTACK_EXECUTE:
+                case GameEventID.UNIT_ATTACK_FINISHED:
+                case GameEventID.UNIT_ATTACK_STOPPED:
                     if (m_UnitEventsRegistered == 0)
                     {
                         GameEventManager.RegisterEventListener(GameEventType.UNIT, this);
@@ -105,6 +110,11 @@ namespace Gem
                 case GameEventID.UNIT_KILLED:
                 case GameEventID.UNIT_REVIVED:
                 case GameEventID.UNIT_SPAWNED:
+                case GameEventID.UNIT_ATTACK_BEGIN:
+                case GameEventID.UNIT_ATTACK_CANCELLED:
+                case GameEventID.UNIT_ATTACK_EXECUTE:
+                case GameEventID.UNIT_ATTACK_FINISHED:
+                case GameEventID.UNIT_ATTACK_STOPPED:
                     if(m_GameEventsRegistered == 1)
                     {
                         GameEventManager.UnregisterEventListener(GameEventType.UNIT, this);

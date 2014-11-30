@@ -28,9 +28,9 @@ namespace Gem
 
         public static float GetAxis(string aName)
         {
-            return getAxis(aName, InputPlayer.ANY);
+            return GetAxis(aName, InputPlayer.ANY);
         }
-        public static float getAxis(string aName, InputPlayer aPlayer)
+        public static float GetAxis(string aName, InputPlayer aPlayer)
         {
             if (instance == null)
             {
@@ -41,9 +41,9 @@ namespace Gem
         }
         public static bool GetButton(string aName)
         {
-            return getButton(aName, InputPlayer.ANY);
+            return GetButton(aName, InputPlayer.ANY);
         }
-        public static bool getButton(string aName, InputPlayer aPlayer)
+        public static bool GetButton(string aName, InputPlayer aPlayer)
         {
             if (instance == null)
             {
@@ -52,11 +52,11 @@ namespace Gem
             }
             return instance.internal_GetButton(aName, aPlayer);
         }
-        public static bool getButtonDown(string aName)
+        public static bool GetButtonDown(string aName)
         {
-            return getButtonDown(aName, InputPlayer.ANY);
+            return GetButtonDown(aName, InputPlayer.ANY);
         }
-        public static bool getButtonDown(string aName, InputPlayer aPlayer)
+        public static bool GetButtonDown(string aName, InputPlayer aPlayer)
         {
             if (instance == null)
             {
@@ -65,11 +65,11 @@ namespace Gem
             }
             return instance.internal_GetButtonDown(aName, aPlayer);
         }
-        public static bool getButtonUp(string aName)
+        public static bool GetButtonUp(string aName)
         {
-            return getButtonUp(aName, InputPlayer.ANY);
+            return GetButtonUp(aName, InputPlayer.ANY);
         }
-        public static bool getButtonUp(string aName, InputPlayer aPlayer)
+        public static bool GetButtonUp(string aName, InputPlayer aPlayer)
         {
             if (instance == null)
             {
@@ -78,7 +78,7 @@ namespace Gem
             }
             return instance.internal_GetButtonUp(aName, aPlayer);
         }
-        public static void save(string aUser)
+        public static void Save(string aUser)
         {
             if (instance == null)
             {
@@ -87,7 +87,7 @@ namespace Gem
             }
             instance.internal_SaveUser(aUser);
         }
-        public static void load(string aUser)
+        public static void Load(string aUser)
         {
             if (instance == null)
             {
@@ -96,7 +96,7 @@ namespace Gem
             }
             instance.internal_LoadUser(aUser);
         }
-        public static void save(FileData aFile)
+        public static void Save(FileData aFile)
         {
             if (instance == null)
             {
@@ -105,7 +105,7 @@ namespace Gem
             }
             instance.internal_SaveUser(aFile);
         }
-        public static void load(FileData aFile)
+        public static void Load(FileData aFile)
         {
             if (instance == null)
             {

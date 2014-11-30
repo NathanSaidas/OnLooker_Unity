@@ -14,7 +14,7 @@ namespace Gem
         {
             Instantiate(m_PlayerPrefab, transform.position, transform.rotation);
             GameObject go = (GameObject)Instantiate(m_PlayerUI, transform.position, transform.rotation);
-            UIHealthBar healthBar = go.GetComponent<UIHealthBar>();
+            UIBar healthBar = go.GetComponent<UIBar>();
         }
 
 

@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Gem
 {
@@ -12,6 +14,7 @@ namespace Gem
         private int m_AttackSwordID = 0;
         private int m_AttackWandID = 0;
         private int m_AttackMotionID = 0;
+        private int m_AttackGunID = 0;
 
 
         private const string ANIMATION_FORWARD = "pForwardSpeed";
@@ -20,6 +23,7 @@ namespace Gem
         private const string ANIMATION_ATTACK_SWORD = "pAttackSword";
         private const string ANIMATION_ATTACK_WAND = "pAttackWand";
         private const string ANIMATION_ATTACK_MOTION = "pAttackMotion";
+        private const string ANIMATION_ATTACK_GUN = "pAttackGun";
         #endregion
         /// <summary>
         /// The characters camera
@@ -112,6 +116,8 @@ namespace Gem
         private Vector3 m_NetExternalForce = Vector3.zero;
         [SerializeField]
         private float m_Mass = 1.0f;
+        [SerializeField]
+        private List<string> m_AcceptedForceTags = new List<string>();
 
         //Springs
         [SerializeField]
@@ -146,6 +152,7 @@ namespace Gem
                 m_AttackSwordID = Animator.StringToHash(ANIMATION_ATTACK_SWORD);
                 m_AttackWandID = Animator.StringToHash(ANIMATION_ATTACK_WAND);
                 m_AttackMotionID = Animator.StringToHash(ANIMATION_ATTACK_MOTION);
+                m_AttackGunID = Animator.StringToHash(ANIMATION_ATTACK_GUN);
             }
 
             Camera gameplayCamera = Game.gameplayCamera;
@@ -163,11 +170,11 @@ namespace Gem
         {
             CheckGrounded();
 
-            Vector3 movementDirection = new Vector3(InputManager.GetAxis("Side"), 0.0f, InputManager.GetAxis("Forward"));
+            Vector3 movementDirection = new Vector3(InputManager.GetAxis(GameConstants.INPUT_MOVE_HORIZONTAL), 0.0f, InputManager.GetAxis(GameConstants.INPUT_MOVE_VERTICAL));
             movementDirection.Normalize();
 
-            bool isJumping = InputManager.GetButton("Jump");
-            bool isAttacking = Input.GetMouseButtonDown(0);
+            bool isJumping = InputManager.GetButton(GameConstants.INPUT_JUMP);
+            bool isAttacking = InputManager.GetButtonDown(GameConstants.INPUT_ATTACK);
             bool isOnGround = m_CharacterController.isGrounded || m_GroundDistance < m_OnGroundThreshholdDistance;
 
             if(isOnGround)
@@ -248,7 +255,7 @@ namespace Gem
 
                     m_Velocity += accelerationThisFrame * forceDir;
 
-                    if(aInfo.collider.rigidbody != null)
+                    if(aInfo.collider.rigidbody != null && m_AcceptedForceTags.Any(Element => Element ==  aInfo.collider.tag ))
                     {
                         Vector3 forcePoint = contactPoint;
                         forcePoint.y = collider.transform.position.y;
@@ -499,16 +506,25 @@ namespace Gem
                     m_Animator.SetBool(m_IsAttackingID, false);
                     m_Animator.SetBool(m_AttackSwordID, false);
                     m_Animator.SetBool(m_AttackWandID, false);
+                    m_Animator.SetBool(m_AttackGunID, false);
                     break;
                 case AttackType.SWORD:
                     m_Animator.SetBool(m_IsAttackingID, true);
                     m_Animator.SetBool(m_AttackSwordID, true);
                     m_Animator.SetBool(m_AttackWandID, false);
+                    m_Animator.SetBool(m_AttackGunID, false);
                     break;
                 case AttackType.WAND:
                     m_Animator.SetBool(m_IsAttackingID, true);
                     m_Animator.SetBool(m_AttackSwordID, false);
                     m_Animator.SetBool(m_AttackWandID, true);
+                    m_Animator.SetBool(m_AttackGunID, false);
+                    break;
+                case AttackType.GUN:
+                    m_Animator.SetBool(m_IsAttackingID, true);
+                    m_Animator.SetBool(m_AttackSwordID, false);
+                    m_Animator.SetBool(m_AttackWandID, false);
+                    m_Animator.SetBool(m_AttackGunID, true);
                     break;
             }
         }

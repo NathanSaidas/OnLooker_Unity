@@ -30,6 +30,8 @@ namespace Gem
                 return;
             }
 
+            inspected.SetPosition(EditorGUILayout.Vector3Field("Position", inspected.viewPosition));
+
             switch(inspected.uiType)
             {
                 case UIType.IMAGE:

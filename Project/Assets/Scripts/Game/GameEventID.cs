@@ -58,6 +58,26 @@
         /// A unit was killed
         /// </summary>
         UNIT_KILLED,
+        /// <summary>
+        /// A unit has begin their attack
+        /// </summary>
+        UNIT_ATTACK_BEGIN,
+        /// <summary>
+        /// A unit has began executing an ability
+        /// </summary>
+        UNIT_ATTACK_EXECUTE,
+        /// <summary>
+        /// A unit has stopped executing a ability by choice
+        /// </summary>
+        UNIT_ATTACK_STOPPED,
+        /// <summary>
+        /// A unit has finished executing their ability
+        /// </summary>
+        UNIT_ATTACK_FINISHED,
+        /// <summary>
+        /// A unit has cancelled their ability
+        /// </summary>
+        UNIT_ATTACK_CANCELLED,
         
         /// <summary>
         /// Area trigger was triggered.
