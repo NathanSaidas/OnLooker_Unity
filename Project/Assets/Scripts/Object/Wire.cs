@@ -116,6 +116,19 @@ namespace Gem
                 next.FlowCurrent(aCurrent * 0.95f,aLength);
             }
         }
+        public void EndFlow(int aLength)
+        {
+            if(aLength <= 0)
+            {
+                return;
+            }
+            m_CurrentFlow = 0.0f;
+            aLength--;
+            if(next != null && next != this)
+            {
+                next.EndFlow(aLength);
+            }
+        }
 
         public Wire next
         {

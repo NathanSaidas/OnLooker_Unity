@@ -36,6 +36,7 @@ namespace Gem
             {
                 m_Renderers.Add(meshRenderer);
             }
+            SetRendererColor();
         }
 
         void Update()
@@ -44,12 +45,20 @@ namespace Gem
             {
                 m_Connection.FlowCurrent(m_Current, m_FlowLength);
             }
+            
         }
 
 
         public override void OnUse()
         {
-            m_IsActive = !m_IsActive;
+            if(m_IsActive)
+            {
+                SetInactive();
+            }
+            else
+            {
+                SetActive();
+            }
         }
         
 
@@ -75,7 +84,7 @@ namespace Gem
                     {
                         continue;
                     }
-                    renderers.Current.material.color = m_ActiveColor;
+                    renderers.Current.material.color = m_InactiveColor;
                 }
             }
         }
@@ -89,6 +98,10 @@ namespace Gem
         {
             m_IsActive = false;
             SetRendererColor();
+            if(m_Connection != null)
+            {
+                m_Connection.EndFlow(m_FlowLength);
+            }
         }
 
         public bool isActive
