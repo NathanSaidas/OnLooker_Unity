@@ -51,6 +51,7 @@ namespace Gem
 
         public override void OnUse()
         {
+            GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_TERMINAL_USE, GameEventType.GAME, this, user));
             if(m_IsActive)
             {
                 SetInactive();
@@ -93,6 +94,7 @@ namespace Gem
         {
             m_IsActive = true;
             SetRendererColor();
+            GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_TERMINAL_ON, GameEventType.GAME, this, user));
         }
         public void SetInactive()
         {
@@ -102,6 +104,7 @@ namespace Gem
             {
                 m_Connection.EndFlow(m_FlowLength);
             }
+            GameEventManager.InvokeEvent(new GameEventData(Time.time, GameEventID.GAME_TERMINAL_OFF, GameEventType.GAME, this, user));
         }
 
         public bool isActive

@@ -217,11 +217,12 @@ namespace Gem
         /// <param name="aInfo"></param>
         public void OnCollisionStay(Collision aInfo)
         {
+            
             if(aInfo.collider.gameObject.layer != Game.LAYER_SURFACE)
             {
                 return;
             }
-
+            Debug.Log("Collision");
             CapsuleCollider capsuleCollider = (CapsuleCollider)collisionHandler.collider;
 
             Vector3 contactPoint = aInfo.contacts[0].point;
@@ -257,6 +258,7 @@ namespace Gem
 
                     if(aInfo.collider.rigidbody != null && m_AcceptedForceTags.Any(Element => Element ==  aInfo.collider.tag ))
                     {
+                        Debug.Log("Adding Force To");
                         Vector3 forcePoint = contactPoint;
                         forcePoint.y = collider.transform.position.y;
                         aInfo.collider.rigidbody.AddForceAtPosition(-(m_PushForceAmount + forceAmount) * forceDir,forcePoint);

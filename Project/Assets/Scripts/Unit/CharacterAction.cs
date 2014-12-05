@@ -95,10 +95,9 @@ namespace Gem
 
             if(InputManager.GetButtonDown(GameConstants.INPUT_INTERACT))
             {
-                Debug.Log("Do something...");
                 if(m_InteractiveObjects.Count == 1)
                 {
-                    m_InteractiveObjects[0].OnUse();
+                    m_InteractiveObjects[0].Use(this);
                 }
             }
 

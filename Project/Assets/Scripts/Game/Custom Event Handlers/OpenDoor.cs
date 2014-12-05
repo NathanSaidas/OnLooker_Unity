@@ -40,8 +40,8 @@ namespace Gem
         /// The item needed to open the door. This can be empty to not require any items.
         /// </summary>
         [SerializeField]
-        string m_RequiredItemName = string.Empty;
-
+        //string m_RequiredItemName = string.Empty;
+        private ItemType m_RequiredItem = ItemType.NONE;
         [SerializeField]
         bool m_RequirePower = false;
 
@@ -91,9 +91,9 @@ namespace Gem
                 UnitInventory inventory = unit.inventory;
                 if(trigger.triggerName == m_DoorName)
                 {
-                    if(m_RequiredItemName.Length > 0)
+                    if(m_RequiredItem != ItemType.NONE)
                     {
-                        if(inventory != null && inventory.GetItem(m_RequiredItemName) != null)
+                        if (inventory != null && inventory.GetItem(m_RequiredItem) != null)
                         {
                             Open();
                         }

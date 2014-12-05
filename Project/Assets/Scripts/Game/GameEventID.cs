@@ -87,6 +87,13 @@
         /// Area trigger has stopped being triggered.
         /// </summary>
         TRIGGER_AREA_EXIT,
+        
+        GAME_TERMINAL_USE,
+        GAME_TERMINAL_ON,
+        GAME_TERMINAL_OFF,
+        UNIT_LEARN_ABILITY,
+        GAME_DOOR_OPEN,
+        GAME_DOOR_CLOSE,
 
     }
 }

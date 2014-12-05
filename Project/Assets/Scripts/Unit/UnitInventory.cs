@@ -217,5 +217,10 @@ namespace Gem
                 AddItem(ItemDatabase.QueryItem(type));
             }
         }
+
+        public bool isFull
+        {
+            get { return m_Items.Count >= m_MaxItemCount; }
+        }
     }
 }

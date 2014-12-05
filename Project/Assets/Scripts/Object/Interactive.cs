@@ -11,14 +11,18 @@ namespace Gem
         private bool m_OneShot = true;
 
         private bool m_InUse = false;
-        public void Use()
+        private CharacterAction m_User = null;
+
+        public void Use(CharacterAction aActor)
         {
             if(m_OneShot)
             {
+                m_User = aActor;
                 OnUse();
             }
             else if(m_UseTime <= 0.0f)
             {
+                m_User = aActor;
                 m_InUse = true;
                 OnUse();
             }
@@ -90,6 +94,10 @@ namespace Gem
         {
             get { return m_InUse; }
             set { m_InUse = value; }
+        }
+        public CharacterAction user
+        {
+            get { return m_User; }
         }
     }
 
