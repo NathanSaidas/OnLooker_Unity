@@ -52,12 +52,12 @@ public class LightningBolt : MonoBehaviour
 		
 		particleEmitter.particles = m_Particles;
 		
-		if (particleEmitter.particleCount >= 2)
+		if (particleEmitter.particleCount >= 30)
 		{
 			if (m_StartLight)
 				m_StartLight.transform.position = m_Particles[0].position;
 			if (m_EndLight)
-				m_EndLight.transform.position = m_Particles[m_Particles.Length - 1].position;
+				m_EndLight.transform.position = m_Particles[m_Particles.Length - 29].position;
 		}
 	}	
 }

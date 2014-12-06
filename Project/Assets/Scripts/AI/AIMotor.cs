@@ -153,7 +153,7 @@ namespace Gem
                 }
                 else
                 {
-                    m_Animator.SetFloat(m_ForwardID, m_CurrentSpeed * 2.0f);
+                    m_Animator.SetFloat(m_ForwardID, m_CurrentSpeed * 3.0f);
                 }
                 switch (m_AttackType)
                 {

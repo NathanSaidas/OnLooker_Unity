@@ -14,6 +14,28 @@ namespace Gem
     /// </summary>
     public class UIToggle : MonoBehaviour
     {
+#if UNITY_EDITOR
+        [UnityEditor.MenuItem("CONTEXT/UIToggle/Update Components")]
+        private static void OnUpdateComponents(UnityEditor.MenuCommand aCommand)
+        {
+            UIToggle context = aCommand.context as UIToggle;
+            UIImage image = context.GetComponentInChildren<UIImage>();
+            if(image != null)
+            {
+                image.GenerateMaterial();
+                image.GenerateMesh();
+                image.SetTexture();
+                image.SetColor();
+            }
+            UILabel label = context.GetComponentInChildren<UILabel>();
+            if(label != null)
+            {
+                label.UpdateComponents();
+            }
+            
+        }
+#endif
+
         #region FIELDS
         bool m_HasMouseOver = false;
         bool m_IsSelected = false;

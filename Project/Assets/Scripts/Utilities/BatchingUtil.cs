@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -49,7 +50,9 @@ namespace Gem
         // Use this for initialization
         void Start()
         {
-            StaticBatchingUtility.Combine(m_Targets, m_Root);
+            List<GameObject> objs = m_Targets.ToList();
+            objs.RemoveAll(Element => Element == null);
+            StaticBatchingUtility.Combine(objs.ToArray(), m_Root);
         }
     }
 }
