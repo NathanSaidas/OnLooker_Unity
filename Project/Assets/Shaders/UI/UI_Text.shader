@@ -16,7 +16,7 @@
 		"IgnoreProjector" = "True" 
 		"RenderType"="Transparent" }
 		
-		Lighting Off Cull Off ZWrite Off Fog {Mode Off}
+		Lighting Off Cull Back ZWrite Off Fog {Mode Off}
 		Blend SrcAlpha OneMinusSrcAlpha
 		
 		Tags { 

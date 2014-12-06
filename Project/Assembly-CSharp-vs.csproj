@@ -82,6 +82,7 @@
      <Compile Include="Assets\Scripts\Game\Custom Event Handlers\LoadNextLevel.cs" />
      <Compile Include="Assets\Scripts\Game\Custom Event Handlers\OpenDoor.cs" />
      <Compile Include="Assets\Scripts\Game\Custom Event Handlers\PickUpKey.cs" />
+     <Compile Include="Assets\Scripts\Game\Custom Event Handlers\PlayerDeath.cs" />
      <Compile Include="Assets\Scripts\Game\Game.cs" />
      <Compile Include="Assets\Scripts\Game\GameConstants.cs" />
      <Compile Include="Assets\Scripts\Game\GameEventData.cs" />
@@ -141,6 +142,7 @@
      <Compile Include="Assets\Scripts\UI\UIToggleParams.cs" />
      <Compile Include="Assets\Scripts\UI\UIType.cs" />
      <Compile Include="Assets\Scripts\UI\UIUtilities.cs" />
+     <Compile Include="Assets\Scripts\Unit\AIFactory.cs" />
      <Compile Include="Assets\Scripts\Unit\Abilities\Gravity.cs" />
      <Compile Include="Assets\Scripts\Unit\Abilities\PowerSurge.cs" />
      <Compile Include="Assets\Scripts\Unit\Ability.cs" />
@@ -193,6 +195,7 @@
      <Compile Include="Assets\Scripts\Utilities\UniqueNumberGenerator.cs" />
      <Compile Include="Assets\Scripts\Utilities\Utilities.cs" />
      <None Include="Assets\Shaders\TerrBumpFirstPass.shader" />
+     <None Include="Assets\Dark Future\ReadMe.txt" />
      <None Include="Assets\Shaders\ReflectiveDiffuseSpecTransp.shader" />
      <None Include="Assets\Textures\Font\bigmacca license.txt" />
      <None Include="Assets\Standard Assets\Particles\Sources\Shaders\Particle Alpha Blend (Queue +100).shader" />
@@ -208,6 +211,7 @@
      <None Include="Assets\Shaders\Metals\Robot_Metal_Shader.shader" />
      <None Include="Assets\Shaders\Text.shader" />
      <None Include="Assets\Shaders\TerrBumpAddPass.shader" />
+     <None Include="Assets\Sci-Fi Music Pack\License.txt" />
      <None Include="Assets\Shaders\UI\UI_Unlit.shader" />
      <None Include="Assets\Shaders\UI\UI_Text.shader" />
      <None Include="Assets\Shaders\Unlit_Tint.shader" />

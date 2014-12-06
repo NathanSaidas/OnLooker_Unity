@@ -61,10 +61,13 @@ namespace Gem
         /// The AI motor driving the behaviours / movement
         /// </summary>
         private AIMotor m_AIMotor = null;
-        
+
+
+        private Unit m_Unit = null;
         protected virtual void Start()
         {
             m_AIMotor = GetComponent<AIMotor>();
+            m_Unit = GetComponent<Unit>();
         }
 
         /// <summary>
@@ -74,11 +77,13 @@ namespace Gem
         {
             if(m_Target != null && m_TargetAquiredBehaviour != null)
             {
+                Game.CanSee(m_Unit);
                 m_TargetAquiredBehaviour.target = m_Target.transform;
                 m_AIMotor.aiBehaviour = m_TargetAquiredBehaviour;
             }
             else
             {
+                Game.CantSee(m_Unit);
                 m_AIMotor.aiBehaviour = m_DefaultBehaviour;
             }
         }

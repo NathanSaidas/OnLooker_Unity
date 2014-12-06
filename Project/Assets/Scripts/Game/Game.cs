@@ -209,6 +209,22 @@ namespace Gem
 
         [SerializeField]
         private UIToggle m_InteractToggle = null;
+        //[SerializeField]
+        //private AudioClip m_NormalSound = null;
+        //[SerializeField]
+        //private AudioClip m_PanicSound = null;
+
+        [SerializeField]
+        private AudioSource m_SourceA = null;
+        [SerializeField]
+        private AudioSource m_SourceB = null;
+
+        [SerializeField]
+        private float m_FadeSpeedA = 1.0f;
+        [SerializeField]
+        private float m_FadeSpeedB = 1.0f;
+
+        List<Unit> m_UnitsCanSee = new List<Unit>();
         #endregion
         /// <summary>
         /// Initialize the game manager.
@@ -244,6 +260,53 @@ namespace Gem
             {
                 Screen.lockCursor = true;
             }
+
+            if(m_SourceA != null && m_SourceB != null)
+            {
+                if(!inPanic)
+                {
+                    if(!m_SourceA.isPlaying)
+                    {
+                        m_SourceA.Play();
+                    }
+                    m_SourceA.volume = Mathf.Clamp01(m_SourceA.volume += Time.deltaTime * m_FadeSpeedA);
+                    m_SourceB.volume = Mathf.Clamp01(m_SourceB.volume -= Time.deltaTime * m_FadeSpeedA);
+                    if(m_SourceB.volume == 0.0f)
+                    {
+                        m_SourceB.Stop();
+                    }
+                }
+                else
+                {
+                    if (!m_SourceB.isPlaying)
+                    {
+                        m_SourceB.Play();
+                    }
+                    m_SourceB.volume = Mathf.Clamp01(m_SourceB.volume += Time.deltaTime * m_FadeSpeedB);
+                    m_SourceA.volume = Mathf.Clamp01(m_SourceA.volume -= Time.deltaTime * m_FadeSpeedB);
+                    if (m_SourceA.volume == 0.0f)
+                    {
+                        m_SourceA.Stop();
+                    }
+                }
+            }
+        }
+
+        bool inPanic
+        {
+            get { return m_UnitsCanSee.Count > 0; }
+        }
+
+        public static void CanSee(Unit aUnit)
+        {
+            if(!instance.m_UnitsCanSee.Contains(aUnit))
+            {
+                instance.m_UnitsCanSee.Add(aUnit);
+            }
+        }
+        public static void CantSee(Unit aUnit)
+        {
+            instance.m_UnitsCanSee.Remove(aUnit);
         }
 
         void OnLevelWasLoaded(int aIndex)
